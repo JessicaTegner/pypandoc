@@ -7,22 +7,49 @@ def convert(source, to, format=None, extra_args=()):
 
     Raises OSError if pandoc is not found! Make sure it has been installed and is available at path.
     '''
-    with open(source) as f:
-        source = f.read()
-        format = format or os.path.splitext(source)[1]
+    return _convert(_read_file, _process_file, source, to, format, extra_args)
 
-    format = {
+def _convert(reader, processor, source, to, format=None, extra_args=()):
+    source, format = reader(source, format)
+
+    formats = {
         'dbk': 'docbook',
         'md': 'markdown',
         'rest': 'rst',
         'tex': 'latex',
-    }.get(format, format)
+    }
+
+    format = formats.get(format, format)
+    to = formats.get(to, to)
 
     if not format:
-        raise RunTimeError('Missing format!')
+        raise RuntimeError('Missing format!')
 
+    from_formats = ('native', 'json', 'markdown', 'markdown+lhs', 'rst',
+        'rst+lhs', 'textile', 'html', 'latex', 'latex+lhs', )
+    if format not in from_formats:
+        raise RuntimeError('Invalid input format!')
+
+    to_formats = ('native', 'json', 'html', 'html+lhs', 's5', 'slidy',
+        'docbook', 'opendocument', 'latex', 'latex+lhs', 'context',
+        'texinfo', 'man', 'markdown', 'markdown+lhs', 'plain', 'rst',
+        'rst+lhs', 'mediawiki', 'textile', 'rtf', 'org', 'odt', 'epub', )
+    if to not in to_formats:
+        raise RuntimeError('Invalid to format!')
+
+    return processor(source, to, format, extra_args)
+
+def _read_file(source, format):
+    with open(source) as f:
+        source = f.read()
+        format = format or os.path.splitext(source)[1].strip('.')
+
+    return source, format
+
+def _process_file(source, to, format, extra_args):
     p = subprocess.Popen(['pandoc', '--from=' + format, '--to=' + to].extend(extra_args),
         stdin=subprocess.PIPE, stdout=subprocess.PIPE
-        )
+    )
+
     return p.communicate(source)[0]
 
