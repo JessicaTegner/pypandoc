@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pandoc import convert
+from pypandoc import convert
 
 __author__ = 'Juho Vepsäläinen'
 __version__ = '0.1.0'

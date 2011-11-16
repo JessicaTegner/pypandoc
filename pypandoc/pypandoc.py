@@ -41,15 +41,16 @@ def _convert(reader, processor, source, to, format=None, extra_args=()):
 
 def _read_file(source, format):
     with open(source) as f:
-        source = f.read()
         format = format or os.path.splitext(source)[1].strip('.')
+        source = f.read()
 
     return source, format
 
 def _process_file(source, to, format, extra_args):
-    p = subprocess.Popen(['pandoc', '--from=' + format, '--to=' + to].extend(extra_args),
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE
-    )
+    args = ['pandoc', '--from=' + format, '--to=' + to]
+    args.extend(extra_args)
+
+    p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
     return p.communicate(source)[0]
 
