@@ -11,7 +11,7 @@ pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/)
 
 The code infers pandoc `--from` format automatically based on given file extension unless one is provided explicitly. `extra_args` parameter makes it possible to access various pandoc options. Please refer to `pandoc -h` and the [official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
 
-See also [pypandoc](http://pypi.python.org/pypi/pyandoc/).
+See also [pyandoc](http://pypi.python.org/pypi/pyandoc/).
 
 ## License
 
