@@ -1,3 +1,5 @@
+from pypandoc import pypandoc
+
 def test_converter(to, format=None, extra_args=()):
     def reader(*args):
         return source, format
