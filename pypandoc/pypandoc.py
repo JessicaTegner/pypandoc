@@ -40,9 +40,10 @@ def _convert(reader, processor, source, to, format=None, extra_args=()):
     return processor(source, to, format, extra_args)
 
 def _read_file(source, format):
-    with open(source) as f:
-        format = format or os.path.splitext(source)[1].strip('.')
-        source = f.read()
+    if format is None:
+        with open(source) as f:
+            format = os.path.splitext(source)[1].strip('.')
+            source = f.read()
 
     return source, format
 
