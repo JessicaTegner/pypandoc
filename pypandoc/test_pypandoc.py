@@ -33,5 +33,10 @@ class TestPypandoc(unittest.TestCase):
         except RuntimeError:
             pass
 
+    def test_basic_conversion_from_string(self):
+        expected = 'some title\n==========\n\n'
+        received = pypandoc.convert('#some title', 'rst', format='md')
+        self.assertAlmostEqual(expected, received)
+
 suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
 unittest.TextTestRunner(verbosity=2).run(suite)
