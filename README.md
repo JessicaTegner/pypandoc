@@ -13,6 +13,10 @@ The code infers pandoc `--from` format automatically based on given file extensi
 
 See also [pyandoc](http://pypi.python.org/pypi/pyandoc/).
 
+## Contributors
+
+* [Valentin Haenel](https://github.com/esc) - String conversion fix
+
 ## License
 
 pypandoc is available under MIT license. See LICENSE for more details.
