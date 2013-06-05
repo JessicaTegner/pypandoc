@@ -12,7 +12,7 @@ except (IOError, OSError):
 
 module = pypandoc
 setup(
-    name = "pypandoc",
+    name = 'pypandoc',
     version = module.__version__,
     url = 'https://github.com/bebraw/pypandoc',
     license = 'MIT',
@@ -34,4 +34,5 @@ setup(
         'Topic :: Text Processing',
         'Topic :: Text Processing :: Filters',
     ],
+    test_suite = 'pypandoc'
 )
