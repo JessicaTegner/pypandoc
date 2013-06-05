@@ -45,6 +45,17 @@ class TestPypandoc(unittest.TestCase):
         received = pypandoc.convert(file_name, 'rst')
         self.assertAlmostEqual(expected, received)
 
+    def test_basic_conversion_from_file_with_format(self):
+        # This will not work on windows:
+        # http://docs.python.org/2/library/tempfile.html
+        test_file = tempfile.NamedTemporaryFile(suffix='.rst')
+        file_name = test_file.name
+        test_file.write('#some title\n')
+        test_file.flush()
+        expected = 'some title\n==========\n\n'
+        received = pypandoc.convert(file_name, 'rst', format='md')
+        self.assertAlmostEqual(expected, received)
+
     def test_basic_conversion_from_string(self):
         expected = 'some title\n==========\n\n'
         received = pypandoc.convert('#some title', 'rst', format='md')
