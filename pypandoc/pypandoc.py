@@ -25,17 +25,13 @@ def _convert(reader, processor, source, to, format=None, extra_args=()):
     if not format:
         raise RuntimeError('Missing format!')
 
-    from_formats = ('native', 'json', 'markdown', 'markdown+lhs', 'rst',
-        'rst+lhs', 'textile', 'html', 'latex', 'latex+lhs', )
-    if format not in from_formats:
-        raise RuntimeError('Invalid input format!')
+    from_formats, to_formats = get_pandoc_formats()
 
-    to_formats = ('native', 'json', 'html', 'html+lhs', 's5', 'slidy',
-        'docbook', 'opendocument', 'latex', 'latex+lhs', 'context',
-        'texinfo', 'man', 'markdown', 'markdown+lhs', 'plain', 'rst',
-        'rst+lhs', 'mediawiki', 'textile', 'rtf', 'org', 'odt', 'epub', )
+    if format not in from_formats:
+        raise RuntimeError('Invalid input format! Expected one of these: ' + ', '.join(from_formats))
+
     if to not in to_formats:
-        raise RuntimeError('Invalid to format!')
+        raise RuntimeError('Invalid to format! Expected one of these: ' + ', '.join(to_formats))
 
     return processor(source, to, format, extra_args)
 
@@ -55,3 +51,17 @@ def _process_file(source, to, format, extra_args):
 
     return p.communicate(source)[0]
 
+def get_pandoc_formats():
+    '''
+    Dynamic preprocessor for Pandoc formats.
+    Return 2 lists. "from_formats" and "to_formats".
+    ''' 
+    p = subprocess.Popen(['pandoc', '-h'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    help_text = p.communicate()[0].splitlines(False)
+    txt = ' '.join(help_text[1:help_text.index('Options:')])
+
+    aux = txt.split('Output formats: ')
+    in_ = aux[0].split('Input formats: ')[1].split(',')
+    out = aux[1].split(',')
+
+    return [f.strip() for f in in_], [f.strip() for f in out]
