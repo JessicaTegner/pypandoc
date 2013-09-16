@@ -43,7 +43,7 @@ class TestPypandoc(unittest.TestCase):
         test_file.flush()
         expected = 'some title\n==========\n\n'
         received = pypandoc.convert(file_name, 'rst')
-        self.assertAlmostEqual(expected, received)
+        self.assertEqual(expected, received)
 
     def test_basic_conversion_from_file_with_format(self):
         # This will not work on windows:
@@ -54,12 +54,12 @@ class TestPypandoc(unittest.TestCase):
         test_file.flush()
         expected = 'some title\n==========\n\n'
         received = pypandoc.convert(file_name, 'rst', format='md')
-        self.assertAlmostEqual(expected, received)
+        self.assertEqual(expected, received)
 
     def test_basic_conversion_from_string(self):
         expected = 'some title\n==========\n\n'
         received = pypandoc.convert('#some title', 'rst', format='md')
-        self.assertAlmostEqual(expected, received)
+        self.assertEqual(expected, received)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
 unittest.TextTestRunner(verbosity=2).run(suite)
