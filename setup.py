@@ -7,7 +7,7 @@ description = "Thin wrapper for pandoc."
 try:
     long_description = pypandoc.convert('README.md', 'rst')
 except (IOError, OSError):
-    print 'check that you have installed pandoc properly and that README.md exists!'
+    print('check that you have installed pandoc properly and that README.md exists!')
     long_description = description
 
 module = pypandoc
