@@ -37,7 +37,7 @@ class TestPypandoc(unittest.TestCase):
     def test_basic_conversion_from_file(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
-        test_file = tempfile.NamedTemporaryFile(suffix='.md')
+        test_file = tempfile.NamedTemporaryFile('w+t', suffix='.md')
         file_name = test_file.name
         test_file.write('#some title\n')
         test_file.flush()
@@ -48,7 +48,7 @@ class TestPypandoc(unittest.TestCase):
     def test_basic_conversion_from_file_with_format(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
-        test_file = tempfile.NamedTemporaryFile(suffix='.rst')
+        test_file = tempfile.NamedTemporaryFile('w+t', suffix='.rst')
         file_name = test_file.name
         test_file.write('#some title\n')
         test_file.flush()

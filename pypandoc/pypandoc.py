@@ -47,7 +47,11 @@ def _process_file(source, to, format, extra_args):
     args = ['pandoc', '--from=' + format, '--to=' + to]
     args.extend(extra_args)
 
-    p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(
+            args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            universal_newlines=True)
 
     return p.communicate(source)[0]
 
@@ -56,7 +60,11 @@ def get_pandoc_formats():
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
     ''' 
-    p = subprocess.Popen(['pandoc', '-h'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(
+            ['pandoc', '-h'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            universal_newlines=True)
     help_text = p.communicate()[0].splitlines(False)
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
