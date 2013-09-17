@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import tempfile
-from . import pypandoc
+import pypandoc
 
 
 def test_converter(to, format=None, extra_args=()):

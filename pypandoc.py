@@ -1,6 +1,15 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement
+
+__author__ = 'Juho Vepsäläinen'
+__version__ = '0.6.0'
+__license__ = 'MIT'
+__all__ = ['convert', 'get_pandoc_formats']
+
 import subprocess
 import os
+
+
 
 def convert(source, to, format=None, extra_args=()):
     '''Converts given `source` from `format` `to` another. `source` may be either a file path or a string to be converted. It's possible to pass `extra_args` if needed. In case `format` is not provided, it will try to invert the format based on given `source`.

@@ -20,8 +20,7 @@ setup(
     long_description = long_description,
     author = module.__author__,
     author_email = 'bebraw@gmail.com',
-    packages = ['pypandoc', ],
-    package_dir = {'pypandoc': 'pypandoc', },
+    py_modules = ['pypandoc', ],
     install_requires = ['setuptools', ],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -34,5 +33,5 @@ setup(
         'Topic :: Text Processing',
         'Topic :: Text Processing :: Filters',
     ],
-    test_suite = 'pypandoc'
+    test_suite = 'tests'
 )
