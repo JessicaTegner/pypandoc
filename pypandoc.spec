@@ -1,4 +1,4 @@
-from pypandoc import pypandoc
+import pypandoc
 
 def test_converter(to, format=None, extra_args=()):
     def reader(*args):
