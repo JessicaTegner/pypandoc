@@ -59,10 +59,9 @@ def _process_file(source, to, format, extra_args):
     p = subprocess.Popen(
             args,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            universal_newlines=True)
+            stdout=subprocess.PIPE)
 
-    return p.communicate(source)[0]
+    return p.communicate(source.encode())[0].decode()
 
 def get_pandoc_formats():
     '''
@@ -72,9 +71,8 @@ def get_pandoc_formats():
     p = subprocess.Popen(
             ['pandoc', '-h'],
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            universal_newlines=True)
-    help_text = p.communicate()[0].splitlines(False)
+            stdout=subprocess.PIPE)
+    help_text = p.communicate()[0].decode().splitlines(False)
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
     aux = txt.split('Output formats: ')
