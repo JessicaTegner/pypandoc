@@ -17,6 +17,7 @@ See also [pyandoc](http://pypi.python.org/pypi/pyandoc/).
 
 * [Valentin Haenel](https://github.com/esc) - String conversion fix
 * [Daniel Sanchez](https://github.com/ErunamoJAZZ) - Automatic parsing of input/output formats
+* [Thomas G.](https://github.com/coldfix) - Python 3 support
 
 ## License
 
