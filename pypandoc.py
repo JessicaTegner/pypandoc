@@ -68,10 +68,14 @@ def get_pandoc_formats():
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
     ''' 
-    p = subprocess.Popen(
-            ['pandoc', '-h'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
+    try:
+        p = subprocess.Popen(
+                ['pandoc', '-h'],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE)
+    except OSError:
+        raise OSError("You probably do not have pandoc installed.")
+    
     help_text = p.communicate()[0].decode().splitlines(False)
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
