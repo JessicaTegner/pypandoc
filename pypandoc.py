@@ -61,7 +61,7 @@ def _process_file(source, to, format, extra_args):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE)
 
-    return p.communicate(source.encode())[0].decode()
+    return p.communicate(source.encode('utf-8'))[0].decode()
 
 def get_pandoc_formats():
     '''
