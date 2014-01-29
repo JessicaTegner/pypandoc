@@ -26,3 +26,15 @@ See also [pyandoc](http://pypi.python.org/pypi/pyandoc/).
 
 pypandoc is available under MIT license. See LICENSE for more details.
 
+
+# Service Examples Useage
+
+**Assuming you are using django**
+
+As within the service we make use of: django.core.files.File
+
+```
+from .services import PandocDocxService
+service = PandocDocxService()
+doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testing 123</p></body></html>')
+```
