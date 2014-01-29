@@ -36,9 +36,9 @@ doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testi
 * [Daniel Sanchez](https://github.com/ErunamoJAZZ) - Automatic parsing of input/output formats
 * [Thomas G.](https://github.com/coldfix) - Python 3 support
 * [Ben Jao Ming](https://github.com/benjaoming) - Fail gracefully if `pandoc` is missing
+* [Ross Crawford-d'Heureuse](http://github.com/rosscdh) - Encode input in UTF-8 and add Django example
 
 ## License
 
-pypandoc is available under MIT license. See LICENSE for more details.
-
+`pypandoc` is available under MIT license. See LICENSE for more details.
 
