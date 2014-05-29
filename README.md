@@ -38,6 +38,7 @@ doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testi
 * [Ben Jao Ming](https://github.com/benjaoming) - Fail gracefully if `pandoc` is missing
 * [Ross Crawford-d'Heureuse](http://github.com/rosscdh) - Encode input in UTF-8 and add Django example
 * [Michael Chow](https://github.com/machow) - Decode output in UTF-8
+* [Janusz Skonieczny](https://github.com/wooyek) - Support Windows newlines and allow encoding to be specified.
 
 ## License
 
