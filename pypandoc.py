@@ -11,15 +11,15 @@ import os
 
 
 
-def convert(source, to, format=None, extra_args=()):
+def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
     '''Converts given `source` from `format` `to` another. `source` may be either a file path or a string to be converted. It's possible to pass `extra_args` if needed. In case `format` is not provided, it will try to invert the format based on given `source`.
 
     Raises OSError if pandoc is not found! Make sure it has been installed and is available at path.
     '''
-    return _convert(_read_file, _process_file, source, to, format, extra_args)
+    return _convert(_read_file, _process_file, source, to, format, extra_args, encoding=encoding)
 
-def _convert(reader, processor, source, to, format=None, extra_args=()):
-    source, format = reader(source, format)
+def _convert(reader, processor, source, to, format=None, extra_args=(), encoding=None):
+    source, format = reader(source, format, encoding=encoding)
 
     formats = {
         'dbk': 'docbook',
@@ -44,9 +44,10 @@ def _convert(reader, processor, source, to, format=None, extra_args=()):
 
     return processor(source, to, format, extra_args)
 
-def _read_file(source, format):
+def _read_file(source, format, encoding='utf-8'):
     if os.path.exists(source):
-        with open(source) as f:
+        import codecs
+        with codecs.open(source, encoding=encoding) as f:
             format = format or os.path.splitext(source)[1].strip('.')
             source = f.read()
 

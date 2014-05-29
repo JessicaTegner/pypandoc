@@ -7,7 +7,7 @@ import os
 
 def test_converter(to, format=None, extra_args=()):
 
-    def reader(*args):
+    def reader(*args, **kwargs):
         return source, format
 
     def processor(*args):
