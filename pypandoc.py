@@ -8,7 +8,7 @@ __all__ = ['convert', 'get_pandoc_formats']
 
 import subprocess
 import os
-
+import re
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
