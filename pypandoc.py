@@ -8,7 +8,7 @@ __all__ = ['convert', 'get_pandoc_formats']
 
 import subprocess
 import os
-
+import re
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
@@ -81,7 +81,7 @@ def get_pandoc_formats():
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
     aux = txt.split('Output formats: ')
-    in_ = aux[0].split('Input formats: ')[1].split(',')
-    out = aux[1].split(',')
+    in_ = re.sub('Input\sformats:\s','',aux[0]).split(',')
+    out = re.sub('\*|\[.*?\]','',aux[1]).split(',')
 
     return [f.strip() for f in in_], [f.strip() for f in out]
