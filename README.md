@@ -39,6 +39,7 @@ doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testi
 * [Ross Crawford-d'Heureuse](http://github.com/rosscdh) - Encode input in UTF-8 and add Django example
 * [Michael Chow](https://github.com/machow) - Decode output in UTF-8
 * [Janusz Skonieczny](https://github.com/wooyek) - Support Windows newlines and allow encoding to be specified.
+* [gabeos](https://github.com/gabeos) - Fix help parsing
 
 ## License
 
