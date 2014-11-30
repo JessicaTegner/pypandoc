@@ -11,7 +11,7 @@ setup(
     version = module.__version__,
     url = 'https://github.com/bebraw/pypandoc',
     license = 'MIT',
-    description = description,
+    description = 'Thin wrapper for pandoc.',
     long_description = long_description,
     author = module.__author__,
     author_email = 'bebraw@gmail.com',
