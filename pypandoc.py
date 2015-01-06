@@ -2,7 +2,7 @@
 from __future__ import with_statement
 
 __author__ = 'Juho Vepsäläinen'
-__version__ = '0.8.4'
+__version__ = '0.8.5'
 __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
