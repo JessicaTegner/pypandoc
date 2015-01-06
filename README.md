@@ -13,9 +13,20 @@ output = pypandoc.convert('somefile.md', 'rst')
 
 # alternatively you could just pass some string to it and define its format
 output = pypandoc.convert('#some title', 'rst', format='md')
+# output == 'some title\r\n==========\r\n\r\n'
 ```
 
-In addition to `format`, it is possible to pass `extra_args`. That makes it possible to access various pandoc options easily. Please refer to `pandoc -h` and the [official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
+In addition to `format`, it is possible to pass `extra_args`. That makes it possible to access various pandoc options easily.
+
+```python
+output = pypandoc.convert('<h1>Primary Heading</h1>', 'md', format='html', extra_args=['--atx-headers'])
+# output == '# Primary Heading\r\n'
+output = pypandoc.convert('# Primary Heading', 'html', format='md', extra_args=['--base-header-level=2'])
+# output == '<h2 id="primary-heading">Primary Heading</h2>\r\n'
+```
+
+Please refer to `pandoc -h` and the [official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
+
 
 See also [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implementation.
 
