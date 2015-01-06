@@ -52,6 +52,7 @@ doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testi
 * [Janusz Skonieczny](https://github.com/wooyek) - Support Windows newlines and allow encoding to be specified.
 * [gabeos](https://github.com/gabeos) - Fix help parsing
 * [Marc Abramowitz](https://github.com/msabramo) - Make `setup.py` fail hard if `pandoc` is missing
+* [Daniel L.](https://github.com/mcktrtl) - Add `extra_args` example to README
 
 ## License
 
