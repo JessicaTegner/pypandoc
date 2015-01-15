@@ -45,7 +45,11 @@ def _convert(reader, processor, source, to, format=None, extra_args=(), encoding
     return processor(source, to, format, extra_args)
 
 def _read_file(source, format, encoding='utf-8'):
-    if os.path.exists(source):
+    try:
+        path = os.path.exists(source)
+    except UnicodeEncodeError:
+        path = os.path.exists(source.decode('utf-8'))
+    if path:
         import codecs
         with codecs.open(source, encoding=encoding) as f:
             format = format or os.path.splitext(source)[1].strip('.')
@@ -62,7 +66,12 @@ def _process_file(source, to, format, extra_args):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE)
 
-    return p.communicate(source.encode('utf-8'))[0].decode('utf-8')
+    try:
+        c = p.communicate(source.encode('utf-8'))[0].decode('utf-8')
+    except UnicodeDecodeError:
+        c = p.communicate(source)[0].decode('utf-8')
+
+    return c
 
 def get_pandoc_formats():
     '''
