@@ -7,6 +7,8 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 import subprocess
+import sys
+import textwrap
 import os
 import re
 
@@ -77,15 +79,45 @@ def get_pandoc_formats():
     '''
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
-    ''' 
+    '''
     try:
         p = subprocess.Popen(
                 ['pandoc', '-h'],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE)
     except OSError:
+        sys.stderr.write(textwrap.dedent("""\
+            ---------------------------------------------------------------
+            An error occurred while trying to run `pandoc`
+        """))
+        if os.path.exists('/usr/local/bin/brew'):
+            sys.stderr.write(textwrap.dedent("""\
+                Maybe try:
+
+                    brew install pandoc
+            """))
+        elif os.path.exists('/usr/bin/apt-get'):
+            sys.stderr.write(textwrap.dedent("""\
+                Maybe try:
+
+                    sudo apt-get install pandoc
+            """))
+        elif os.path.exists('/usr/bin/yum'):
+            sys.stderr.write(textwrap.dedent("""\
+                Maybe try:
+
+                    sudo yum install pandoc
+            """))
+        sys.stderr.write(textwrap.dedent("""\
+            See http://johnmacfarlane.net/pandoc/installing.html
+            for installation options
+        """))
+        sys.stderr.write(textwrap.dedent("""\
+            ---------------------------------------------------------------
+
+        """))
         raise OSError("You probably do not have pandoc installed.")
-    
+
     help_text = p.communicate()[0].decode().splitlines(False)
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
