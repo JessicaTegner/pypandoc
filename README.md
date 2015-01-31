@@ -5,6 +5,16 @@
 
 pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/), a universal document converter.
 
+## Installation
+
+- Install pandoc
+  - Ubuntu/Debian: `sudo apt-get pandoc`
+  - Fedora/Red Hat: `sudo yum install pandoc`
+  - Mac OS X with Homebrew: `brew install pandoc`
+  - Machine with Haskell: `cabal-install pandoc`
+  - Or see http://johnmacfarlane.net/pandoc/installing.html
+- `pip install pypandoc`
+
 ## Usage
 
 The basic invocation looks like this: `pypandoc.convert('input', 'output format')`. `pypandoc` tries to infer the type of the input automatically. If it's a file, it will load it. In case you pass a string, you can define the `format` using the parameter. The example below should clarify the usage:
