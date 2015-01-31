@@ -45,7 +45,7 @@ class TestPypandoc(unittest.TestCase):
             test_file.flush()
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
         received = pypandoc.convert(file_name, 'rst')
-        self.assertEqual(expected, received)
+        self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_file_with_format(self):
         # This will not work on windows:
@@ -56,12 +56,16 @@ class TestPypandoc(unittest.TestCase):
             test_file.flush()
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
         received = pypandoc.convert(file_name, 'rst', format='md')
-        self.assertEqual(expected, received)
+        self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_string(self):
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
         received = pypandoc.convert('#some title', 'rst', format='md')
-        self.assertEqual(expected, received)
+        self.assertEqualExceptForNewlineEnd(expected, received)
+
+    def assertEqualExceptForNewlineEnd(self, expected, received):
+        self.assertEqual(expected.rstrip('\n'), received.rstrip('\n'))
+
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
 ret = unittest.TextTestRunner(verbosity=2).run(suite)
