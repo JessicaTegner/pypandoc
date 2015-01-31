@@ -2,7 +2,8 @@
 import unittest
 import tempfile
 import pypandoc
-import os 
+import os
+import sys
 
 
 def test_converter(to, format=None, extra_args=()):
@@ -63,4 +64,5 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqual(expected, received)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
-unittest.TextTestRunner(verbosity=2).run(suite)
+ret = unittest.TextTestRunner(verbosity=2).run(suite)
+sys.exit(0 if ret.wasSuccessful() else 1)
