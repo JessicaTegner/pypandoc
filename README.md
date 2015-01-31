@@ -8,7 +8,7 @@ pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/)
 ## Installation
 
 - Install pandoc
-  - Ubuntu/Debian: `sudo apt-get pandoc`
+  - Ubuntu/Debian: `sudo apt-get install pandoc`
   - Fedora/Red Hat: `sudo yum install pandoc`
   - Mac OS X with Homebrew: `brew install pandoc`
   - Machine with Haskell: `cabal-install pandoc`
