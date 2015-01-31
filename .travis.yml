@@ -1,0 +1,16 @@
+language: python
+sudo: false
+addons:
+  apt_packages:
+    - pandoc
+env:
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=pypy
+  - TOXENV=flake8
+install:
+  - travis_retry pip install tox
+script:
+  - tox
