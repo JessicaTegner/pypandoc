@@ -68,7 +68,7 @@ def _process_file(source, to, format, extra_args):
 
     try:
         c = p.communicate(source.encode('utf-8'))[0].decode('utf-8')
-    except UnicodeDecodeError, UnicodeEncodeError:
+    except (UnicodeDecodeError, UnicodeEncodeError):
         c = p.communicate(source)[0]
 
     return c
