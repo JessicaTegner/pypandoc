@@ -18,12 +18,19 @@ output = pypandoc.convert('#some title', 'rst', format='md')
 # output == 'some title\r\n==========\r\n\r\n'
 ```
 
-In addition to `format`, it is possible to pass `extra_args`. That makes it possible to access various pandoc options easily.
+In addition to `format`, it is possible to pass `extra_args`.
+That makes it possible to access various pandoc options easily.
 
 ```python
-output = pypandoc.convert('<h1>Primary Heading</h1>', 'md', format='html', extra_args=['--atx-headers'])
+output = pypandoc.convert(
+    '<h1>Primary Heading</h1>',
+    'md', format='html',
+    extra_args=['--atx-headers'])
 # output == '# Primary Heading\r\n'
-output = pypandoc.convert('# Primary Heading', 'html', format='md', extra_args=['--base-header-level=2'])
+output = pypandoc.convert(
+    '# Primary Heading',
+    'html', format='md',
+    extra_args=['--base-header-level=2'])
 # output == '<h2 id="primary-heading">Primary Heading</h2>\r\n'
 ```
 
@@ -40,7 +47,11 @@ See `services.py` at the project root for implementation. Use it like this:
 from .services import PandocDocxService
 
 service = PandocDocxService()
-doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testing 123</p></body></html>')
+doc_file = service.generate(
+    '<html><body>'
+    '<h1>Heading 1</h1>'
+    '<p>testing testing 123</p>'
+    '</body></html>')
 ```
 
 ## Contributors
