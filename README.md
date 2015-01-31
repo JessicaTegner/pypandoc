@@ -1,6 +1,7 @@
 # pypandoc
 
 [![Latest Version](https://pypip.in/version/pypandoc/badge.svg)](https://pypi.python.org/pypi/pypandoc/)
+[![Build Status](https://travis-ci.org/bebraw/pypandoc.svg?branch=master)](https://travis-ci.org/bebraw/pypandoc)
 
 pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/), a universal document converter.
 
