@@ -1,5 +1,7 @@
 # pypandoc
 
+[![Latest Version](https://pypip.in/version/pypandoc/badge.svg)](https://pypi.python.org/pypi/pypandoc/)
+
 pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/), a universal document converter.
 
 ## Usage
@@ -58,4 +60,3 @@ doc_file = service.generate(html='<html><body><h1>Heading 1</h1><p>testing testi
 ## License
 
 `pypandoc` is available under MIT license. See LICENSE for more details.
-
