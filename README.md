@@ -50,21 +50,6 @@ Please refer to `pandoc -h` and the [official documentation](http://johnmacfarla
 
 See also [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implementation.
 
-## Django Service Example
-
-See `services.py` at the project root for implementation. Use it like this:
-
-```python
-from .services import PandocDocxService
-
-service = PandocDocxService()
-doc_file = service.generate(
-    '<html><body>'
-    '<h1>Heading 1</h1>'
-    '<p>testing testing 123</p>'
-    '</body></html>')
-```
-
 ## Contributors
 
 * [Valentin Haenel](https://github.com/esc) - String conversion fix
