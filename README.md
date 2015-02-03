@@ -60,7 +60,7 @@ See also [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative impl
 * [Michael Chow](https://github.com/machow) - Decode output in UTF-8
 * [Janusz Skonieczny](https://github.com/wooyek) - Support Windows newlines and allow encoding to be specified.
 * [gabeos](https://github.com/gabeos) - Fix help parsing
-* [Marc Abramowitz](https://github.com/msabramo) - Make `setup.py` fail hard if `pandoc` is missing
+* [Marc Abramowitz](https://github.com/msabramo) - Make `setup.py` fail hard if `pandoc` is missing, Travis, Dockerfile, PyPI badge, Tox, PEP-8, improved documentation
 * [Daniel L.](https://github.com/mcktrtl) - Add `extra_args` example to README
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
 
