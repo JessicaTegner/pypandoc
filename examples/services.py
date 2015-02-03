@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Example Services for using pypandoc
-Django Services make use of the File object but that can be removed
-and simply return the NamedTemporaryFile object
 """
-from django.core.files import File
 from tempfile import NamedTemporaryFile
 
 import pypandoc
@@ -48,7 +45,7 @@ class PandocPDFService(BasePandocService):
         # generate it using pandoc
         self.service.convert(html, to_format, format=from_format, extra_args=extra_args)
         # return the file which is now populated with the docx forms
-        return File(self.file_object)
+        return self.file_object
 
 
 class PandocDocxService(BasePandocService):
@@ -69,4 +66,4 @@ class PandocDocxService(BasePandocService):
         # generate it using pandoc
         self.service.convert(html, to_format, format=from_format, extra_args=extra_args)
         # return the file which is now populated with the docx forms
-        return File(self.file_object)
+        return self.file_object
