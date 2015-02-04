@@ -12,6 +12,8 @@ pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/)
   - Fedora/Red Hat: `sudo yum install pandoc`
   - Mac OS X with Homebrew: `brew install pandoc`
   - Machine with Haskell: `cabal-install pandoc`
+  - Windows: There is an installer available [here](http://johnmacfarlane.net/pandoc/installing.html)
+  - [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
   - Or see http://johnmacfarlane.net/pandoc/installing.html
 - `pip install pypandoc`
 
