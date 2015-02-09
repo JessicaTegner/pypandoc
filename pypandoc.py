@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-__author__ = 'Juho Vepsäläinen'
-__version__ = '0.9.1'
-__license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats']
-
 import subprocess
 import sys
 import textwrap
 import os
 import re
+
+__author__ = 'Juho Vepsäläinen'
+__version__ = '0.9.1'
+__license__ = 'MIT'
+__all__ = ['convert', 'get_pandoc_formats']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
