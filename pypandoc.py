@@ -51,9 +51,12 @@ def _convert(reader, processor, source, to,
             'Invalid input format! Expected one of these: ' +
             ', '.join(from_formats))
 
-    if to not in to_formats:
+    # Markdown syntax extensions can be individually enabled or disabled by
+    # appending +EXTENSION or -EXTENSION to the format name.
+    to_base = re.split('\+|-', to)[0]
+    if to_base not in to_formats:
         raise RuntimeError(
-            'Invalid to format! Expected one of these: ' +
+            'Invalid output format! Expected one of these: ' +
             ', '.join(to_formats))
 
     return processor(source, to, format, extra_args)
