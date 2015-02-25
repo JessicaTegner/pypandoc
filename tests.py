@@ -65,6 +65,15 @@ class TestPypandoc(unittest.TestCase):
         received = pypandoc.convert('#some title', 'rst', format='md')
         self.assertEqualExceptForNewlineEnd(expected, received)
 
+    def test_conversion_with_markdown_extensions(self):
+        input = '<s>strike</s>'
+        expected_with_extension = u'~~strike~~'
+        expected_without_extension = u'<s>strike</s>'
+        received_with_extension = pypandoc.convert(input, 'markdown+strikeout', format='html')
+        received_without_extension = pypandoc.convert(input, 'markdown-strikeout', format='html')
+        self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
+        self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         self.assertEqual(expected.rstrip('\n'), received.rstrip('\n'))
 
