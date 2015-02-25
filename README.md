@@ -82,6 +82,7 @@ This one hasn't been active in a while though.
 * [Marc Abramowitz](https://github.com/msabramo) - Make `setup.py` fail hard if `pandoc` is missing, Travis, Dockerfile, PyPI badge, Tox, PEP-8, improved documentation
 * [Daniel L.](https://github.com/mcktrtl) - Add `extra_args` example to README
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
+* [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
 
 ## License
 
