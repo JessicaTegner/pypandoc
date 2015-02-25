@@ -51,11 +51,7 @@ Please refer to `pandoc -h` and the [official documentation](http://johnmacfarla
 
 ## Related
 
-[pydocverter](https://github.com/msabramo/pydocverter) is a client for a service called [Docverter](http://www.docverter.com/), 
-which offers pandoc as a service (plus some extra goodies).
-It has the same API as pypandoc,
-so you can easily write code that uses one and falls back to the other. 
-E.g.:
+[pydocverter](https://github.com/msabramo/pydocverter) is a client for a service called [Docverter](http://www.docverter.com/), which offers pandoc as a service (plus some extra goodies). It has the same API as pypandoc, so you can easily write code that uses one and falls back to the other. E.g.:
 
 ```python
 try:
@@ -66,8 +62,7 @@ except ImportError:
 converter.convert('somefile.md', 'rst')
 ```
 
-See [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a pandoc wrapper from Kenneth Reitz.
-This one hasn't been active in a while though.
+See [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a pandoc wrapper from Kenneth Reitz. This one hasn't been active in a while though.
 
 ## Contributors
 
