@@ -78,6 +78,7 @@ See [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implement
 * [Daniel L.](https://github.com/mcktrtl) - Add `extra_args` example to README
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
 * [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
+* [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
 
 ## License
 
