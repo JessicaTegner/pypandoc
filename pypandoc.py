@@ -46,15 +46,12 @@ def _convert(reader, processor, source, to,
 
     from_formats, to_formats = get_pandoc_formats()
 
-    if format not in from_formats:
+    if _get_base_format(format) not in from_formats:
         raise RuntimeError(
             'Invalid input format! Expected one of these: ' +
             ', '.join(from_formats))
 
-    # Markdown syntax extensions can be individually enabled or disabled by
-    # appending +EXTENSION or -EXTENSION to the format name.
-    to_base = re.split('\+|-', to)[0]
-    if to_base not in to_formats:
+    if _get_base_format(to) not in to_formats:
         raise RuntimeError(
             'Invalid output format! Expected one of these: ' +
             ', '.join(to_formats))
@@ -91,6 +88,16 @@ def _process_file(source, to, format, extra_args):
         c = p.communicate(source)[0]
 
     return c
+
+
+def _get_base_format(format):
+    '''
+    According to http://johnmacfarlane.net/pandoc/README.html#general-options,
+    syntax extensions for markdown can be individually enabled or disabled by
+    appending +EXTENSION or -EXTENSION to the format name.
+    Return the base format without any extensions.
+    '''
+    return re.split('\+|-', format)[0]
 
 
 def get_pandoc_formats():
