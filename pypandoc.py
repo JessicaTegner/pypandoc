@@ -13,6 +13,45 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 
+class Pandoc(object):
+    _pandoc_cmd = None
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = Pandoc()
+        return cls._instance
+
+    def subprocess(self, args):
+        cmdline = (self.pandoc_cmd,) + args
+        return subprocess.Popen(
+            cmdline,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
+
+    @property
+    def pandoc_cmd(self):
+        if self._pandoc_cmd:
+            return self._pandoc_cmd
+
+        pandoc_cmd = 'pandoc'
+
+        try:
+            subprocess.Popen(
+                [pandoc_cmd, '-h'],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE)
+        except OSError:
+            if sys.platform == 'darwin':
+                import pkg_resources
+                pandoc_cmd = pkg_resources.resource_filename(
+                    'pypandoc', 'vendor/pandoc/darwin/bin/pandoc')
+
+        self._pandoc_cmd = pandoc_cmd
+        return self._pandoc_cmd
+
+
 def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
     '''Converts given `source` from `format` `to` another. `source` may be
     either a file path or a string to be converted. It's possible to pass
@@ -74,13 +113,7 @@ def _read_file(source, format, encoding='utf-8'):
 
 
 def _process_file(source, to, format, extra_args):
-    args = ['pandoc', '--from=' + format, '--to=' + to]
-    args.extend(extra_args)
-
-    p = subprocess.Popen(
-        args,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+    p = Pandoc.get_instance().subprocess(('--from=' + format, '--to=' + to))
 
     try:
         c = p.communicate(source.encode('utf-8'))[0].decode('utf-8')
@@ -106,15 +139,12 @@ def get_pandoc_formats():
     Return 2 lists. "from_formats" and "to_formats".
     '''
     try:
-        p = subprocess.Popen(
-            ['pandoc', '-h'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
-    except OSError:
+        p = Pandoc.get_instance().subprocess(('-h',))
+    except OSError as e:
         sys.stderr.write(textwrap.dedent("""\
             ---------------------------------------------------------------
-            An error occurred while trying to run `pandoc`
-        """))
+            An error occurred while trying to run `pandoc`: %s
+        """) % e)
         if os.path.exists('/usr/local/bin/brew'):
             sys.stderr.write(textwrap.dedent("""\
                 Maybe try:

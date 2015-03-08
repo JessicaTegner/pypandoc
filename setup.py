@@ -16,6 +16,10 @@ setup(
     author = module.__author__,
     author_email = 'bebraw@gmail.com',
     py_modules = ['pypandoc', ],
+    packages = ['vendor.pandoc.darwin.lib',
+                'vendor.pandoc.darwin.bin'],
+    package_data = {'vendor.pandoc.darwin.lib': ['*.dylib'],
+                    'vendor.pandoc.darwin.bin': ['pandoc']},
     install_requires = ['setuptools', ],
     classifiers=[
         'Development Status :: 4 - Beta',
