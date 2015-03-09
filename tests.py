@@ -12,7 +12,7 @@ def test_converter(to, format=None, extra_args=()):
     def reader(*args, **kwargs):
         return source, format
 
-    def processor(*args):
+    def processor(*args, **kwargs):
         return 'ok'
 
     source = 'foo'
@@ -83,7 +83,25 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
         self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
 
+    def test_basic_conversion_to_file(self):
+        # we just want to get a temp file name, where we can write to
+        tf = tempfile.NamedTemporaryFile(suffix='.rst', delete=False)
+        name = tf.name
+        tf.close()
+
+        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+        received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=name)
+        self.assertEqualExceptForNewlineEnd("", received)
+        with open(name) as f:
+            written = f.read()
+        os.remove(name)
+        self.assertEqualExceptForNewlineEnd(expected, written)
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
+        # output written to a file does not seem to have os.linesep
+        # handle everything here by replacing the os linesep by a simple \n
+        expected = expected.replace(os.linesep, "\n")
+        received = received.replace(os.linesep, "\n")
         self.assertEqual(expected.rstrip('\n'), received.rstrip('\n'))
 
 

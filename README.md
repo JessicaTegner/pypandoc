@@ -31,6 +31,17 @@ output = pypandoc.convert('#some title', 'rst', format='md')
 # output == 'some title\r\n==========\r\n\r\n'
 ```
 
+It's also possible to directly let pandoc write the output to a file. This is the only way to 
+convert to some output formats (e.g. odt, docx, epub, epub3). In that case `convert()` will 
+return an empty string.
+
+```python
+import pypandoc
+
+output = pypandoc.convert('somefile.md', 'docx', outputfile="somefile.docx")
+assert output == ""
+```
+
 In addition to `format`, it is possible to pass `extra_args`.
 That makes it possible to access various pandoc options easily.
 
@@ -79,6 +90,7 @@ See [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implement
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
 * [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
 * [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
+* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file
 
 ## License
 
