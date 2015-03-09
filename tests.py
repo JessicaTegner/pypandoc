@@ -97,6 +97,11 @@ class TestPypandoc(unittest.TestCase):
         os.remove(name)
         self.assertEqualExceptForNewlineEnd(expected, written)
 
+        # to odf does not work without a file
+        def f():
+            pypandoc.convert('#some title\n', to='odf', format='md', outputfile=None)
+        self.assertRaises(RuntimeError, f)
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
