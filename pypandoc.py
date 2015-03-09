@@ -13,18 +13,20 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 
-def convert(source, to, format=None, extra_args=(), encoding='utf-8', outputfile=None):
+def convert(source, to, format=None, extra_args=(), encoding='utf-8',
+            outputfile=None):
     '''Converts given `source` from `format` `to` another. `source` may be
     either a file path or a string to be converted. It's possible to pass
     `extra_args` if needed. In case `format` is not provided, it will try to
     invert the format based on given `source`.
 
-    Raises OSError if pandoc is not found! Make sure it has been installed and
-    is available at path.
+    Raises OSError if pandoc is not found! Make sure it has been installed
+    and is available at path.
 
     '''
     return _convert(_read_file, _process_file, source, to,
-                    format, extra_args, encoding=encoding, outputfile=outputfile)
+                    format, extra_args, encoding=encoding,
+                    outputfile=outputfile)
 
 
 def _convert(reader, processor, source, to,
@@ -56,11 +58,13 @@ def _convert(reader, processor, source, to,
         raise RuntimeError(
             'Invalid output format! Expected one of these: ' +
             ', '.join(to_formats))
+
     # list from https://github.com/jgm/pandoc/blob/master/pandoc.hs
     # `[...] where binaries = ["odt","docx","epub","epub3"] [...]`
-    if base_to_format in ["odt","docx","epub","epub3"] and not outputfile:
-        raise RuntimeError('Output to %s only works by using a outputfile.' % base_to_format)
-
+    if base_to_format in ["odt", "docx", "epub", "epub3"] and not outputfile:
+        raise RuntimeError(
+            'Output to %s only works by using a outputfile.' % base_to_format
+        )
 
     return processor(source, to, format, extra_args, outputfile=outputfile)
 
@@ -99,6 +103,7 @@ def _process_file(source, to, format, extra_args, outputfile=None):
 
     # if there is an outputfile, then c is likely empty!
     return c
+
 
 def _get_base_format(format):
     '''

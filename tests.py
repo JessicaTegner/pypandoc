@@ -69,19 +69,30 @@ class TestPypandoc(unittest.TestCase):
         input = '<s>strike</s>'
         expected_with_extension = u'~~strike~~'
         expected_without_extension = u'<s>strike</s>'
-        received_with_extension = pypandoc.convert(input, 'markdown+strikeout', format='html')
-        received_without_extension = pypandoc.convert(input, 'markdown-strikeout', format='html')
-        self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
-        self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
+        received_with_extension = pypandoc.convert(input, 'markdown+strikeout',
+                                                   format='html')
+        received_without_extension = pypandoc.convert(input,
+                                                      'markdown-strikeout',
+                                                      format='html')
+        self.assertEqualExceptForNewlineEnd(expected_with_extension,
+                                            received_with_extension)
+        self.assertEqualExceptForNewlineEnd(expected_without_extension,
+                                            received_without_extension)
 
     def test_conversion_from_markdown_with_extensions(self):
         input = u'~~strike~~'
         expected_with_extension = u'<p><del>strike</del></p>'
         expected_without_extension = u'<p><sub><sub>strike</sub></sub></p>'
-        received_with_extension = pypandoc.convert(input, 'html', format='markdown+strikeout')
-        received_without_extension = pypandoc.convert(input, 'html', format='markdown-strikeout')
-        self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
-        self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
+        with_strikeout = u'markdown+strikeout'
+        no_strikeout = u'markdown-strikeout'
+        received_with_extension = pypandoc.convert(input, 'html',
+                                                   format=with_strikeout)
+        received_without_extension = pypandoc.convert(input, 'html',
+                                                      format=no_strikeout)
+        self.assertEqualExceptForNewlineEnd(expected_with_extension,
+                                            received_with_extension)
+        self.assertEqualExceptForNewlineEnd(expected_without_extension,
+                                            received_without_extension)
 
     def test_basic_conversion_to_file(self):
         # we just want to get a temp file name, where we can write to
@@ -90,7 +101,8 @@ class TestPypandoc(unittest.TestCase):
         tf.close()
 
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-        received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=name)
+        received = pypandoc.convert('#some title\n', to='rst', format='md',
+                                    outputfile=name)
         self.assertEqualExceptForNewlineEnd("", received)
         with open(name) as f:
             written = f.read()
@@ -99,7 +111,8 @@ class TestPypandoc(unittest.TestCase):
 
         # to odf does not work without a file
         def f():
-            pypandoc.convert('#some title\n', to='odf', format='md', outputfile=None)
+            pypandoc.convert('#some title\n', to='odf', format='md',
+                             outputfile=None)
         self.assertRaises(RuntimeError, f)
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
