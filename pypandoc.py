@@ -13,7 +13,7 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 
-def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
+def convert(source, to, format=None, extra_args=(), encoding='utf-8', outputfile=None):
     '''Converts given `source` from `format` `to` another. `source` may be
     either a file path or a string to be converted. It's possible to pass
     `extra_args` if needed. In case `format` is not provided, it will try to
@@ -24,11 +24,11 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8'):
 
     '''
     return _convert(_read_file, _process_file, source, to,
-                    format, extra_args, encoding=encoding)
+                    format, extra_args, encoding=encoding, outputfile=outputfile)
 
 
 def _convert(reader, processor, source, to,
-             format=None, extra_args=(), encoding=None):
+             format=None, extra_args=(), encoding=None, outputfile=None):
     source, format = reader(source, format, encoding=encoding)
 
     formats = {
@@ -51,12 +51,18 @@ def _convert(reader, processor, source, to,
             'Invalid input format! Expected one of these: ' +
             ', '.join(from_formats))
 
-    if _get_base_format(to) not in to_formats:
+    base_to_format = _get_base_format(to)
+    if base_to_format not in to_formats:
         raise RuntimeError(
             'Invalid output format! Expected one of these: ' +
             ', '.join(to_formats))
+    # list from https://github.com/jgm/pandoc/blob/master/pandoc.hs
+    # `[...] where binaries = ["odt","docx","epub","epub3"] [...]`
+    if base_to_format in ["odt","docx","epub","epub3"] and not outputfile:
+        raise RuntimeError('Output to %s only works by using a outputfile.' % base_to_format)
 
-    return processor(source, to, format, extra_args)
+
+    return processor(source, to, format, extra_args, outputfile=outputfile)
 
 
 def _read_file(source, format, encoding='utf-8'):
@@ -73,8 +79,12 @@ def _read_file(source, format, encoding='utf-8'):
     return source, format
 
 
-def _process_file(source, to, format, extra_args):
+def _process_file(source, to, format, extra_args, outputfile=None):
     args = ['pandoc', '--from=' + format, '--to=' + to]
+
+    if outputfile:
+        args.append("--output="+outputfile)
+
     args.extend(extra_args)
 
     p = subprocess.Popen(
@@ -87,8 +97,8 @@ def _process_file(source, to, format, extra_args):
     except (UnicodeDecodeError, UnicodeEncodeError):
         c = p.communicate(source)[0]
 
+    # if there is an outputfile, then c is likely empty!
     return c
-
 
 def _get_base_format(format):
     '''
