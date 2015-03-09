@@ -3,3 +3,7 @@
 dist/
 pypandoc.egg-info/
 .tox/
+
+## IDEs
+# pycharm
+.idea/
