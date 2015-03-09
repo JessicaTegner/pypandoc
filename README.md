@@ -99,7 +99,7 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
 * [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
 * [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
-* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file
+* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of Pandoc
 
 ## License
 
