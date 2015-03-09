@@ -75,6 +75,15 @@ converter.convert('somefile.md', 'rst')
 
 See [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a pandoc wrapper from Kenneth Reitz. This one hasn't been active in a while though.
 
+## Contributing
+
+Contributions are welcome. When opening a PR, please keep the following guidelines in mind:
+
+1. Before implementing, please open an issue for discussion.
+2. Make sure you have tests for the new logic.
+3. Make sure your code passes `flake8 pypandoc.py tests.py`
+4. Add yourself to contributors at `README.md` unless you are already there. In that case tweak your contributions.
+
 ## Contributors
 
 * [Valentin Haenel](https://github.com/esc) - String conversion fix
