@@ -13,8 +13,7 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 
-def convert(source, to, format=None, extra_args=(), encoding='utf-8',
-            outputfile=None):
+def convert(source, to, format=None, extra_args=(), encoding='utf-8', outputfile=None):
     '''Converts given `source` from `format` `to` another. `source` may be
     either a file path or a string to be converted. It's possible to pass
     `extra_args` if needed. In case `format` is not provided, it will try to
@@ -29,8 +28,8 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
                     outputfile=outputfile)
 
 
-def _convert(reader, processor, source, to,
-             format=None, extra_args=(), encoding=None, outputfile=None):
+def _convert(reader, processor, source, to, format=None, extra_args=(), encoding=None,
+             outputfile=None):
     source, format = reader(source, format, encoding=encoding)
 
     formats = {
