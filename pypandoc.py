@@ -94,7 +94,9 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
     args.extend(extra_args)
 
     # adds the proper filter syntax for each item in the filters list
-    if filters != None:
+    if filters is not None:
+        if type(filters) == str:
+            filters = filters.split()
         f = ['--filter=' + x for x in filters]
         args.extend(f)
 
