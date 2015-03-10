@@ -16,6 +16,7 @@ pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/)
   - [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
   - Or see http://johnmacfarlane.net/pandoc/installing.html
 - `pip install pypandoc`
+- To use pandoc filters, you must have the relevant filter installed on your machine
 
 ## Usage
 
@@ -57,6 +58,20 @@ output = pypandoc.convert(
     extra_args=['--base-header-level=2'])
 # output == '<h2 id="primary-heading">Primary Heading</h2>\r\n'
 ```
+pypandoc now supports easy addition of [pandoc filters](http://johnmacfarlane.net/pandoc/scripting.html).
+
+```python
+filters = ['pandoc-citeproc']
+pdoc_args = ['--mathjax',
+             '--smart']
+output = pd.convert(source=filename,
+                    to='html5',
+                    format='md',
+                    extra_args=pdoc_args,
+                    filters=filters)
+```
+Please pass any filters in as a list and not a string.
+
 
 Please refer to `pandoc -h` and the [official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
 
@@ -100,6 +115,7 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 * [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
 * [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
 * [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of Pandoc
+* [Aaron Gonzales](https://github.com/xysmas) - Added better filter handling 
 
 ## License
 
