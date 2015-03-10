@@ -107,6 +107,17 @@ class TestPypandoc(unittest.TestCase):
                              outputfile=None)
         self.assertRaises(RuntimeError, f)
 
+    def test_basic_conversion_with_filter(self):
+        # we just want to get a temp file name, where we can write to
+        filters = ['pandoc-citeproc']
+        written = pypandoc.convert('./filter_test.md', to='html', format='md',
+                                   outputfile=None, filters=filters)
+        import re as re
+        found = re.search(r'Fenner', written)
+        self.assertTrue(found.group() == 'Fenner')
+        found = re.search(r'10.1038', written)
+        self.assertTrue(found.group() == '10.1038')
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
