@@ -13,11 +13,13 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 
-def convert(source, to, format=None, extra_args=(), encoding='utf-8', outputfile=None):
+def convert(source, to, format=None, extra_args=(), encoding='utf-8',
+            outputfile=None, filters=None):
     '''Converts given `source` from `format` `to` another. `source` may be
     either a file path or a string to be converted. It's possible to pass
     `extra_args` if needed. In case `format` is not provided, it will try to
-    invert the format based on given `source`.
+    invert the format based on given `source`. Pandoc filters can be passed as
+    a list, e.g. filters=['pandoc-citeproc']
 
     Raises OSError if pandoc is not found! Make sure it has been installed
     and is available at path.
@@ -25,11 +27,11 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8', outputfile
     '''
     return _convert(_read_file, _process_file, source, to,
                     format, extra_args, encoding=encoding,
-                    outputfile=outputfile)
+                    outputfile=outputfile, filters=filters)
 
 
 def _convert(reader, processor, source, to, format=None, extra_args=(), encoding=None,
-             outputfile=None):
+             outputfile=None, filters=None):
     source, format = reader(source, format, encoding=encoding)
 
     formats = {
@@ -65,7 +67,8 @@ def _convert(reader, processor, source, to, format=None, extra_args=(), encoding
             'Output to %s only works by using a outputfile.' % base_to_format
         )
 
-    return processor(source, to, format, extra_args, outputfile=outputfile)
+    return processor(source, to, format, extra_args, outputfile=outputfile,
+                     filters=filters)
 
 
 def _read_file(source, format, encoding='utf-8'):
@@ -82,13 +85,20 @@ def _read_file(source, format, encoding='utf-8'):
     return source, format
 
 
-def _process_file(source, to, format, extra_args, outputfile=None):
+def _process_file(source, to, format, extra_args, outputfile=None, filters=None):
     args = ['pandoc', '--from=' + format, '--to=' + to]
 
     if outputfile:
         args.append("--output="+outputfile)
 
     args.extend(extra_args)
+
+    # adds the proper filter syntax for each item in the filters list
+    if filters is not None:
+        if type(filters) == str:
+            filters = filters.split()
+        f = ['--filter=' + x for x in filters]
+        args.extend(f)
 
     p = subprocess.Popen(
         args,
