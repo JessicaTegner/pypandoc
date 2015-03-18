@@ -120,6 +120,17 @@ class TestPypandoc(unittest.TestCase):
         found = re.search(r'10.1038', written)
         self.assertTrue(found.group() == '10.1038')
 
+        # make sure that it splits the filter line
+        for filters in ['pandoc-citeproc', u'pandoc-citeproc']:
+            written = pypandoc.convert('./filter_test.md', to='html', format='md',
+                                       outputfile=None, filters=filters)
+            # only properly converted file will have this in it
+            found = re.search(r'Fenner', written)
+            self.assertTrue(found.group() == 'Fenner')
+            # only properly converted file will have this in it
+            found = re.search(r'10.1038', written)
+            self.assertTrue(found.group() == '10.1038')
+
     def test_conversion_with_empty_filter(self):
         # we just want to get a temp file name, where we can write to
         filters = ''

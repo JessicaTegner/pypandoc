@@ -13,6 +13,15 @@ __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
 
+if sys.version_info[0] >= 3:
+    PY3 = True
+    string_types = (str,)
+    unicode_type = str
+else:
+    PY3 = False
+    string_types = (str, unicode)
+    unicode_type = unicode
+
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
     '''Converts given `source` from `format` `to` another. `source` may be
@@ -95,7 +104,7 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
 
     # adds the proper filter syntax for each item in the filters list
     if filters is not None:
-        if type(filters) == str:
+        if isinstance(filters, string_types):
             filters = filters.split()
         f = ['--filter=' + x for x in filters]
         args.extend(f)
