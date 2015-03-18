@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import unittest
 import tempfile
@@ -150,6 +151,21 @@ class TestPypandoc(unittest.TestCase):
             pypandoc.convert('<h1>Primary Heading</h1>','md', format='html', extra_args=["--blah"])
         self.assertRaises(RuntimeError, f)
 
+
+    def test_unicode_input(self):
+        # make sure that pandoc always returns unicode and does not mishandle it
+        expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
+        written = pypandoc.convert(u'<h1>üäöîôû</h1>','md', format='html')
+        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+        self.assertEqualExceptForNewlineEnd(expected, written)
+        bytes = u'<h1>üäöîôû</h1>'.encode("utf-8")
+        written = pypandoc.convert(bytes,'md', format='html')
+        self.assertEqualExceptForNewlineEnd(expected, written)
+        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+        def f():
+            bytes = u'<h1>üäö</h1>'.encode("iso-8859-15")
+            nothing = pypandoc.convert(bytes,'md', format='html')
+        self.assertRaises(RuntimeError, f)
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep

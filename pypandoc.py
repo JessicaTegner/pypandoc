@@ -123,10 +123,18 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
         )
 
     try:
-        stdout, stderr = p.communicate(source.encode('utf-8'))
-        stdout = stdout.decode('utf-8')
+        source = source.encode('utf-8')
     except (UnicodeDecodeError, UnicodeEncodeError):
-        stdout, stderr = p.communicate(source)
+        # assume that it is already a utf-8 encoded string
+        pass
+
+    stdout, stderr = p.communicate(source)
+
+    try:
+        stdout = stdout.decode('utf-8')
+    except UnicodeDecodeError:
+        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
+        raise RuntimeError('Pandoc output was not utf-8.')
 
     # check that pandoc returned successfully
     if p.returncode != 0:
