@@ -103,15 +103,30 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+
+    # something else than 'None' indicates that the process already terminated
+    if not p.returncode is None:
+        raise RuntimeError(
+            'Pandoc died with exitcode "%s" before receiving input: %s' % (p.returncode,
+                                                                           p.stderr.read())
+        )
 
     try:
-        c = p.communicate(source.encode('utf-8'))[0].decode('utf-8')
+        stdout, stderr = p.communicate(source.encode('utf-8'))
+        stdout = stdout.decode('utf-8')
     except (UnicodeDecodeError, UnicodeEncodeError):
-        c = p.communicate(source)[0]
+        stdout, stderr = p.communicate(source)
 
-    # if there is an outputfile, then c is likely empty!
-    return c
+    # check that pandoc returned successfully
+    if p.returncode != 0:
+        raise RuntimeError(
+            'Pandoc died with exitcode "%s" during conversation: %s' % (p.returncode, stderr)
+        )
+
+    # if there is an outputfile, then stdout is likely empty!
+    return stdout
 
 
 def _get_base_format(format):

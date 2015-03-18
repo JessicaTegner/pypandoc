@@ -133,6 +133,13 @@ class TestPypandoc(unittest.TestCase):
         found = re.search(r'10.1038', written)
         self.assertTrue(found is None)
 
+    def test_conversion_error(self):
+        # pandoc dies on wrong commandline arguments
+        def f():
+            pypandoc.convert('<h1>Primary Heading</h1>','md', format='html', extra_args=["--blah"])
+        self.assertRaises(RuntimeError, f)
+
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
