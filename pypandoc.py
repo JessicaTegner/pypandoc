@@ -24,16 +24,33 @@ else:
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
-    '''Converts given `source` from `format` `to` another. `source` may be
-    either a file path or a string to be converted. It's possible to pass
-    `extra_args` if needed. In case `format` is not provided, it will try to
-    invert the format based on given `source`. Pandoc filters can be passed as
-    a list, e.g. filters=['pandoc-citeproc']
+    """Converts given `source` from `format` `to` another.
 
-    Raises OSError if pandoc is not found! Make sure it has been installed
-    and is available at path.
+    :param str source: Unicode string or utf-8 encoded bytes or a file path
 
-    '''
+    :param str to: format into which the input should be converted. Can be one of
+            `pypandoc.get_pandoc_formats()[1]`
+
+    :param str format: the format of the inputs; will be inferred if input is a file with an
+            known filename extension (Default value = None)
+
+    :param list extra_args: extra arguments (list of strings) to be passed to pandoc
+            (Default value = ())
+
+    :param str encoding: the encoding of the file (Default value = 'utf-8')
+
+    :param str outputfile: Output will be written to outfilename or the converted content
+            returned if None (Default value = None)
+
+    :param list filters: Pandoc filters e.g. filters=['pandoc-citeproc']
+
+    :returns: converted string (unicode) or an empty string if an outputfile was given
+    :rtype: unicode
+
+    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
+    :raises OSError: if pandoc is not found! Make sure it has been installed and is available at
+            path.
+    """
     return _convert(_read_file, _process_file, source, to,
                     format, extra_args, encoding=encoding,
                     outputfile=outputfile, filters=filters)
