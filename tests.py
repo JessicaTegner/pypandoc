@@ -162,10 +162,22 @@ class TestPypandoc(unittest.TestCase):
         written = pypandoc.convert(bytes,'md', format='html')
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, pypandoc.unicode_type))
+
+        # Only use german umlauts in th next test, as iso-8859-15 covers that
+        expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
+        bytes = u'<h1>üäö€</h1>'.encode("iso-8859-15")
+        # Without encoding, this fails as we expect utf-8 per default
         def f():
-            bytes = u'<h1>üäö</h1>'.encode("iso-8859-15")
             nothing = pypandoc.convert(bytes,'md', format='html')
         self.assertRaises(RuntimeError, f)
+        def f():
+            # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
+            nothing = pypandoc.convert(bytes,'md', format='html', encoding="utf-16")
+        self.assertRaises(RuntimeError, f)
+        # with the right encoding it should work...
+        written = pypandoc.convert(bytes,'md', format='html', encoding="iso-8859-15")
+        self.assertEqualExceptForNewlineEnd(expected, written)
+        self.assertTrue(isinstance(written, pypandoc.unicode_type))
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep

@@ -107,7 +107,14 @@ def _read_file(source, format, encoding='utf-8'):
         with codecs.open(source, encoding=encoding) as f:
             format = format or os.path.splitext(source)[1].strip('.')
             source = f.read()
-
+    else:
+        if encoding != 'utf-8':
+            # if a source and a different encoding is given, try to decode the the source into a
+            # unicode string
+            try:
+                source = source.decode(encoding)
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                pass
     return source, format
 
 
