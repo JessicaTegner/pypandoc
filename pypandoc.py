@@ -26,29 +26,30 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
     """Converts given `source` from `format` `to` another.
 
-    :param str source: Unicode string or utf-8 encoded bytes or a file path
+    :param str source: Unicode string or bytes or a file path (see encoding)
 
-    :param str to: format into which the input should be converted. Can be one of
+    :param str to: format into which the input should be converted; can be one of
             `pypandoc.get_pandoc_formats()[1]`
 
     :param str format: the format of the inputs; will be inferred if input is a file with an
-            known filename extension (Default value = None)
+            known filename extension; can be one of `pypandoc.get_pandoc_formats()[1]`
+            (Default value = None)
 
     :param list extra_args: extra arguments (list of strings) to be passed to pandoc
             (Default value = ())
 
-    :param str encoding: the encoding of the file (Default value = 'utf-8')
+    :param str encoding: the encoding of the file or the input bytes (Default value = 'utf-8')
 
-    :param str outputfile: Output will be written to outfilename or the converted content
+    :param str outputfile: output will be written to outfilename or the converted content
             returned if None (Default value = None)
 
-    :param list filters: Pandoc filters e.g. filters=['pandoc-citeproc']
+    :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
     :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
-    :raises OSError: if pandoc is not found! Make sure it has been installed and is available at
+    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
     return _convert(_read_file, _process_file, source, to,
