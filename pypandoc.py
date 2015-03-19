@@ -6,19 +6,52 @@ import sys
 import textwrap
 import os
 import re
+import locale
 
 __author__ = 'Juho Vepsäläinen'
 __version__ = '0.9.5'
 __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
+# compat code from IPython py3compat.py and encoding.py, which is licensed under the terms of the
+# Modified BSD License (also known as New or Revised or 3-Clause BSD)
+try:
+    # There are reports of getpreferredencoding raising errors
+    # in some cases, which may well be fixed, but let's be conservative here.
+    _DEFAULT_ENCODING = locale.getpreferredencoding()
+except Exception:
+    pass
+_DEFAULT_ENCODING = _DEFAULT_ENCODING or sys.getdefaultencoding()
+
+
+def _decode(s, encoding=None):
+    encoding = encoding or _DEFAULT_ENCODING
+    return s.decode(encoding)
+
+def _encode(u, encoding=None):
+    encoding = encoding or _DEFAULT_ENCODING
+    return u.encode(encoding)
+
+
+def _cast_unicode(s, encoding=None):
+    if isinstance(s, bytes):
+        return _decode(s, encoding)
+    return s
+
+def _cast_bytes(s, encoding=None):
+    # bytes == str on py2.7 -> always encode on py2
+    if not isinstance(s, bytes):
+        return _encode(s, encoding)
+    return s
 
 if sys.version_info[0] >= 3:
     PY3 = True
+
     string_types = (str,)
     unicode_type = str
 else:
     PY3 = False
+
     string_types = (str, unicode)
     unicode_type = unicode
 
@@ -113,7 +146,7 @@ def _read_file(source, format, encoding='utf-8'):
             # if a source and a different encoding is given, try to decode the the source into a
             # unicode string
             try:
-                source = source.decode(encoding)
+                source = _cast_unicode(source, encoding=encoding)
             except (UnicodeDecodeError, UnicodeEncodeError):
                 pass
     return source, format
@@ -148,7 +181,7 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
         )
 
     try:
-        source = source.encode('utf-8')
+        source = _cast_bytes(source, encoding='utf-8')
     except (UnicodeDecodeError, UnicodeEncodeError):
         # assume that it is already a utf-8 encoded string
         pass
