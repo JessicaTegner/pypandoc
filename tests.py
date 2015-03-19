@@ -148,18 +148,17 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_error(self):
         # pandoc dies on wrong commandline arguments
         def f():
-            pypandoc.convert('<h1>Primary Heading</h1>','md', format='html', extra_args=["--blah"])
+            pypandoc.convert('<h1>Primary Heading</h1>', 'md', format='html', extra_args=["--blah"])
         self.assertRaises(RuntimeError, f)
-
 
     def test_unicode_input(self):
         # make sure that pandoc always returns unicode and does not mishandle it
         expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
-        written = pypandoc.convert(u'<h1>üäöîôû</h1>','md', format='html')
+        written = pypandoc.convert(u'<h1>üäöîôû</h1>', 'md', format='html')
         self.assertTrue(isinstance(written, pypandoc.unicode_type))
         self.assertEqualExceptForNewlineEnd(expected, written)
         bytes = u'<h1>üäöîôû</h1>'.encode("utf-8")
-        written = pypandoc.convert(bytes,'md', format='html')
+        written = pypandoc.convert(bytes, 'md', format='html')
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, pypandoc.unicode_type))
 
@@ -167,15 +166,17 @@ class TestPypandoc(unittest.TestCase):
         expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
         bytes = u'<h1>üäö€</h1>'.encode("iso-8859-15")
         # Without encoding, this fails as we expect utf-8 per default
+
         def f():
-            nothing = pypandoc.convert(bytes,'md', format='html')
+            pypandoc.convert(bytes, 'md', format='html')
         self.assertRaises(RuntimeError, f)
+
         def f():
             # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
-            nothing = pypandoc.convert(bytes,'md', format='html', encoding="utf-16")
+            pypandoc.convert(bytes, 'md', format='html', encoding="utf-16")
         self.assertRaises(RuntimeError, f)
         # with the right encoding it should work...
-        written = pypandoc.convert(bytes,'md', format='html', encoding="iso-8859-15")
+        written = pypandoc.convert(bytes, 'md', format='html', encoding="iso-8859-15")
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, pypandoc.unicode_type))
 

@@ -28,6 +28,7 @@ def _decode(s, encoding=None):
     encoding = encoding or _DEFAULT_ENCODING
     return s.decode(encoding)
 
+
 def _encode(u, encoding=None):
     encoding = encoding or _DEFAULT_ENCODING
     return u.encode(encoding)
@@ -38,11 +39,13 @@ def _cast_unicode(s, encoding=None):
         return _decode(s, encoding)
     return s
 
+
 def _cast_bytes(s, encoding=None):
     # bytes == str on py2.7 -> always encode on py2
     if not isinstance(s, bytes):
         return _encode(s, encoding)
     return s
+
 
 if sys.version_info[0] >= 3:
     PY3 = True
@@ -54,6 +57,7 @@ else:
 
     string_types = (str, unicode)
     unicode_type = unicode
+
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
@@ -174,7 +178,7 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
         stderr=subprocess.PIPE)
 
     # something else than 'None' indicates that the process already terminated
-    if not p.returncode is None:
+    if not (p.returncode is None):
         raise RuntimeError(
             'Pandoc died with exitcode "%s" before receiving input: %s' % (p.returncode,
                                                                            p.stderr.read())
