@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import unittest
 import tempfile
@@ -120,6 +121,17 @@ class TestPypandoc(unittest.TestCase):
         found = re.search(r'10.1038', written)
         self.assertTrue(found.group() == '10.1038')
 
+        # make sure that it splits the filter line
+        for filters in ['pandoc-citeproc', u'pandoc-citeproc']:
+            written = pypandoc.convert('./filter_test.md', to='html', format='md',
+                                       outputfile=None, filters=filters)
+            # only properly converted file will have this in it
+            found = re.search(r'Fenner', written)
+            self.assertTrue(found.group() == 'Fenner')
+            # only properly converted file will have this in it
+            found = re.search(r'10.1038', written)
+            self.assertTrue(found.group() == '10.1038')
+
     def test_conversion_with_empty_filter(self):
         # we just want to get a temp file name, where we can write to
         filters = ''
@@ -132,6 +144,41 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(found is None)
         found = re.search(r'10.1038', written)
         self.assertTrue(found is None)
+
+    def test_conversion_error(self):
+        # pandoc dies on wrong commandline arguments
+        def f():
+            pypandoc.convert('<h1>Primary Heading</h1>', 'md', format='html', extra_args=["--blah"])
+        self.assertRaises(RuntimeError, f)
+
+    def test_unicode_input(self):
+        # make sure that pandoc always returns unicode and does not mishandle it
+        expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
+        written = pypandoc.convert(u'<h1>üäöîôû</h1>', 'md', format='html')
+        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+        self.assertEqualExceptForNewlineEnd(expected, written)
+        bytes = u'<h1>üäöîôû</h1>'.encode("utf-8")
+        written = pypandoc.convert(bytes, 'md', format='html')
+        self.assertEqualExceptForNewlineEnd(expected, written)
+        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+
+        # Only use german umlauts in th next test, as iso-8859-15 covers that
+        expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
+        bytes = u'<h1>üäö€</h1>'.encode("iso-8859-15")
+        # Without encoding, this fails as we expect utf-8 per default
+
+        def f():
+            pypandoc.convert(bytes, 'md', format='html')
+        self.assertRaises(RuntimeError, f)
+
+        def f():
+            # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
+            pypandoc.convert(bytes, 'md', format='html', encoding="utf-16")
+        self.assertRaises(RuntimeError, f)
+        # with the right encoding it should work...
+        written = pypandoc.convert(bytes, 'md', format='html', encoding="iso-8859-15")
+        self.assertEqualExceptForNewlineEnd(expected, written)
+        self.assertTrue(isinstance(written, pypandoc.unicode_type))
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
