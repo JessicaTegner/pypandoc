@@ -22,6 +22,19 @@ def test_converter(to, format=None, extra_args=()):
 
 
 class TestPypandoc(unittest.TestCase):
+
+    def test_get_pandoc_formats(self):
+        inputs, outputs = pypandoc.get_pandoc_formats()
+        self.assertTrue("markdown" in inputs)
+        self.assertTrue("markdown" in outputs)
+
+    def test_get_pandoc_version(self):
+        version = pypandoc.get_pandoc_version()
+        self.assertTrue(isinstance(version, pypandoc.string_types))
+        major = int(version.split(".")[0])
+        # according to http://pandoc.org/releases.html there were only two versions 0.x ...
+        self.assertTrue(major in [0, 1])
+
     def test_converts_valid_format(self):
         self.assertEqual(test_converter(format='md', to='rest'), 'ok')
 
