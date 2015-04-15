@@ -269,3 +269,48 @@ def get_pandoc_formats():
     out = re.sub('\*|\[.*?\]', '', aux[1]).split(',')
 
     return [f.strip() for f in in_], [f.strip() for f in out]
+
+
+# copied and adapted from jupyter_nbconvert/utils/pandoc.py, Modified BSD License
+def get_pandoc_version():
+    """Gets the Pandoc version if Pandoc is installed.
+
+    It will probe Pandoc for its version, cache it and return that value. If a cached version is
+    found, it will return the cached version and stop probing Pandoc
+    (unless :func:`clean_version_cache()` is called).
+
+    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
+            path.
+    """
+    global __version
+
+    if __version is None:
+
+        # this does a ' pandoc -h' and raises an error if this fails ("pandoc not
+        # installed")
+        # This (and other places above) would probably benefit from shutils.which in py3.4
+        # (backport: ipython_genutils/py3compat.py)
+        get_pandoc_formats()
+
+        p = subprocess.Popen(
+            ['pandoc', '-v'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
+
+        out_lines = p.communicate()[0].decode().splitlines(False)
+        version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
+        for tok in out_lines[0].split():
+            if version_pattern.match(tok):
+                __version = tok
+                break
+    return __version
+
+
+# -----------------------------------------------------------------------------
+# Internal state management
+# -----------------------------------------------------------------------------
+def clean_version_cache():
+    global __version
+    __version = None
+
+__version = None
