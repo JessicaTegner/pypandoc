@@ -81,9 +81,16 @@ output = pd.convert(source=filename,
 ```
 Please pass any filters in as a list and not a string.
 
-
 Please refer to `pandoc -h` and the
 [official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
+
+## Getting Pandoc Version
+
+As it can be useful sometimes to check what Pandoc version is available at your system, `pypandoc` provides an utility for this. Example:
+
+```
+version = pypandoc.get_pandoc_version()
+```
 
 ## Related
 
@@ -132,8 +139,7 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
 * [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
 * [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
-* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer
-  version of Pandoc, return code checking
+* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of Pandoc, return code checking, get_pandoc_version
 * [Aaron Gonzales](https://github.com/xysmas) - Added better filter handling
 
 ## License
