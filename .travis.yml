@@ -1,5 +1,5 @@
 language: python
-sudo: false
+sudo: true
 env:
   global:
     - PATH=$TRAVIS_BUILD_DIR/pandoc:$PATH
