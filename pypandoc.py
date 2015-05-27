@@ -140,6 +140,8 @@ def _read_file(source, format, encoding='utf-8'):
         path = os.path.exists(source)
     except UnicodeEncodeError:
         path = os.path.exists(source.encode('utf-8'))
+    except ValueError:
+        path = ''
     if path:
         import codecs
         with codecs.open(source, encoding=encoding) as f:
