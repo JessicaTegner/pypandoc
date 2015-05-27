@@ -287,13 +287,6 @@ def get_pandoc_version():
     global __version
 
     if __version is None:
-
-        # this does a ' pandoc -h' and raises an error if this fails ("pandoc not
-        # installed")
-        # This (and other places above) would probably benefit from shutils.which in py3.4
-        # (backport: ipython_genutils/py3compat.py)
-        get_pandoc_formats()
-
         p = subprocess.Popen(
             ['pandoc', '-v'],
             stdin=subprocess.PIPE,
