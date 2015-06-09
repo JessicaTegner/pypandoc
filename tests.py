@@ -194,6 +194,25 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, pypandoc.unicode_type))
 
+    def test_conversion_from_non_plain_text_file(self):
+        tf = tempfile.NamedTemporaryFile(suffix='.docx', delete=False)
+        name = tf.name
+        tf.close()
+
+        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+
+        try:
+            # let's just test conversion (to and) from docx, testing e.g. odt
+            # as well would really be testing pandoc rather than pypandoc
+            received = pypandoc.convert('#some title\n', to='docx', format='md', outputfile=name)
+            self.assertEqualExceptForNewlineEnd("", received)
+            received = pypandoc.convert(name, to='rst')
+            self.assertEqualExceptForNewlineEnd(expected, received)
+        except:
+            raise
+        finally:
+            os.remove(name)
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
