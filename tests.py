@@ -11,12 +11,13 @@ import sys
 def test_converter(to, format=None, extra_args=()):
 
     def reader(*args, **kwargs):
-        return source, format
+        return source, format, input_type
 
     def processor(*args, **kwargs):
         return 'ok'
 
     source = 'foo'
+    input_type = 'string'
 
     return pypandoc._convert(reader, processor, source, to, format, extra_args)
 
