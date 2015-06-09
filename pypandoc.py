@@ -96,7 +96,7 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
 
 def _convert(reader, processor, source, to, format=None, extra_args=(), encoding=None,
              outputfile=None, filters=None):
-    source, format = reader(source, format, encoding=encoding)
+    source, format, input_type = reader(source, format, encoding=encoding)
 
     formats = {
         'dbk': 'docbook',
@@ -131,8 +131,8 @@ def _convert(reader, processor, source, to, format=None, extra_args=(), encoding
             'Output to %s only works by using a outputfile.' % base_to_format
         )
 
-    return processor(source, to, format, extra_args, outputfile=outputfile,
-                     filters=filters)
+    return processor(source, input_type, to, format, extra_args,
+                     outputfile=outputfile, filters=filters)
 
 
 def _read_file(source, format, encoding='utf-8'):
@@ -143,10 +143,8 @@ def _read_file(source, format, encoding='utf-8'):
     except ValueError:
         path = ''
     if path:
-        import codecs
-        with codecs.open(source, encoding=encoding) as f:
-            format = format or os.path.splitext(source)[1].strip('.')
-            source = f.read()
+        format = format or os.path.splitext(source)[1].strip('.')
+        input_type = 'path'
     else:
         if encoding != 'utf-8':
             # if a source and a different encoding is given, try to decode the the source into a
@@ -155,11 +153,15 @@ def _read_file(source, format, encoding='utf-8'):
                 source = _cast_unicode(source, encoding=encoding)
             except (UnicodeDecodeError, UnicodeEncodeError):
                 pass
-    return source, format
+        input_type = 'string'
+    return source, format, input_type
 
 
-def _process_file(source, to, format, extra_args, outputfile=None, filters=None):
-    args = ['pandoc', '--from=' + format, '--to=' + to]
+def _process_file(source, input_type, to, format, extra_args, outputfile=None,
+                  filters=None):
+    string_input = input_type == 'string'
+    input_file = [source] if not string_input else []
+    args = ['pandoc', '--from=' + format, '--to=' + to] + input_file
 
     if outputfile:
         args.append("--output="+outputfile)
@@ -175,7 +177,7 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
 
     p = subprocess.Popen(
         args,
-        stdin=subprocess.PIPE,
+        stdin=subprocess.PIPE if string_input else None,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
 
@@ -192,7 +194,7 @@ def _process_file(source, to, format, extra_args, outputfile=None, filters=None)
         # assume that it is already a utf-8 encoded string
         pass
 
-    stdout, stderr = p.communicate(source)
+    stdout, stderr = p.communicate(source if string_input else None)
 
     try:
         stdout = stdout.decode('utf-8')
