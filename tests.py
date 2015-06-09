@@ -54,27 +54,26 @@ class TestPypandoc(unittest.TestCase):
     def test_basic_conversion_from_file(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
-        with tempfile.NamedTemporaryFile('w+t', suffix='.md',
-                                         delete=False) as test_file:
+        with tempfile.NamedTemporaryFile('w+t', suffix='.md') as test_file:
             file_name = test_file.name
             test_file.write('#some title\n')
             test_file.flush()
 
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-        received = pypandoc.convert(file_name, 'rst')
-        self.assertEqualExceptForNewlineEnd(expected, received)
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received = pypandoc.convert(file_name, 'rst')
+            self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_file_with_format(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
-        with tempfile.NamedTemporaryFile('w+t', suffix='.rst',
-                                         delete=False) as test_file:
+        with tempfile.NamedTemporaryFile('w+t', suffix='.rst') as test_file:
             file_name = test_file.name
             test_file.write('#some title\n')
             test_file.flush()
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-        received = pypandoc.convert(file_name, 'rst', format='md')
-        self.assertEqualExceptForNewlineEnd(expected, received)
+
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received = pypandoc.convert(file_name, 'rst', format='md')
+            self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_string(self):
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
@@ -109,12 +108,17 @@ class TestPypandoc(unittest.TestCase):
         tf.close()
 
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-        received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=name)
-        self.assertEqualExceptForNewlineEnd("", received)
-        with open(name) as f:
-            written = f.read()
-        os.remove(name)
-        self.assertEqualExceptForNewlineEnd(expected, written)
+
+        try:
+            received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=name)
+            self.assertEqualExceptForNewlineEnd("", received)
+            with open(name) as f:
+                written = f.read()
+            self.assertEqualExceptForNewlineEnd(expected, written)
+        except:
+            raise
+        finally:
+            os.remove(name)
 
         # to odf does not work without a file
         def f():
