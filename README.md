@@ -144,6 +144,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
 * [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of Pandoc, return code checking, get_pandoc_version
 * [Aaron Gonzales](https://github.com/xysmas) - Added better filter handling
+* [David Lukes](https://github.com/dlukes) - Enabled input from non-plain-text files and made sure tests clean up template files correctly if they fail
 
 ## License
 
