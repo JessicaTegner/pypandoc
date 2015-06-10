@@ -118,8 +118,11 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 1. Before implementing, please open an issue for discussion.
 2. Make sure you have tests for the new logic.
 3. Make sure your code passes `flake8 pypandoc.py tests.py`
-4. Add yourself to contributors at `README.md` unless you are already there. In that case tweak
-   your contributions.
+4. Add yourself to contributors at `README.md` unless you are already there. In that case tweak your contributions.
+
+Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https://github.com/jgm/pandoc-citeproc) installed.
+
+> IMPORTANT! Currently Travis build is a bit broken. If you have any idea on how to debug that, please see [#55](https://github.com/bebraw/pypandoc/issues/55).
 
 ## Contributors
 
