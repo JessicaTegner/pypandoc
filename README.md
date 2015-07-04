@@ -41,7 +41,7 @@ If you pass in a string (and not a filename), `convert` expects this string to b
 utf-8 encoded bytes. `convert` will always return a unicode string.
 
 It's also possible to directly let pandoc write the output to a file. This is the only way to
-convert to some output formats (e.g. odt, docx, epub, epub3). In that case `convert()` will
+convert to some output formats (e.g. odt, docx, epub, epub3, pdf). In that case `convert()` will
 return an empty string.
 
 ```python
@@ -83,6 +83,17 @@ Please pass any filters in as a list and not a string.
 
 Please refer to `pandoc -h` and the
 [official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
+
+## Dealing with Formatting Arguments
+
+Pandoc supports custom formatting though `-V` parameter. In order to use it through pypandoc, use code such as this:
+
+```python
+output = pypandoc.convert('demo.md', 'pdf', outputfile='demo.pdf',
+  extra_args=['-V', 'geometry:margin=1.5cm'])
+```
+
+Note that it's important to separate `-V` and its argument within a list like that or else it won't work. This gotcha has to do with the way `subprocess.Popen` works.
 
 ## Getting Pandoc Version
 
