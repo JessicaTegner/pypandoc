@@ -161,7 +161,13 @@ def _process_file(source, input_type, to, format, extra_args, outputfile=None,
                   filters=None):
     string_input = input_type == 'string'
     input_file = [source] if not string_input else []
-    args = ['pandoc', '--from=' + format, '--to=' + to] + input_file
+    args = ['pandoc', '--from=' + format]
+
+    # #59 - pdf output won't work with `--to` set!
+    if to is not 'pdf':
+        args.append('--to=' + to)
+
+    args += input_file
 
     if outputfile:
         args.append("--output="+outputfile)

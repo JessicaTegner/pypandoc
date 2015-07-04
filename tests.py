@@ -217,6 +217,18 @@ class TestPypandoc(unittest.TestCase):
         finally:
             os.remove(name)
 
+    def test_pdf_conversion(self):
+        tf = tempfile.NamedTemporaryFile(suffix='.pdf', delete=False)
+        name = tf.name
+        tf.close()
+
+        try:
+            pypandoc.convert('#some title\n', to='pdf', format='md', outputfile=name)
+        except:
+            raise
+        finally:
+            os.remove(name)
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
