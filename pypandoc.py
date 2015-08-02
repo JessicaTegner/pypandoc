@@ -211,7 +211,7 @@ def _process_file(source, input_type, to, format, extra_args, outputfile=None,
     # check that pandoc returned successfully
     if p.returncode != 0:
         raise RuntimeError(
-            'Pandoc died with exitcode "%s" during conversation: %s' % (p.returncode, stderr)
+            'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
 
     # if there is an outputfile, then stdout is likely empty!
