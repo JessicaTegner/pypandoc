@@ -156,7 +156,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of Pandoc, return code checking, get_pandoc_version
 * [Aaron Gonzales](https://github.com/xysmas) - Added better filter handling
 * [David Lukes](https://github.com/dlukes) - Enabled input from non-plain-text files and made sure tests clean up template files correctly if they fail
-* [valholl](https://github.com/valholl) - Set up licensing information correcly
+* [valholl](https://github.com/valholl) - Set up licensing information correctly and include examples to distribution version
 
 ## License
 
