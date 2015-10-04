@@ -15,7 +15,7 @@ services:
 addons:
   apt_packages:
     - pandoc
-    - texlive-latex-base
+    - texlive-full
 install:
   - travis_retry pip install tox
 script:
