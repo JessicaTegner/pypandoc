@@ -1,6 +1,8 @@
 language: python
 sudo: required
 env:
+  global:
+    - HOME=$TRAVIS_BUILD_DIR
   matrix:
     - TOXENV=py26
     - TOXENV=py27
