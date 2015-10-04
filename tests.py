@@ -129,7 +129,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_conversion_with_citeproc_filter(self):
         import os
-        if 'CI' in os.environ:
+        if os.environ.get('CI', None) is not None:
             print("Skipping: there is a bug with citeproc on travis.")
             return
         # we just want to get a temp file name, where we can write to
