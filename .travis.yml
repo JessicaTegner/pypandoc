@@ -1,8 +1,6 @@
 language: python
-sudo: false
+sudo: required
 env:
-  global:
-    - PATH=$TRAVIS_BUILD_DIR/pandoc:$PATH
   matrix:
     - TOXENV=py26
     - TOXENV=py27
@@ -10,9 +8,18 @@ env:
     - TOXENV=py34
     - TOXENV=pypy
     - TOXENV=flake8
-before_install:
-  - 'wget https://7de4dfdec62155b49b44-d726a73613a1989d29b147f20996e7c1.ssl.cf2.rackcdn.com/pandoc-1.12.3-linux-debian-x86_64.zip && unzip pandoc-1.12.3-linux-debian-x86_64.zip;'
+services:
+  - docker
+addons:
+  apt_packages:
+    - pandoc
+    - pandoc-citeproc
+    - texlive-latex-base
+    - texlive-latex-extra
+    - texlive-fonts-recommended
+    - lmodern
 install:
   - travis_retry pip install tox
 script:
+  - pandoc -v
   - tox
