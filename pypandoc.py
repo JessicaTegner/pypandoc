@@ -299,10 +299,6 @@ def get_pandoc_version():
             ['pandoc', '-v'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE)
-
-        # DEBUG
-        print(p.communicate())
-
         out_lines = p.communicate()[0].decode().splitlines(False)
         version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
         for tok in out_lines[0].split():
