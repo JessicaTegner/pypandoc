@@ -115,8 +115,8 @@ def _convert(reader, processor, source, to, format=None, extra_args=(), encoding
 
     if _get_base_format(format) not in from_formats:
         raise RuntimeError(
-            'Invalid input format! Expected one of these: ' +
-            ', '.join(from_formats))
+            'Invalid input format! Got "%s" but expected one of these: %s' % (
+                _get_base_format(format), ', '.join(from_formats)))
 
     base_to_format = _get_base_format(to)
     if base_to_format not in to_formats:
@@ -271,7 +271,11 @@ def get_pandoc_formats():
         """))
         raise OSError("You probably do not have pandoc installed.")
 
-    help_text = p.communicate()[0].decode().splitlines(False)
+    comm = p.communicate()
+    help_text = comm[0].decode().splitlines(False)
+    if p.returncode != 0 or 'Options:' not in help_text:
+        raise RuntimeError("Couldn't call pandoc to get output formats. Output from pandoc:\n%s" %
+                           str(comm))
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
     aux = txt.split('Output formats: ')
@@ -299,7 +303,12 @@ def get_pandoc_version():
             ['pandoc', '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE)
-        out_lines = p.communicate()[0].decode().splitlines(False)
+        comm = p.communicate()
+        out_lines = comm[0].decode().splitlines(False)
+        if p.returncode != 0 or len(out_lines) == 0:
+            raise RuntimeError("Couldn't call pandoc to get version information. Output from "
+                               "pandoc:\n%s" % str(comm))
+
         version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
         for tok in out_lines[0].split():
             if version_pattern.match(tok):
