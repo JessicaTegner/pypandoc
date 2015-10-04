@@ -1,6 +1,8 @@
 language: python
 sudo: required
 env:
+  global:
+    - CI=1
   matrix:
     - TOXENV=py26
     - TOXENV=py27
