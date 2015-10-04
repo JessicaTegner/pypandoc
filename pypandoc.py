@@ -199,8 +199,12 @@ def _process_file(source, input_type, to, format, extra_args, outputfile=None,
     except (UnicodeDecodeError, UnicodeEncodeError):
         # assume that it is already a utf-8 encoded string
         pass
-
-    stdout, stderr = p.communicate(source if string_input else None)
+    try:
+        stdout, stderr = p.communicate(source if string_input else None)
+    except OSError:
+        # this is happening only on Py2.6 when pandoc dies before reading all
+        # the input. We treat that the same as when we exit with an error...
+        raise RuntimeError('Pandoc died with exitcode "%s" during conversion.' % (p.returncode))
 
     try:
         stdout = stdout.decode('utf-8')
