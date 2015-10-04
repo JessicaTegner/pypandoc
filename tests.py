@@ -27,6 +27,7 @@ class TestPypandoc(unittest.TestCase):
     def test_get_pandoc_formats(self):
         inputs, outputs = pypandoc.get_pandoc_formats()
         self.assertTrue("markdown" in inputs)
+        self.assertTrue("json" in inputs)
         self.assertTrue("markdown" in outputs)
 
     def test_get_pandoc_version(self):
