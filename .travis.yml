@@ -20,4 +20,5 @@ addons:
 install:
   - travis_retry pip install tox
 script:
+  - pandoc --version
   - tox
