@@ -17,6 +17,7 @@ addons:
     - texlive-latex-base
     - texlive-latex-extra
     - texlive-fonts-recommended
+    - lmodern
 install:
   - travis_retry pip install tox
 script:
