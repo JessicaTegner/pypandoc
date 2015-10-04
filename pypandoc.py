@@ -275,7 +275,7 @@ def get_pandoc_formats():
     txt = ' '.join(help_text[1:help_text.index('Options:')])
 
     aux = txt.split('Output formats: ')
-    in_ = re.sub('Input\sformats:\s', '', aux[0]).split(',')
+    in_ = re.sub('Input\sformats:\s|\*', '', aux[0]).split(',')
     out = re.sub('\*|\[.*?\]', '', aux[1]).split(',')
 
     return [f.strip() for f in in_], [f.strip() for f in out]

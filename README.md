@@ -157,6 +157,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Aaron Gonzales](https://github.com/xysmas) - Added better filter handling
 * [David Lukes](https://github.com/dlukes) - Enabled input from non-plain-text files and made sure tests clean up template files correctly if they fail
 * [valholl](https://github.com/valholl) - Set up licensing information correctly and include examples to distribution version
+* [Cyrille Rossant](https://github.com/rossant) - Fix bug by trimming out stars in the list of pandoc formats
 
 ## License
 
