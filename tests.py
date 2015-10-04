@@ -24,6 +24,18 @@ def test_converter(to, format=None, extra_args=()):
 
 class TestPypandoc(unittest.TestCase):
 
+    def setUp(self):
+        if 'HOME' not in os.environ:
+            # if this is used with older versions of pandoc-citeproc
+            # https://github.com/jgm/pandoc-citeproc/issues/35
+            if 'TRAVIS_BUILD_DIR' in os.environ:
+                os.environ["HOME"] = os.environ["TRAVIS_BUILD_DIR"]
+                print("Using TRAVIS_BUILD_DIR as HOME")
+            else:
+                os.environ["HOME"] = str(os.getcwd())
+                print("Using current dir as HOME")
+        print(os.environ["HOME"])
+
     def test_get_pandoc_formats(self):
         inputs, outputs = pypandoc.get_pandoc_formats()
         self.assertTrue("markdown" in inputs)
@@ -31,10 +43,7 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue("markdown" in outputs)
 
     def test_get_pandoc_version(self):
-        if os.environ.get('CI', None):
-            print("Skipping: travis fails with 'getAppUserDataDirectory: does not exist'")
-            return
-
+        assert "HOME" in os.environ, "No HOME set, this will error..."
         version = pypandoc.get_pandoc_version()
         self.assertTrue(isinstance(version, pypandoc.string_types))
         major = int(version.split(".")[0])
@@ -208,7 +217,7 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(isinstance(written, pypandoc.unicode_type))
 
     def test_conversion_from_non_plain_text_file(self):
-        if os.environ.get('CI', None):
+        if 'CI' in os.environ:
             print("Skipping: travis is running on old pandoc, no docx")
             return
 
