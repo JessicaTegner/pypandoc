@@ -1,8 +1,6 @@
 language: python
 sudo: required
 env:
-  global:
-    - HOME=$TRAVIS_BUILD_DIR
   matrix:
     - TOXENV=py26
     - TOXENV=py27
@@ -23,5 +21,5 @@ addons:
 install:
   - travis_retry pip install tox
 script:
-  - pandoc --version
+  - pandoc -v
   - tox
