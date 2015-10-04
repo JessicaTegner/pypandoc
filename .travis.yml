@@ -1,8 +1,6 @@
 language: python
 sudo: required
 env:
-  global:
-    - PATH=$TRAVIS_BUILD_DIR/pandoc:$PATH
   matrix:
     - TOXENV=py26
     - TOXENV=py27
@@ -18,6 +16,7 @@ addons:
     - pandoc-citeproc
     - texlive-latex-base
     - texlive-latex-extra
+    - texlive-fonts-recommended
 install:
   - travis_retry pip install tox
 script:
