@@ -296,7 +296,7 @@ def get_pandoc_version():
 
     if __version is None:
         p = subprocess.Popen(
-            ['pandoc', '-v'],
+            ['pandoc', '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE)
         out_lines = p.communicate()[0].decode().splitlines(False)
