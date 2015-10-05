@@ -1,8 +1,6 @@
 language: python
-sudo: required
+sudo: false
 env:
-  global:
-    - CI=1
   matrix:
     - TOXENV=py26
     - TOXENV=py27
@@ -10,18 +8,24 @@ env:
     - TOXENV=py34
     - TOXENV=pypy
     - TOXENV=flake8
-services:
-  - docker
 addons:
-  apt_packages:
-    - pandoc
-    - pandoc-citeproc
-    - texlive-latex-base
-    - texlive-latex-extra
-    - texlive-fonts-recommended
-    - lmodern
+  apt:
+    packages:
+      - texlive-latex-base
+      - texlive-latex-extra
+      - texlive-fonts-recommended
+      - texlive-latex-recommended
+      - lmodern
 install:
+  # Stolen from https://github.com/yihui/knitr/blob/master/.travis.yml
+  - "[ ! -d ~/bin ] && mkdir ~/bin || true"
+  - "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash"
   - travis_retry pip install tox
+
+cache:
+  directories:
+  - $HOME/bin
+
 script:
   - pandoc -v
   - tox
