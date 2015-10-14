@@ -9,7 +9,7 @@ import re
 import locale
 
 __author__ = 'Juho Vepsäläinen'
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats']
 
