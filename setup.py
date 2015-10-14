@@ -3,7 +3,11 @@
 import pypandoc
 from setuptools import setup
 
-long_description = pypandoc.convert('README.md', 'rst')
+try:
+    long_description = pypandoc.convert('README.md', 'rst')
+except OSError:
+    # pandoc is not installed, fallback to using raw contents
+    long_description = open('README.md').read()
 
 module = pypandoc
 setup(
