@@ -158,6 +158,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [David Lukes](https://github.com/dlukes) - Enabled input from non-plain-text files and made sure tests clean up template files correctly if they fail
 * [valholl](https://github.com/valholl) - Set up licensing information correctly and include examples to distribution version
 * [Cyrille Rossant](https://github.com/rossant) - Fixed bug by trimming out stars in the list of pandoc formats. Helped to fix the Travis build.
+* [Paul Osborne](https://github.com/posborne) - Don't require pandoc to install pypandoc.
 
 ## License
 
