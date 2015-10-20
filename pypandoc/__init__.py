@@ -278,6 +278,7 @@ def _get_pandoc_version(pandoc_path):
             break
     return version
 
+
 def get_pandoc_version():
     """Gets the Pandoc version if Pandoc is installed.
 
@@ -295,11 +296,12 @@ def get_pandoc_version():
         __version = _get_pandoc_version(__pandoc_path)
     return __version
 
+
 def _ensure_pandoc_path():
     global __pandoc_path
-    
+
     if __pandoc_path is None:
-        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)), 
+        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
         search_paths = ["pandoc",  included_pandoc]
         # If a user added the complete path to pandoc to an env, use that as the
@@ -308,22 +310,22 @@ def _ensure_pandoc_path():
         if os.getenv('PYPANDOC_PANDOC', None):
             search_paths = [os.getenv('PYPANDOC_PANDOC')]
         for path in search_paths:
-            curr_version = [0,0,0]
-            version_string="0.0.0"
+            curr_version = [0, 0, 0]
+            version_string = "0.0.0"
             try:
                 version_string = _get_pandoc_version(path)
-            except Exception as e:
+            except:
                 # we can't use that path...
-                #print(e)
+                # print(e)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
                 version.append(0)
-            #print("%s, %s" % (path, version))
+            # print("%s, %s" % (path, version))
             for pos in range(len(curr_version)):
                 # Only use the new version if it is any bigger...
                 if version[pos] > curr_version[pos]:
-                    #print("Found: %s" % path)
+                    # print("Found: %s" % path)
                     __pandoc_path = path
                     curr_version = version
                     break
@@ -356,9 +358,8 @@ def _ensure_pandoc_path():
 
             """))
             raise RuntimeError("No pandoc was found: either install pandoc and add it\n"
-                               "to your PATH or install pypandoc wheels with included pandoc.") 
-            
-        
+                               "to your PATH or install pypandoc wheels with included pandoc.")
+
 
 # -----------------------------------------------------------------------------
 # Internal state management
@@ -366,6 +367,7 @@ def _ensure_pandoc_path():
 def clean_version_cache():
     global __version
     __version = None
+
 
 def clean_pandocpath_cache():
     global __pandoc_path
