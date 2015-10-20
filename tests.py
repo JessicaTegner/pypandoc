@@ -65,9 +65,13 @@ class TestPypandoc(unittest.TestCase):
         except RuntimeError:
             pass
 
+    # We can't use skipIf as it is not available in py2.6
+    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
     def test_basic_conversion_from_file(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
+        if sys.platform.startswith("win"):
+            return
         with tempfile.NamedTemporaryFile('w+t', suffix='.md') as test_file:
             file_name = test_file.name
             test_file.write('#some title\n')
@@ -77,9 +81,13 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
+    # We can't use skipIf as it is not available in py2.6
+    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
     def test_basic_conversion_from_file_with_format(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
+        if sys.platform.startswith("win"):
+            return
         with tempfile.NamedTemporaryFile('w+t', suffix='.rst') as test_file:
             file_name = test_file.name
             test_file.write('#some title\n')
