@@ -299,8 +299,15 @@ def _ensure_pandoc_path():
     global __pandoc_path
     
     if __pandoc_path is None:
-        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files", "pandoc")
-        for path in ["pandoc",  included_pandoc]:
+        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)), 
+                                       "files", "pandoc")
+        search_paths = ["pandoc",  included_pandoc]
+        # If a user added the complete path to pandoc to an env, use that as the
+        # only way to get pandoc so that a user can overwrite even a higher
+        # version in some other places.
+        if os.getenv('PYPANDOC_PANDOC', None):
+            search_paths = [os.getenv('PYPANDOC_PANDOC')]
+        for path in search_paths:
             curr_version = [0,0,0]
             version_string="0.0.0"
             try:
