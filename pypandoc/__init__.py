@@ -159,9 +159,10 @@ def _read_file(source, format, encoding='utf-8'):
 
 def _process_file(source, input_type, to, format, extra_args, outputfile=None,
                   filters=None):
+    _ensure_pandoc_path()
     string_input = input_type == 'string'
     input_file = [source] if not string_input else []
-    args = ['pandoc', '--from=' + format]
+    args = [__pandoc_path, '--from=' + format]
 
     # #59 - pdf output won't work with `--to` set!
     if to is not 'pdf':
@@ -237,43 +238,11 @@ def get_pandoc_formats():
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
     '''
-    try:
-        p = subprocess.Popen(
-            ['pandoc', '-h'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
-    except OSError:
-        sys.stderr.write(textwrap.dedent("""\
-            ---------------------------------------------------------------
-            An error occurred while trying to run `pandoc`
-        """))
-        if os.path.exists('/usr/local/bin/brew'):
-            sys.stderr.write(textwrap.dedent("""\
-                Maybe try:
-
-                    brew install pandoc
-            """))
-        elif os.path.exists('/usr/bin/apt-get'):
-            sys.stderr.write(textwrap.dedent("""\
-                Maybe try:
-
-                    sudo apt-get install pandoc
-            """))
-        elif os.path.exists('/usr/bin/yum'):
-            sys.stderr.write(textwrap.dedent("""\
-                Maybe try:
-
-                    sudo yum install pandoc
-            """))
-        sys.stderr.write(textwrap.dedent("""\
-            See http://johnmacfarlane.net/pandoc/installing.html
-            for installation options
-        """))
-        sys.stderr.write(textwrap.dedent("""\
-            ---------------------------------------------------------------
-
-        """))
-        raise OSError("You probably do not have pandoc installed.")
+    _ensure_pandoc_path()
+    p = subprocess.Popen(
+        [__pandoc_path, '-h'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE)
 
     comm = p.communicate()
     help_text = comm[0].decode().splitlines(False)
@@ -290,6 +259,25 @@ def get_pandoc_formats():
 
 
 # copied and adapted from jupyter_nbconvert/utils/pandoc.py, Modified BSD License
+
+def _get_pandoc_version(pandoc_path):
+    p = subprocess.Popen(
+        [pandoc_path, '--version'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE)
+    comm = p.communicate()
+    out_lines = comm[0].decode().splitlines(False)
+    if p.returncode != 0 or len(out_lines) == 0:
+        raise RuntimeError("Couldn't call pandoc to get version information. Output from "
+                           "pandoc:\n%s" % str(comm))
+
+    version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
+    for tok in out_lines[0].split():
+        if version_pattern.match(tok):
+            version = tok
+            break
+    return version
+
 def get_pandoc_version():
     """Gets the Pandoc version if Pandoc is installed.
 
@@ -303,23 +291,67 @@ def get_pandoc_version():
     global __version
 
     if __version is None:
-        p = subprocess.Popen(
-            ['pandoc', '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
-        comm = p.communicate()
-        out_lines = comm[0].decode().splitlines(False)
-        if p.returncode != 0 or len(out_lines) == 0:
-            raise RuntimeError("Couldn't call pandoc to get version information. Output from "
-                               "pandoc:\n%s" % str(comm))
-
-        version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
-        for tok in out_lines[0].split():
-            if version_pattern.match(tok):
-                __version = tok
-                break
+        _ensure_pandoc_path()
+        __version = _get_pandoc_version(__pandoc_path)
     return __version
 
+def _ensure_pandoc_path():
+    global __pandoc_path
+    
+    if __pandoc_path is None:
+        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files", "pandoc")
+        for path in ["pandoc",  included_pandoc]:
+            curr_version = [0,0,0]
+            version_string="0.0.0"
+            try:
+                version_string = _get_pandoc_version(path)
+            except Exception as e:
+                # we can't use that path...
+                #print(e)
+                continue
+            version = [int(x) for x in version_string.split(".")]
+            while len(version) < len(curr_version):
+                version.append(0)
+            #print("%s, %s" % (path, version))
+            for pos in range(len(curr_version)):
+                # Only use the new version if it is any bigger...
+                if version[pos] > curr_version[pos]:
+                    #print("Found: %s" % path)
+                    __pandoc_path = path
+                    curr_version = version
+                    break
+
+        if __pandoc_path is None:
+            if os.path.exists('/usr/local/bin/brew'):
+                sys.stderr.write(textwrap.dedent("""\
+                    Maybe try:
+
+                        brew install pandoc
+                """))
+            elif os.path.exists('/usr/bin/apt-get'):
+                sys.stderr.write(textwrap.dedent("""\
+                    Maybe try:
+
+                        sudo apt-get install pandoc
+                """))
+            elif os.path.exists('/usr/bin/yum'):
+                sys.stderr.write(textwrap.dedent("""\
+                    Maybe try:
+
+                        sudo yum install pandoc
+                """))
+            sys.stderr.write(textwrap.dedent("""\
+                See http://johnmacfarlane.net/pandoc/installing.html
+                for installation options
+            """))
+            sys.stderr.write(textwrap.dedent("""\
+                ---------------------------------------------------------------
+
+            """))
+            raise RuntimeError("No pandoc was found: either install pandoc and add it\n"
+                               "to your PATH or install pypandoc wheels with included pandoc.") 
+            
+        
 
 # -----------------------------------------------------------------------------
 # Internal state management
@@ -328,4 +360,10 @@ def clean_version_cache():
     global __version
     __version = None
 
+def clean_pandocpath_cache():
+    global __pandoc_path
+    __pandoc_path = None
+
+
 __version = None
+__pandoc_path = None
