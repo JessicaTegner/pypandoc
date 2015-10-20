@@ -9,7 +9,11 @@ import shutil
 import tempfile
 import os.path
 import subprocess
-import urllib.request
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib import urlopen
 
 try:
     long_description = pypandoc.convert('README.md', 'rst')
@@ -86,8 +90,9 @@ class DownloadPandocCommand(Command):
         else:
 
             print("* Downloading pandoc from %s ..." % url)
-            with urllib.request.urlopen(url) as response, open(filename, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
+            with urlopen(url) as response:
+                with open(filename, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
         
         unpack = getattr(self, "_unpack_"+platform)
         unpack(filename)
