@@ -12,7 +12,7 @@ from .py3compat import string_types, cast_bytes, cast_unicode
 __author__ = 'Juho Vepsäläinen'
 __version__ = '1.0.5'
 __license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats']
+__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
