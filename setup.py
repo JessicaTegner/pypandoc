@@ -23,7 +23,7 @@ except OSError:
     long_description = open('README.md').read()
 
 # Uses sys.platform keys, but removes the 2 from linux2
-# Adding a new plattform means implemnting unpacking in "DownloadPandocCommand" and adding the URL here
+# Adding a new plattform means implementing unpacking in "DownloadPandocCommand" and adding the URL here
 # For macosx: http://stackoverflow.com/questions/11298855/how-to-unpack-and-pack-pkg-file
 # for deb: https://www.tablix.org/~avian/blog/archives/2005/09/unpacking_a_deb_without_dpkg/
 PANDOC_URLS = {
@@ -36,7 +36,7 @@ class DownloadPandocCommand(Command):
 
     """Download pandoc"""
 
-    description = "downloads a pandc release and adds it to the package"
+    description = "downloads a pandoc release and adds it to the package"
 
     user_options = []
 
@@ -52,7 +52,7 @@ class DownloadPandocCommand(Command):
 
         tempfolder = tempfile.mkdtemp()
 
-        # Make sure the targetfolder exists...
+        # Make sure targetfolder exists...
         try:
             os.makedirs(targetfolder)
         except OSError:
