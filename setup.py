@@ -62,8 +62,8 @@ class DownloadPandocCommand(Command):
         # if only 3.5 is supported, should be `run(..., check=True)`
         subprocess.check_call(cmd)
 
-        # pandoc.exe and citeproc.exe and pandoc-citeproc.exe are in the Pandoc subfolder
-        for exe in ["pandoc.exe", "pandoc-citeproc.exe"]:
+        # pandoc.exe, pandoc-citeproc.exe, and the COPYRIGHT are in the Pandoc subfolder
+        for exe in ["pandoc.exe", "pandoc-citeproc.exe", "COPYRIGHT.txt"]:
             src = os.path.join(tempfolder, "Pandoc", exe)
             dst = os.path.join(targetfolder, exe)
             print("* Copying %s to %s ..." % (exe, targetfolder))
@@ -71,7 +71,7 @@ class DownloadPandocCommand(Command):
             shutil.copyfile(src, dst)
 
         # remove temporary dir
-        #shutil.rmtree(tempfolder)
+        shutil.rmtree(tempfolder)
         print("* Done.")
 
     def run(self):
