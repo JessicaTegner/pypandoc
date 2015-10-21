@@ -19,8 +19,10 @@ except ImportError:
 try:
     long_description = pypandoc.convert('README.md', 'rst')
 except OSError:
+    import io
     # pandoc is not installed, fallback to using raw contents
-    long_description = open('README.md').read()
+    with io.open('README.md', encoding="utf-8") as f:
+        long_description = f.read()
 
 # Uses sys.platform keys, but removes the 2 from linux2
 # Adding a new plattform means implementing unpacking in "DownloadPandocCommand" and adding the URL here
