@@ -74,7 +74,6 @@ class DownloadPandocCommand(Command):
             src = os.path.join(tempfolder, "pandoc.pkg", "usr", "local", "bin", exe)
             dst = os.path.join(targetfolder, exe)
             print("* Copying %s to %s ..." % (exe, targetfolder))
-            print("%s, %s" % (src, dst))
             shutil.copyfile(src, dst)
 
         # remove temporary dir
@@ -102,7 +101,6 @@ class DownloadPandocCommand(Command):
             src = os.path.join(tempfolder, "Pandoc", exe)
             dst = os.path.join(targetfolder, exe)
             print("* Copying %s to %s ..." % (exe, targetfolder))
-            print("%s, %s" % (src, dst))
             shutil.copyfile(src, dst)
 
         # remove temporary dir
