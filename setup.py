@@ -123,9 +123,10 @@ class DownloadPandocCommand(Command):
             print("* Using already downloaded file %s" % (filename))
         else:
             print("* Downloading pandoc from %s ..." % url)
-            with urlopen(url) as response:
-                with open(filename, 'wb') as out_file:
-                    shutil.copyfileobj(response, out_file)
+            # https://stackoverflow.com/questions/30627937/tracebaclk-attributeerroraddinfourl-instance-has-no-attribute-exit
+            response = urlopen(url)
+            with open(filename, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
 
         unpack = getattr(self, "_unpack_"+pf)
         unpack(filename)
