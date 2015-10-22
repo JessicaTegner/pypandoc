@@ -60,7 +60,7 @@ class DownloadPandocCommand(Command):
         except OSError:
             pass # dir already exists...
 
-        cmd = ["pkgutil" "--expand", filename, tempfolder]
+        cmd = ["pkgutil" "--expand", filename, "%s" % (tempfolder)]
         # if only 3.5 is supported, should be `run(..., check=True)`
         subprocess.check_call(cmd)
 
