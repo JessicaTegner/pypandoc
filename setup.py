@@ -54,7 +54,7 @@ class DownloadPandocCommand(Command):
 
         tempfolder = tempfile.mkdtemp()
 
-        # Make sure targetfolder exists...
+        # Make sure target folder exists...
         try:
             os.makedirs(targetfolder)
         except OSError:
