@@ -88,7 +88,7 @@ class DownloadPandocCommand(Command):
         try:
             url = PANDOC_URLS[pf]
         except:
-            raise Exception("No prebuilt pandoc available or not yet implmented for your platform")
+            raise Exception("No prebuilt pandoc available or not yet implemented for your platform")
 
         filename = url.split("/")[-1]
         if os.path.isfile(filename):
