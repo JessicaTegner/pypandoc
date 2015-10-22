@@ -1,62 +1,18 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
+from __future__ import with_statement, absolute_import
 
 import subprocess
 import sys
 import textwrap
 import os
 import re
-import locale
 
-__author__ = 'Juho Vepsäläinen'
+from .py3compat import string_types, cast_bytes, cast_unicode
+
+__author__ = u'Juho Vepsäläinen'
 __version__ = '1.0.5'
 __license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats']
-
-# compat code from IPython py3compat.py and encoding.py, which is licensed under the terms of the
-# Modified BSD License (also known as New or Revised or 3-Clause BSD)
-try:
-    # There are reports of getpreferredencoding raising errors
-    # in some cases, which may well be fixed, but let's be conservative here.
-    _DEFAULT_ENCODING = locale.getpreferredencoding()
-except Exception:
-    pass
-_DEFAULT_ENCODING = _DEFAULT_ENCODING or sys.getdefaultencoding()
-
-
-def _decode(s, encoding=None):
-    encoding = encoding or _DEFAULT_ENCODING
-    return s.decode(encoding)
-
-
-def _encode(u, encoding=None):
-    encoding = encoding or _DEFAULT_ENCODING
-    return u.encode(encoding)
-
-
-def _cast_unicode(s, encoding=None):
-    if isinstance(s, bytes):
-        return _decode(s, encoding)
-    return s
-
-
-def _cast_bytes(s, encoding=None):
-    # bytes == str on py2.7 -> always encode on py2
-    if not isinstance(s, bytes):
-        return _encode(s, encoding)
-    return s
-
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    string_types = (str,)
-    unicode_type = str
-else:
-    PY3 = False
-
-    string_types = (str, unicode)
-    unicode_type = unicode
+__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
@@ -150,7 +106,7 @@ def _read_file(source, format, encoding='utf-8'):
             # if a source and a different encoding is given, try to decode the the source into a
             # unicode string
             try:
-                source = _cast_unicode(source, encoding=encoding)
+                source = cast_unicode(source, encoding=encoding)
             except (UnicodeDecodeError, UnicodeEncodeError):
                 pass
         input_type = 'string'
@@ -159,9 +115,10 @@ def _read_file(source, format, encoding='utf-8'):
 
 def _process_file(source, input_type, to, format, extra_args, outputfile=None,
                   filters=None):
+    _ensure_pandoc_path()
     string_input = input_type == 'string'
     input_file = [source] if not string_input else []
-    args = ['pandoc', '--from=' + format]
+    args = [__pandoc_path, '--from=' + format]
 
     # #59 - pdf output won't work with `--to` set!
     if to is not 'pdf':
@@ -195,7 +152,7 @@ def _process_file(source, input_type, to, format, extra_args, outputfile=None,
         )
 
     try:
-        source = _cast_bytes(source, encoding='utf-8')
+        source = cast_bytes(source, encoding='utf-8')
     except (UnicodeDecodeError, UnicodeEncodeError):
         # assume that it is already a utf-8 encoded string
         pass
@@ -237,43 +194,11 @@ def get_pandoc_formats():
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
     '''
-    try:
-        p = subprocess.Popen(
-            ['pandoc', '-h'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
-    except OSError:
-        sys.stderr.write(textwrap.dedent("""\
-            ---------------------------------------------------------------
-            An error occurred while trying to run `pandoc`
-        """))
-        if os.path.exists('/usr/local/bin/brew'):
-            sys.stderr.write(textwrap.dedent("""\
-                Maybe try:
-
-                    brew install pandoc
-            """))
-        elif os.path.exists('/usr/bin/apt-get'):
-            sys.stderr.write(textwrap.dedent("""\
-                Maybe try:
-
-                    sudo apt-get install pandoc
-            """))
-        elif os.path.exists('/usr/bin/yum'):
-            sys.stderr.write(textwrap.dedent("""\
-                Maybe try:
-
-                    sudo yum install pandoc
-            """))
-        sys.stderr.write(textwrap.dedent("""\
-            See http://johnmacfarlane.net/pandoc/installing.html
-            for installation options
-        """))
-        sys.stderr.write(textwrap.dedent("""\
-            ---------------------------------------------------------------
-
-        """))
-        raise OSError("You probably do not have pandoc installed.")
+    _ensure_pandoc_path()
+    p = subprocess.Popen(
+        [__pandoc_path, '-h'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE)
 
     comm = p.communicate()
     help_text = comm[0].decode().splitlines(False)
@@ -290,6 +215,26 @@ def get_pandoc_formats():
 
 
 # copied and adapted from jupyter_nbconvert/utils/pandoc.py, Modified BSD License
+
+def _get_pandoc_version(pandoc_path):
+    p = subprocess.Popen(
+        [pandoc_path, '--version'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE)
+    comm = p.communicate()
+    out_lines = comm[0].decode().splitlines(False)
+    if p.returncode != 0 or len(out_lines) == 0:
+        raise RuntimeError("Couldn't call pandoc to get version information. Output from "
+                           "pandoc:\n%s" % str(comm))
+
+    version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
+    for tok in out_lines[0].split():
+        if version_pattern.match(tok):
+            version = tok
+            break
+    return version
+
+
 def get_pandoc_version():
     """Gets the Pandoc version if Pandoc is installed.
 
@@ -303,22 +248,73 @@ def get_pandoc_version():
     global __version
 
     if __version is None:
-        p = subprocess.Popen(
-            ['pandoc', '--version'],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE)
-        comm = p.communicate()
-        out_lines = comm[0].decode().splitlines(False)
-        if p.returncode != 0 or len(out_lines) == 0:
-            raise RuntimeError("Couldn't call pandoc to get version information. Output from "
-                               "pandoc:\n%s" % str(comm))
-
-        version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
-        for tok in out_lines[0].split():
-            if version_pattern.match(tok):
-                __version = tok
-                break
+        _ensure_pandoc_path()
+        __version = _get_pandoc_version(__pandoc_path)
     return __version
+
+
+def _ensure_pandoc_path():
+    global __pandoc_path
+
+    if __pandoc_path is None:
+        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                       "files", "pandoc")
+        search_paths = ["pandoc",  included_pandoc]
+        # If a user added the complete path to pandoc to an env, use that as the
+        # only way to get pandoc so that a user can overwrite even a higher
+        # version in some other places.
+        if os.getenv('PYPANDOC_PANDOC', None):
+            search_paths = [os.getenv('PYPANDOC_PANDOC')]
+        for path in search_paths:
+            curr_version = [0, 0, 0]
+            version_string = "0.0.0"
+            try:
+                version_string = _get_pandoc_version(path)
+            except:
+                # we can't use that path...
+                # print(e)
+                continue
+            version = [int(x) for x in version_string.split(".")]
+            while len(version) < len(curr_version):
+                version.append(0)
+            # print("%s, %s" % (path, version))
+            for pos in range(len(curr_version)):
+                # Only use the new version if it is any bigger...
+                if version[pos] > curr_version[pos]:
+                    # print("Found: %s" % path)
+                    __pandoc_path = path
+                    curr_version = version
+                    break
+
+        if __pandoc_path is None:
+            if os.path.exists('/usr/local/bin/brew'):
+                sys.stderr.write(textwrap.dedent("""\
+                    Maybe try:
+
+                        brew install pandoc
+                """))
+            elif os.path.exists('/usr/bin/apt-get'):
+                sys.stderr.write(textwrap.dedent("""\
+                    Maybe try:
+
+                        sudo apt-get install pandoc
+                """))
+            elif os.path.exists('/usr/bin/yum'):
+                sys.stderr.write(textwrap.dedent("""\
+                    Maybe try:
+
+                        sudo yum install pandoc
+                """))
+            sys.stderr.write(textwrap.dedent("""\
+                See http://johnmacfarlane.net/pandoc/installing.html
+                for installation options
+            """))
+            sys.stderr.write(textwrap.dedent("""\
+                ---------------------------------------------------------------
+
+            """))
+            raise RuntimeError("No pandoc was found: either install pandoc and add it\n"
+                               "to your PATH or install pypandoc wheels with included pandoc.")
 
 
 # -----------------------------------------------------------------------------
@@ -328,4 +324,11 @@ def clean_version_cache():
     global __version
     __version = None
 
+
+def clean_pandocpath_cache():
+    global __pandoc_path
+    __pandoc_path = None
+
+
 __version = None
+__pandoc_path = None

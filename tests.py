@@ -4,6 +4,7 @@
 import unittest
 import tempfile
 import pypandoc
+from pypandoc.py3compat import unicode_type
 import os
 import sys
 
@@ -65,9 +66,13 @@ class TestPypandoc(unittest.TestCase):
         except RuntimeError:
             pass
 
+    # We can't use skipIf as it is not available in py2.6
+    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
     def test_basic_conversion_from_file(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
+        if sys.platform.startswith("win"):
+            return
         with tempfile.NamedTemporaryFile('w+t', suffix='.md') as test_file:
             file_name = test_file.name
             test_file.write('#some title\n')
@@ -77,9 +82,13 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
+    # We can't use skipIf as it is not available in py2.6
+    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
     def test_basic_conversion_from_file_with_format(self):
         # This will not work on windows:
         # http://docs.python.org/2/library/tempfile.html
+        if sys.platform.startswith("win"):
+            return
         with tempfile.NamedTemporaryFile('w+t', suffix='.rst') as test_file:
             file_name = test_file.name
             test_file.write('#some title\n')
@@ -191,12 +200,12 @@ class TestPypandoc(unittest.TestCase):
         # make sure that pandoc always returns unicode and does not mishandle it
         expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
         written = pypandoc.convert(u'<h1>üäöîôû</h1>', 'md', format='html')
-        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+        self.assertTrue(isinstance(written, unicode_type))
         self.assertEqualExceptForNewlineEnd(expected, written)
         bytes = u'<h1>üäöîôû</h1>'.encode("utf-8")
         written = pypandoc.convert(bytes, 'md', format='html')
         self.assertEqualExceptForNewlineEnd(expected, written)
-        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+        self.assertTrue(isinstance(written, unicode_type))
 
         # Only use german umlauts in th next test, as iso-8859-15 covers that
         expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
@@ -214,7 +223,7 @@ class TestPypandoc(unittest.TestCase):
         # with the right encoding it should work...
         written = pypandoc.convert(bytes, 'md', format='html', encoding="iso-8859-15")
         self.assertEqualExceptForNewlineEnd(expected, written)
-        self.assertTrue(isinstance(written, pypandoc.unicode_type))
+        self.assertTrue(isinstance(written, unicode_type))
 
     def test_conversion_from_non_plain_text_file(self):
         if 'CI' in os.environ:

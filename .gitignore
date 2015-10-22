@@ -7,3 +7,11 @@ pypandoc.egg-info/
 ## IDEs
 # pycharm
 .idea/
+
+# downloaded pandoc packages
+pandoc-*.msi
+pandoc-*.deb
+pandoc-*.pkg
+# The downloaded files end up here
+pypandoc/files/
+build/
