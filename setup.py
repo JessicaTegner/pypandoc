@@ -18,7 +18,7 @@ except ImportError:
 
 try:
     long_description = pypandoc.convert('README.md', 'rst')
-except OSError:
+except RuntimeError:
     import io
     # pandoc is not installed, fallback to using raw contents
     with io.open('README.md', encoding="utf-8") as f:
