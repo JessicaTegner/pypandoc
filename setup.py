@@ -26,11 +26,9 @@ except RuntimeError:
 
 # Uses sys.platform keys, but removes the 2 from linux2
 # Adding a new platform means implementing unpacking in "DownloadPandocCommand" and adding the URL here
-# For macosx: http://stackoverflow.com/questions/11298855/how-to-unpack-and-pack-pkg-file
-# for deb: https://www.tablix.org/~avian/blog/archives/2005/09/unpacking_a_deb_without_dpkg/
 PANDOC_URLS = {
     "win32": "https://github.com/jgm/pandoc/releases/download/1.15.1.1/pandoc-1.15.1.1-windows.msi",
-    #"linux": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-1-amd64.deb",
+    "linux": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-1-amd64.deb",
     "darwin": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-osx.pkg"
 }
 
@@ -47,18 +45,41 @@ class DownloadPandocCommand(Command):
 
     def finalize_options(self):
          pass
-
-    def _unpack_darwin(self, filename):
-        targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
+    
+    def _unpack_linux(self, filename, targetfolder):
+        
+        assert platform.architecture()[0] == "64bit", "Downloaded linux pandoc is only compiled for 64bit."
+        
         print("* Unpacking %s to tempfolder..." % (filename))
 
         tempfolder = tempfile.mkdtemp()
-
-        # Make sure target folder exists...
+        cur_wd = os.getcwd()
+        filename = os.path.abspath(filename)
         try:
-            os.makedirs(targetfolder)
-        except OSError:
-            pass # dir already exists...
+            os.chdir(tempfolder)
+            cmd = ["ar", "x", filename]
+            # if only 3.5 is supported, should be `run(..., check=True)`
+            subprocess.check_call(cmd)
+            cmd = ["tar", "xzf", "data.tar.gz"]
+            subprocess.check_call(cmd)
+            # pandoc and pandoc-citeproc are in ./usr/bin subfolder
+            for exe in ["pandoc", "pandoc-citeproc"]:
+                src = os.path.join(tempfolder, "usr", "local", "bin", exe)
+                dst = os.path.join(targetfolder, exe)
+                print("* Copying %s to %s ..." % (exe, targetfolder))
+                shutil.copyfile(src, dst)
+            src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
+            dst = os.path.join(targetfolder, "copyright")
+            print("* Copying %s to %s ..." % (exe, targetfolder))
+            shutil.copyfile(src, dst)
+        finally:
+            os.chdir(cur_wd)
+            shutil.rmtree(tempfolder)
+            
+    def _unpack_darwin(self, filename, targetfolder):
+        print("* Unpacking %s to tempfolder..." % (filename))
+
+        tempfolder = tempfile.mkdtemp()
 
         pkgutilfolder = os.path.join(tempfolder, 'tmp')
         cmd = ["pkgutil", "--expand", filename, pkgutilfolder]
@@ -70,7 +91,7 @@ class DownloadPandocCommand(Command):
             "-C", pkgutilfolder]
         subprocess.check_call(cmd)
 
-        # pandoc and pandoc-citeproc are in the Pandoc subfolder
+        # pandoc and pandoc-citeproc are in the ./usr/local/bin subfolder
         for exe in ["pandoc", "pandoc-citeproc"]:
             src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
             dst = os.path.join(targetfolder, exe)
@@ -81,17 +102,10 @@ class DownloadPandocCommand(Command):
         shutil.rmtree(tempfolder)
         print("* Done.")
 
-    def _unpack_win32(self, filename):
-        targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
+    def _unpack_win32(self, filename, targetfolder):
         print("* Unpacking %s to tempfolder..." % (filename))
 
         tempfolder = tempfile.mkdtemp()
-
-        # Make sure target folder exists...
-        try:
-            os.makedirs(targetfolder)
-        except OSError:
-            pass # dir already exists...
 
         cmd = ["msiexec", "/a", filename, "/qb", "TARGETDIR=%s" % (tempfolder)]
         # if only 3.5 is supported, should be `run(..., check=True)`
@@ -128,9 +142,18 @@ class DownloadPandocCommand(Command):
             response = urlopen(url)
             with open(filename, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
+        
+        targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
+
+        # Make sure target folder exists...
+        try:
+            os.makedirs(targetfolder)
+        except OSError:
+            pass # dir already exists...
 
         unpack = getattr(self, "_unpack_"+pf)
-        unpack(filename)
+        
+        unpack(filename, targetfolder)
 
 
 cmd_classes = {'download_pandoc': DownloadPandocCommand}
