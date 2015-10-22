@@ -92,7 +92,7 @@ class DownloadPandocCommand(Command):
 
         filename = url.split("/")[-1]
         if os.path.isfile(filename):
-            print("* Using alread downloaded file %s" % (filename))
+            print("* Using already downloaded file %s" % (filename))
         else:
 
             print("* Downloading pandoc from %s ..." % url)
