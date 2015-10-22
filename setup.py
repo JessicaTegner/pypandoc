@@ -60,13 +60,18 @@ class DownloadPandocCommand(Command):
         except OSError:
             pass # dir already exists...
 
-        cmd = ["pkgutil" "--expand", filename, tempfolder]
+        # XXXXX: fails with "Error 17: File exists"
+        cmd = ["pkgutil", "--expand", filename, tempfolder]
         # if only 3.5 is supported, should be `run(..., check=True)`
         subprocess.check_call(cmd)
 
-        # pandoc, pandoc-citeproc, and the COPYRIGHT are in the Pandoc subfolder
-        for exe in ["pandoc", "pandoc-citeproc", "COPYRIGHT.txt"]:
-            src = os.path.join(tempfolder, "Pandoc", exe)
+        # this will generate usr/local/bin below the dir
+        cmd = ["tar", "xvf", os.path.join(tempfolder, "pandoc.pkg", "Payload")]
+        subprocess.check_call(cmd)
+
+        # pandoc and pandoc-citeproc are in the Pandoc subfolder
+        for exe in ["pandoc", "pandoc-citeproc"]:
+            src = os.path.join(tempfolder, "pandoc.pkg", "usr", "local", "bin", exe)
             dst = os.path.join(targetfolder, exe)
             print("* Copying %s to %s ..." % (exe, targetfolder))
             print("%s, %s" % (src, dst))
