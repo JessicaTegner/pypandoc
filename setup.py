@@ -31,7 +31,7 @@ except OSError:
 PANDOC_URLS = {
     "win32": "https://github.com/jgm/pandoc/releases/download/1.15.1.1/pandoc-1.15.1.1-windows.msi",
     #"linux": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-1-amd64.deb",
-    #"darwin": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-osx.pkg"
+    "darwin": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-osx.pkg"
 }
 
 class DownloadPandocCommand(Command):
@@ -47,6 +47,34 @@ class DownloadPandocCommand(Command):
 
     def finalize_options(self):
          pass
+
+    def _unpack_darwin(self, filename):
+        targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
+        print("* Unpacking %s to tempfolder..." % (filename))
+
+        tempfolder = tempfile.mkdtemp()
+
+        # Make sure target folder exists...
+        try:
+            os.makedirs(targetfolder)
+        except OSError:
+            pass # dir already exists...
+
+        cmd = ["pkgutil" "--expand", filename, tempfolder]
+        # if only 3.5 is supported, should be `run(..., check=True)`
+        subprocess.check_call(cmd)
+
+        # pandoc, pandoc-citeproc, and the COPYRIGHT are in the Pandoc subfolder
+        for exe in ["pandoc", "pandoc-citeproc", "COPYRIGHT.txt"]:
+            src = os.path.join(tempfolder, "Pandoc", exe)
+            dst = os.path.join(targetfolder, exe)
+            print("* Copying %s to %s ..." % (exe, targetfolder))
+            print("%s, %s" % (src, dst))
+            shutil.copyfile(src, dst)
+
+        # remove temporary dir
+        shutil.rmtree(tempfolder)
+        print("* Done.")
 
     def _unpack_win32(self, filename):
         targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
@@ -94,7 +122,6 @@ class DownloadPandocCommand(Command):
         if os.path.isfile(filename):
             print("* Using already downloaded file %s" % (filename))
         else:
-
             print("* Downloading pandoc from %s ..." % url)
             with urlopen(url) as response:
                 with open(filename, 'wb') as out_file:
