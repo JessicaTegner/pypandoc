@@ -64,13 +64,13 @@ class DownloadPandocCommand(Command):
             subprocess.check_call(cmd)
             # pandoc and pandoc-citeproc are in ./usr/bin subfolder
             for exe in ["pandoc", "pandoc-citeproc"]:
-                src = os.path.join(tempfolder, "usr", "local", "bin", exe)
+                src = os.path.join(tempfolder, "usr", "bin", exe)
                 dst = os.path.join(targetfolder, exe)
                 print("* Copying %s to %s ..." % (exe, targetfolder))
                 shutil.copyfile(src, dst)
             src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
             dst = os.path.join(targetfolder, "copyright")
-            print("* Copying %s to %s ..." % (exe, targetfolder))
+            print("* Copying copyright to %s ..." % (targetfolder))
             shutil.copyfile(src, dst)
         finally:
             os.chdir(cur_wd)
