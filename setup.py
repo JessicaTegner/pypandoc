@@ -108,9 +108,6 @@ class DownloadPandocCommand(Command):
         print("* Done.")
 
     def run(self):
-
-        assert platform.architecture()[0] == "64bit", "Downloaded pandoc is only compiled for 64bit"
-
         pf = sys.platform
         # compatibility with py3
         if pf.startswith("linux"):
