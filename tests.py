@@ -260,6 +260,10 @@ class TestPypandoc(unittest.TestCase):
         finally:
             os.remove(name)
 
+    def test_get_pandoc_path(self):
+        result = pypandoc.get_pandoc_path()
+        assert "pandoc" in result
+
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n

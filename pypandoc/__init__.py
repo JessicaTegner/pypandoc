@@ -12,7 +12,7 @@ from .py3compat import string_types, cast_bytes, cast_unicode
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.1.0'
 __license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version']
+__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
@@ -251,6 +251,26 @@ def get_pandoc_version():
         _ensure_pandoc_path()
         __version = _get_pandoc_version(__pandoc_path)
     return __version
+
+
+def get_pandoc_path():
+    """Gets the Pandoc path if Pandoc is installed.
+
+    It will return a path to pandoc which is used by pypandoc.
+
+    This might be a full path or, if pandoc is on PATH, simple `pandoc`. It's garanteed
+    to be callable (i.e. we could get version information from `pandoc --version`).
+    If `PYPANDOC_PANDOC` is set and valid, it will return that value. If the environment
+    variable is not set, either the full path to the included pandoc or the pandoc in
+    `PATH` (whatever is the higher version) will be returned.
+
+    If a cached path is found, it will return the cached path and stop probing Pandoc
+    (unless :func:`clean_pandocpath_cache()` is called).
+
+    :raises OSError: if pandoc is not found
+    """
+    _ensure_pandoc_path()
+    return __pandoc_path
 
 
 def _ensure_pandoc_path():
