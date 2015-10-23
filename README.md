@@ -1,24 +1,64 @@
 # pypandoc
 
-[![Latest Version](https://pypip.in/version/pypandoc/badge.svg)](https://pypi.python.org/pypi/pypandoc/)
 [![Build Status](https://travis-ci.org/bebraw/pypandoc.svg?branch=master)](https://travis-ci.org/bebraw/pypandoc)
+[![PyPI version](https://badge.fury.io/py/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
+[![conda version](https://anaconda.org/janschulz/pypandoc/badges/version.svg)](https://anaconda.org/janschulz/pypandoc/)
 
 pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/), a universal
 document converter.
 
 ## Installation
 
-- Install pandoc
-  - Ubuntu/Debian: `sudo apt-get install pandoc`
-  - Fedora/Red Hat: `sudo yum install pandoc`
-  - Mac OS X with Homebrew: `brew install pandoc`
-  - Machine with Haskell: `cabal-install pandoc`
-  - Windows: There is an installer available
-    [here](http://johnmacfarlane.net/pandoc/installing.html)
-  - [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
+pypandoc uses pandoc, so it needs an available installation of pandoc. For some common cases
+(wheels, conda packages), pypandoc already includes pandoc (and pandoc_citeproc) in it's
+prebuilt package.
+
+If pandoc is already installed (`pandoc` is in the PATH), pypandoc uses the version with the
+higher version number and if both are the same, the already installed version. You can point
+to a specific version by setting the environment variable `PYPANDOC_PANDOC` to the full 
+path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or 
+`PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variabel is set, this is the only
+place where pandoc is searched for.
+
+To use pandoc filters, you must have the relevant filter installed on your machine.
+
+### Installing via pip
+
+Install via `pip install pypandoc`
+
+Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc/) include
+pandoc. If there is no prebuilt binary available, you have to
+[install pandoc yourself](#installing-pandoc).
+
+If you use Linux and have [your own wheelhouse](http://wheel.readthedocs.org/en/latest/#usage),
+you can build a wheel which includes pandoc with
+`python setup.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
+on 64bit intel systems, as we only download it from the
+[oficial source](https://github.com/jgm/pandoc/releases).
+
+### Installing via conda
+
+Install via `conda install -c https://conda.anaconda.org/janschulz pypandoc`.
+
+You can also add the channel to your conda config via
+`conda config --add channels https://conda.anaconda.org/janschulz`. This makes it possible to
+use `conda install pypandoc` directly and also lets you update via `conda update pypandoc`.
+
+Conda packages include pandoc and are available for py2.7, py3.4 and py3.5,
+for Windows (32bit and 64bit), Mac OS X (64bit) and Linux (64bit).
+
+### Installing pandoc
+
+pandoc is available for many different platforms:
+
+- Ubuntu/Debian: `sudo apt-get install pandoc`
+- Fedora/Red Hat: `sudo yum install pandoc`
+- Mac OS X with Homebrew: `brew install pandoc`
+- Machine with Haskell: `cabal-install pandoc`
+- Windows: There is an installer available
+  [here](http://johnmacfarlane.net/pandoc/installing.html)
+- [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
   - Or see http://johnmacfarlane.net/pandoc/installing.html
-- `pip install pypandoc`
-- To use pandoc filters, you must have the relevant filter installed on your machine
 
 ## Usage
 
@@ -131,9 +171,8 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 3. Make sure your code passes `flake8 pypandoc.py tests.py`
 4. Add yourself to contributors at `README.md` unless you are already there. In that case tweak your contributions.
 
-Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https://github.com/jgm/pandoc-citeproc) installed.
-
-> IMPORTANT! Currently Travis build is a bit broken. If you have any idea on how to debug that, please see [#55](https://github.com/bebraw/pypandoc/issues/55).
+Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https://github.com/jgm/pandoc-citeproc) 
+installed. If you installed a prebuilt wheel or conda package, it is already included.
 
 ## Contributors
 
@@ -162,4 +201,4 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 
 ## License
 
-`pypandoc` is available under MIT license. See LICENSE for more details.
+`pypandoc` is available under MIT license. See LICENSE for more details. `pandoc` itself is [available under the GPL2 license](https://github.com/jgm/pandoc/blob/master/COPYING).
