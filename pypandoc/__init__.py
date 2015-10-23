@@ -10,7 +10,7 @@ import re
 from .py3compat import string_types, cast_bytes, cast_unicode
 
 __author__ = u'Juho Vepsäläinen'
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 __license__ = 'MIT'
 __all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path']
 
