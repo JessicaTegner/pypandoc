@@ -313,8 +313,8 @@ def _ensure_pandoc_path():
                 ---------------------------------------------------------------
 
             """))
-            raise RuntimeError("No pandoc was found: either install pandoc and add it\n"
-                               "to your PATH or install pypandoc wheels with included pandoc.")
+            raise OSError("No pandoc was found: either install pandoc and add it\n"
+                          "to your PATH or install pypandoc wheels with included pandoc.")
 
 
 # -----------------------------------------------------------------------------
