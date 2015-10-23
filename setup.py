@@ -47,11 +47,11 @@ class DownloadPandocCommand(Command):
 
     def finalize_options(self):
          pass
-    
+
     def _unpack_linux(self, filename, targetfolder):
-        
+
         assert platform.architecture()[0] == "64bit", "Downloaded linux pandoc is only compiled for 64bit."
-        
+
         print("* Unpacking %s to tempfolder..." % (filename))
 
         tempfolder = tempfile.mkdtemp()
@@ -77,7 +77,7 @@ class DownloadPandocCommand(Command):
         finally:
             os.chdir(cur_wd)
             shutil.rmtree(tempfolder)
-            
+
     def _unpack_darwin(self, filename, targetfolder):
         print("* Unpacking %s to tempfolder..." % (filename))
 
@@ -124,6 +124,7 @@ class DownloadPandocCommand(Command):
         shutil.rmtree(tempfolder)
         print("* Done.")
 
+
     def run(self):
         pf = sys.platform
         # compatibility with py3
@@ -144,7 +145,7 @@ class DownloadPandocCommand(Command):
             response = urlopen(url)
             with open(filename, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
-        
+
         targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
 
         # Make sure target folder exists...
@@ -154,7 +155,7 @@ class DownloadPandocCommand(Command):
             pass # dir already exists...
 
         unpack = getattr(self, "_unpack_"+pf)
-        
+
         unpack(filename, targetfolder)
 
 
@@ -165,22 +166,48 @@ cmd_classes = {'download_pandoc': DownloadPandocCommand}
 # binaries.
 if (os.path.isfile(os.path.join("pypandoc", "files", "pandoc")) or
     os.path.isfile(os.path.join("pypandoc", "files", "pandoc.exe"))):
-
+    print("Patching wheel building...")
     try:
         from wheel.bdist_wheel import bdist_wheel
     except ImportError:
         # No wheel installed, so we also can't run that command...
         pass
     else:
+        # these imports should fail as our our later functions relies on it...
+        from wheel.bdist_wheel import (get_platform, get_abbr_impl,
+                                       get_impl_ver, pep425tags, sysconfig)
+        print("Making sure that wheel is platform specific...")
         class new_bdist_wheel(bdist_wheel):
+            def get_tag(self):
+                # originally get_tag would branch for 'root_is_pure" and return
+                # tags suitable for wheels running on any py3/py2 system. So
+                # setting the attribute in finalize_options was enough. But
+                # In the 3.5 instead of the attribute,
+                # self.distribution.is_pure() is called, so we have to overwrite
+                # the complete functions...
+
+                supported_tags = pep425tags.get_supported()
+                plat_name = self.plat_name
+                if plat_name is None:
+                    plat_name = get_platform()
+                plat_name = plat_name.replace('-', '_').replace('.', '_')
+                impl_name = get_abbr_impl()
+                impl_ver = get_impl_ver()
+                # PEP 3149 -- no SOABI in Py 2
+                # For PyPy?
+                # "pp%s%s" % (sys.pypy_version_info.major,
+                # sys.pypy_version_info.minor)
+                abi_tag = sysconfig.get_config_vars().get('SOABI', 'none')
+                if abi_tag.startswith('cpython-'):
+                    abi_tag = 'cp' + abi_tag.rsplit('-', 1)[-1]
+
+                tag = (impl_name + impl_ver, abi_tag, plat_name)
+                # XXX switch to this alternate implementation for non-pure:
+                assert tag == supported_tags[0]
+                return tag
             def finalize_options(self):
                 bdist_wheel.finalize_options(self)
-                # this turns on the proper filenames
-                self.root_is_pure = False
-                # in the orig finalize_options this is set to:
-                # self.root_is_pure = not (self.distribution.has_ext_modules()
-                #                  or self.distribution.has_c_libraries())
-
+                assert "any" not in self.get_archive_basename(), "bdist_wheel will not generate platform specific names, aborting!"
         cmd_classes["bdist_wheel"] = new_bdist_wheel
 
 module = pypandoc
