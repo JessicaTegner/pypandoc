@@ -18,10 +18,9 @@ addons:
       - texlive-latex-recommended
       - lmodern
 install:
-  # Stolen from https://github.com/yihui/knitr/blob/master/.travis.yml
-  - "[ ! -d ~/bin ] && mkdir ~/bin || true"
-  - "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash"
   - travis_retry pip install tox
+  # download a newer pandoc version...
+  - python setup.py download_pandoc
 
 cache:
   directories:
