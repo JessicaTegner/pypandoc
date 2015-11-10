@@ -22,10 +22,7 @@ install:
   # download a newer pandoc version...
   - python setup.py download_pandoc
 
-cache:
-  directories:
-  - $HOME/bin
-
 script:
   - pandoc -v
+  - python -c "import pypandoc; print(pypandoc.get_pandoc_path(), pypandoc.get_pandoc_version())"
   - tox
