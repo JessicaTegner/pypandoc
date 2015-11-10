@@ -34,7 +34,7 @@ If you use Linux and have [your own wheelhouse](http://wheel.readthedocs.org/en/
 you can build a wheel which includes pandoc with
 `python setup.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
 on 64bit intel systems, as we only download it from the
-[oficial source](https://github.com/jgm/pandoc/releases).
+[official source](https://github.com/jgm/pandoc/releases).
 
 ### Installing via conda
 
