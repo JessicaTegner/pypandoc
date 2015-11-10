@@ -19,10 +19,7 @@ addons:
       - lmodern
 install:
   - travis_retry pip install tox
-  # download a newer pandoc version...
-  - python setup.py download_pandoc
-
+  
 script:
-  - pandoc -v
-  - python -c "import pypandoc; print(pypandoc.get_pandoc_path(), pypandoc.get_pandoc_version())"
+  - pandoc -v || True
   - tox
