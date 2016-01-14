@@ -15,9 +15,7 @@ prebuilt package.
 
 If pandoc is already installed (`pandoc` is in the PATH), pypandoc uses the version with the
 higher version number and if both are the same, the already installed version. You can point
-to a specific version by setting the environment variable `PYPANDOC_PANDOC` to the full 
-path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or 
-`PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variabel is set, this is the only
+to a specific version by setting the environment variable `PYPANDOC_PANDOC` to the full path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variabel is set, this is the only
 place where pandoc is searched for.
 
 To use pandoc filters, you must have the relevant filter installed on your machine.
@@ -172,8 +170,7 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 3. Make sure your code passes `flake8 pypandoc.py tests.py`
 4. Add yourself to contributors at `README.md` unless you are already there. In that case tweak your contributions.
 
-Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https://github.com/jgm/pandoc-citeproc) 
-installed. If you installed a prebuilt wheel or conda package, it is already included.
+Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https://github.com/jgm/pandoc-citeproc) installed. If you installed a prebuilt wheel or conda package, it is already included.
 
 ## Contributors
 
