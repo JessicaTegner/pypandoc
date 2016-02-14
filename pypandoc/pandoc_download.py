@@ -18,9 +18,9 @@ except ImportError:
 # Adding a new platform means implementing unpacking in "DownloadPandocCommand"
 # and adding the URL here
 PANDOC_URLS = {
-    "win32": "https://github.com/jgm/pandoc/releases/download/1.15.1.1/pandoc-1.15.1.1-windows.msi",
-    "linux": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-1-amd64.deb",
-    "darwin": "https://github.com/jgm/pandoc/releases/download/1.15.1/pandoc-1.15.1-osx.pkg"
+    "win32": "https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-windows.msi",
+    "linux": "https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb",
+    "darwin": "https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-osx.pkg"
 }
 
 
