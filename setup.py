@@ -3,6 +3,7 @@
 import pypandoc
 from setuptools import setup, Command
 
+import sys
 import os
 import os.path
 
@@ -44,54 +45,39 @@ class DownloadPandocCommand(Command):
 
 cmd_classes = {'download_pandoc': DownloadPandocCommand}
 
-# add our own bdist_wheel command, so that it ends up platform specific,
-# even if we only compile python code and no platform specific
-# binaries.
-if (os.path.isfile(os.path.join("pypandoc", "files", "pandoc")) or
-    os.path.isfile(os.path.join("pypandoc", "files", "pandoc.exe"))):
-    print("Patching wheel building...")
-    try:
-        from wheel.bdist_wheel import bdist_wheel
-    except ImportError:
-        # No wheel installed, so we also can't run that command...
-        pass
+# Make sure wheels end up platform specific, if they include a pandoc binary
+has_pandoc = (os.path.isfile(os.path.join("pypandoc", "files", "pandoc")) or
+              os.path.isfile(os.path.join("pypandoc", "files", "pandoc.exe")))
+is_build_wheel = ("bdist_wheel" in sys.argv)
+is_download_pandoc = ("download_pandoc" in sys.argv)
+
+if is_build_wheel:
+    if has_pandoc or is_download_pandoc:
+        # we need to make sure that bdist_wheel is after is_download_pandoc,
+        # otherwise we don't include pandoc in the wheel... :-(
+        pos_bdist_wheel = sys.argv.index("bdist_wheel")
+        if is_download_pandoc:
+            pos_download_pandoc = sys.argv.index("download_pandoc")
+            if pos_bdist_wheel < pos_download_pandoc:
+                raise RuntimeError("'download_pandoc' needs to be before 'bdist_wheel'.")
+        # we also need to make sure that this version of bdist_wheel supports
+        # the --plat-name argument
+        try:
+            import wheel
+            from distutils.version import StrictVersion
+            if not StrictVersion(wheel.__version__) >= StrictVersion("0.27"):
+                msg = "Including pandoc in wheel needs wheel >=0.27 but found %s.\nPlease update wheel!"
+                raise RuntimeError(msg % wheel.__version__)
+        except ImportError:
+            # No wheel installed, the user will get an error at a different place...
+            pass
+        print("forcing platform specific wheel name...")
+        from distutils.util import get_platform
+        sys.argv.insert(pos_bdist_wheel + 1, '--plat-name')
+        sys.argv.insert(pos_bdist_wheel + 2, get_platform())
     else:
-        # these imports should fail as our our later functions relies on it...
-        from wheel.bdist_wheel import (get_platform, get_abbr_impl,
-                                       get_impl_ver, pep425tags, sysconfig)
-        print("Making sure that wheel is platform specific...")
-        class new_bdist_wheel(bdist_wheel):
-            def get_tag(self):
-                # originally get_tag would branch for 'root_is_pure" and return
-                # tags suitable for wheels running on any py3/py2 system. So
-                # setting the attribute in finalize_options was enough. But
-                # In the 3.5 instead of the attribute,
-                # self.distribution.is_pure() is called, so we have to overwrite
-                # the complete functions...
-
-                supported_tags = pep425tags.get_supported()
-                plat_name = self.plat_name
-                if plat_name is None:
-                    plat_name = get_platform()
-                plat_name = plat_name.replace('-', '_').replace('.', '_')
-                impl_name = get_abbr_impl()
-                impl_ver = get_impl_ver()
-                # PEP 3149 -- no SOABI in Py 2
-                # For PyPy?
-                # "pp%s%s" % (sys.pypy_version_info.major,
-                # sys.pypy_version_info.minor)
-                abi_tag = sysconfig.get_config_vars().get('SOABI', 'none')
-                if abi_tag.startswith('cpython-'):
-                    abi_tag = 'cp' + abi_tag.rsplit('-', 1)[-1]
-
-                tag = (impl_name + impl_ver, abi_tag, plat_name)
-                # XXX switch to this alternate implementation for non-pure:
-                assert tag == supported_tags[0]
-                return tag
-            def finalize_options(self):
-                bdist_wheel.finalize_options(self)
-                assert "any" not in self.get_archive_basename(), "bdist_wheel will not generate platform specific names, aborting!"
-        cmd_classes["bdist_wheel"] = new_bdist_wheel
+        print("no pandoc found, building platform unspecific wheel...")
+        print("use 'python setup.py download_pandoc' to download pandoc.")
 
 module = pypandoc
 setup(
