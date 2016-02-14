@@ -23,6 +23,12 @@ PANDOC_URLS = {
     "darwin": "https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-osx.pkg"
 }
 
+DEFAULT_TARGET_FOLDER = {
+    "win32": "~\\AppData\\Local\\Pandoc",
+    "linux": "~/bin",
+    "darwin": "~/Applications/pandoc"
+}
+
 
 def _handle_linux(filename, targetfolder):
 
@@ -45,7 +51,7 @@ def _handle_linux(filename, targetfolder):
             print("* Copying %s to %s ..." % (exe, targetfolder))
             shutil.copyfile(src, dst)
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
-        dst = os.path.join(targetfolder, "copyright")
+        dst = os.path.join(targetfolder, "copyright.pandoc")
         print("* Copying copyright to %s ..." % (targetfolder))
         shutil.copyfile(src, dst)
     finally:
@@ -102,17 +108,33 @@ def _handle_win32(filename, targetfolder):
 
 
 def download_pandoc(url=None, targetfolder=None):
+    """Download and unpack pandoc
+
+    Downloads prebuild binaries for pandoc from `url` and unpacks it into
+    `targetfolder`.
+
+    :param str url: URL for the to be downloaded pandoc binary distribution for
+        the platform under which this python runs. If no `url` is give, uses
+        the latest available release at the time pypandoc was released.
+
+    :param str targetfolder: directory, where the binaries should be installed
+        to. If no `targetfolder` is give, uses a platform specific user
+        location: `~/bin` on Linux, `~/Applications/pandoc` on Mac OS X, and
+        `~\\AppData\\Local\\Pandoc` on Windows.
+    """
     pf = sys.platform
+
     # compatibility with py3
     if pf.startswith("linux"):
         pf = "linux"
-        assert platform.architecture()[0] == "64bit", "Linux pandoc is only compiled for 64bit."
+        if platform.architecture()[0] != "64bit":
+            raise RuntimeError("Linux pandoc is only compiled for 64bit.")
+
+    if pf not in PANDOC_URLS:
+        raise RuntimeError("Can't handle your platform (only Linux, Mac OS X, Windows).")
 
     if url is None:
-        try:
-            url = PANDOC_URLS[pf]
-        except:
-            raise Exception("No prebuilt pandoc available or not yet implemented for your platform")
+        url = PANDOC_URLS[pf]
 
     filename = url.split("/")[-1]
     if os.path.isfile(filename):
@@ -123,8 +145,10 @@ def download_pandoc(url=None, targetfolder=None):
         response = urlopen(url)
         with open(filename, 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
+
     if targetfolder is None:
-        targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
+        targetfolder = DEFAULT_TARGET_FOLDER[pf]
+    targetfolder = os.path.expanduser(targetfolder)
 
     # Make sure target folder exists...
     try:

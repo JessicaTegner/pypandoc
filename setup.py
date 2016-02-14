@@ -15,7 +15,7 @@ except ImportError:
 try:
     long_description = pypandoc.convert('README.md', 'rst')
     long_description = long_description.replace("\r","")
-except OSError:
+except OSError as e:
     print("\n\n!!! pandoc not found, long_description is bad, don't upload this to PyPI !!!\n\n")
     import io
     # pandoc is not installed, fallback to using raw contents

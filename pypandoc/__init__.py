@@ -9,10 +9,13 @@ import re
 
 from .py3compat import string_types, cast_bytes, cast_unicode
 
+from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
+
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.1.3'
 __license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path']
+__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version',
+           'get_pandoc_path', 'download_pandoc']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
@@ -262,7 +265,8 @@ def get_pandoc_path():
     to be callable (i.e. we could get version information from `pandoc --version`).
     If `PYPANDOC_PANDOC` is set and valid, it will return that value. If the environment
     variable is not set, either the full path to the included pandoc or the pandoc in
-    `PATH` (whatever is the higher version) will be returned.
+    `PATH` or a pandoc in some of the more usual (platform specific) install locations
+    (whatever is the higher version) will be returned.
 
     If a cached path is found, it will return the cached path and stop probing Pandoc
     (unless :func:`clean_pandocpath_cache()` is called).
@@ -280,12 +284,32 @@ def _ensure_pandoc_path():
         included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
         search_paths = ["pandoc",  included_pandoc]
+        pf = "linux" if sys.platform.startswith("linux") else sys.platform
+        try:
+            search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc"))
+        except:
+            # not one of the know platforms...
+            pass
+        if pf == "linux":
+            # Currently we install into ~/bin, but this is equally likely...
+            search_paths.append("~/.bin/pandoc")
+        # Also add the interpreter script path, as that's where pandoc could be
+        # installed if it's an environment and the environment wasn't activated
+        if pf == "win32":
+            search_paths.append(os.path.join(sys.exec_prefix, "Scripts"))
+            # on windows, Library\bin could also be used, but that's already in
+            # path by the interpreter!
+        else:
+            search_paths.append(os.path.join(sys.exec_prefix, "bin"))
         # If a user added the complete path to pandoc to an env, use that as the
         # only way to get pandoc so that a user can overwrite even a higher
         # version in some other places.
         if os.getenv('PYPANDOC_PANDOC', None):
             search_paths = [os.getenv('PYPANDOC_PANDOC')]
         for path in search_paths:
+            # Needed for windows and subprocess which can't expand it on it's
+            # own...
+            path = os.path.expanduser(path)
             curr_version = [0, 0, 0]
             version_string = "0.0.0"
             try:
@@ -334,7 +358,8 @@ def _ensure_pandoc_path():
 
             """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
-                          "to your PATH or install pypandoc wheels with included pandoc.")
+                          "to your PATH or or call pypandoc.download_pandoc(...) or\n"
+                          "install pypandoc wheels with included pandoc.")
 
 
 # -----------------------------------------------------------------------------
