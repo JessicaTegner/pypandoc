@@ -52,7 +52,7 @@ pandoc is available for many different platforms:
 - Ubuntu/Debian: `sudo apt-get install pandoc`
 - Fedora/Red Hat: `sudo yum install pandoc`
 - Arch: `sudo pacman -S pandoc`
-- Mac OS X with Homebrew: `brew install pandoc`
+- Mac OS X with Homebrew: `brew install pandoc pandoc-citeproc Caskroom/cask/mactex`
 - Machine with Haskell: `cabal-install pandoc`
 - Windows: There is an installer available
   [here](http://johnmacfarlane.net/pandoc/installing.html)
