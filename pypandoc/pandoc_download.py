@@ -22,6 +22,7 @@ PANDOC_URLS = {
     "linux": "https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-1-amd64.deb",
     "darwin": "https://github.com/jgm/pandoc/releases/download/1.16.0.2/pandoc-1.16.0.2-osx.pkg"
 }
+INCLUDED_PANDOC_VERSION="1.16.0.2"
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
@@ -29,6 +30,11 @@ DEFAULT_TARGET_FOLDER = {
     "darwin": "~/Applications/pandoc"
 }
 
+
+def _make_executable(path):
+    mode = os.stat(path).st_mode
+    mode |= (mode & 0o444) >> 2    # copy R bits to X
+    os.chmod(path, mode)
 
 def _handle_linux(filename, targetfolder):
 
@@ -50,6 +56,7 @@ def _handle_linux(filename, targetfolder):
             dst = os.path.join(targetfolder, exe)
             print("* Copying %s to %s ..." % (exe, targetfolder))
             shutil.copyfile(src, dst)
+            _make_executable(dst)
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
         dst = os.path.join(targetfolder, "copyright.pandoc")
         print("* Copying copyright to %s ..." % (targetfolder))
@@ -80,6 +87,7 @@ def _handle_darwin(filename, targetfolder):
         dst = os.path.join(targetfolder, exe)
         print("* Copying %s to %s ..." % (exe, targetfolder))
         shutil.copyfile(src, dst)
+        _make_executable(dst)
 
     # remove temporary dir
     shutil.rmtree(tempfolder)

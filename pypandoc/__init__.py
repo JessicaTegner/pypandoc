@@ -312,9 +312,10 @@ def _ensure_pandoc_path():
             path = os.path.expanduser(path)
             curr_version = [0, 0, 0]
             version_string = "0.0.0"
+            # print("Trying: %s" % path)
             try:
                 version_string = _get_pandoc_version(path)
-            except:
+            except Exception as e:
                 # we can't use that path...
                 # print(e)
                 continue

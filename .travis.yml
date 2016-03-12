@@ -11,21 +11,20 @@ env:
 addons:
   apt:
     packages:
+      # Some tests do a pdf conversion, so install latex which is needed for that.
       - texlive-latex-base
       - texlive-latex-extra
       - texlive-fonts-recommended
       - texlive-latex-recommended
       - lmodern
 install:
-  # Stolen from https://github.com/yihui/knitr/blob/master/.travis.yml
-  - "[ ! -d ~/bin ] && mkdir ~/bin || true"
-  - "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash"
   - travis_retry pip install tox
-
-cache:
-  directories:
-  - $HOME/bin
+  # only download pandoc, the tests should work without a install of pypandoc
+  - python setup.py download_pandoc
 
 script:
-  - pandoc -v
+  - ./pypandoc/files/pandoc -v
+  - python -c "import pypandoc; print(pypandoc.get_pandoc_version())"
+  # make sure we use our own pandoc version
+  - python -c "import sys; import pypandoc; from pypandoc.pandoc_download import INCLUDED_PANDOC_VERSION as IPV; pypandoc.get_pandoc_version() == IPV or sys.exit(-1)"
   - tox
