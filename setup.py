@@ -222,7 +222,7 @@ setup(
     author_email = 'bebraw@gmail.com',
     packages = ['pypandoc'],
     package_data={'pypandoc': ['files/*']},
-    install_requires = ['setuptools', ],
+    install_requires = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
