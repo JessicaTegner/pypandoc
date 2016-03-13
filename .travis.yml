@@ -6,6 +6,7 @@ env:
     - TOXENV=py27
     - TOXENV=py33
     - TOXENV=py34
+    - TOXENV=py35
     - TOXENV=pypy
     - TOXENV=flake8
 addons:
@@ -17,15 +18,8 @@ addons:
       - texlive-latex-recommended
       - lmodern
 install:
-  # Stolen from https://github.com/yihui/knitr/blob/master/.travis.yml
-  - "[ ! -d ~/bin ] && mkdir ~/bin || true"
-  - "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash"
   - travis_retry pip install tox
-
-cache:
-  directories:
-  - $HOME/bin
-
+  
 script:
-  - pandoc -v
+  - pandoc -v || True
   - tox
