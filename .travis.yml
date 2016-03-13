@@ -1,11 +1,14 @@
 language: python
 sudo: false
+python:
+ - 3.5 # otherwise we can't run tox 3.5 tests
 env:
   matrix:
     - TOXENV=py26
     - TOXENV=py27
     - TOXENV=py33
     - TOXENV=py34
+    - TOXENV=py35
     - TOXENV=pypy
     - TOXENV=flake8
 addons:
@@ -24,7 +27,4 @@ install:
 
 script:
   - ./pypandoc/files/pandoc -v
-  - python -c "import pypandoc; print(pypandoc.get_pandoc_version())"
-  # make sure we use our own pandoc version
-  - python -c "import sys; import pypandoc; from pypandoc.pandoc_download import INCLUDED_PANDOC_VERSION as IPV; pypandoc.get_pandoc_version() == IPV or sys.exit(-1)"
   - tox

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement, absolute_import
+from __future__ import with_statement, absolute_import, print_function
 
 import subprocess
 import sys
@@ -322,9 +322,12 @@ def _ensure_pandoc_path():
             # print("Trying: %s" % path)
             try:
                 version_string = _get_pandoc_version(path)
-            except:  # Exception as e:
+            except Exception as e:
                 # we can't use that path...
-                # print(e)
+                if os.path.exists(path):
+                    # path exist but is not useable -> not executable?
+                    print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
+                    print(e, file=sys.stderr)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
