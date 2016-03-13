@@ -141,11 +141,18 @@ def _process_file(source, input_type, to, format, extra_args, outputfile=None,
         f = ['--filter=' + x for x in filters]
         args.extend(f)
 
+    # To get access to pandoc-citeproc when we use a included copy of pandoc,
+    # we need to add the pypandoc/files dir to the PATH
+    new_env = os.environ.copy()
+    files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
+    new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
+
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE if string_input else None,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+        stderr=subprocess.PIPE,
+        env=new_env)
 
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
@@ -315,7 +322,7 @@ def _ensure_pandoc_path():
             # print("Trying: %s" % path)
             try:
                 version_string = _get_pandoc_version(path)
-            except Exception as e:
+            except:  # Exception as e:
                 # we can't use that path...
                 # print(e)
                 continue
