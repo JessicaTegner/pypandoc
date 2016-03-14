@@ -1,31 +1,30 @@
 language: python
 sudo: false
+python:
+ - 3.5 # otherwise we can't run tox 3.5 tests
 env:
   matrix:
     - TOXENV=py26
     - TOXENV=py27
     - TOXENV=py33
     - TOXENV=py34
+    - TOXENV=py35
     - TOXENV=pypy
     - TOXENV=flake8
 addons:
   apt:
     packages:
+      # Some tests do a pdf conversion, so install latex which is needed for that.
       - texlive-latex-base
       - texlive-latex-extra
       - texlive-fonts-recommended
       - texlive-latex-recommended
       - lmodern
 install:
-  # Stolen from https://github.com/yihui/knitr/blob/master/.travis.yml
-  - "[ ! -d ~/bin ] && mkdir ~/bin || true"
-  - "wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash"
   - travis_retry pip install tox
-
-cache:
-  directories:
-  - $HOME/bin
+  # only download pandoc, the tests should work without a install of pypandoc
+  - python setup.py download_pandoc
 
 script:
-  - pandoc -v
+  - ./pypandoc/files/pandoc -v
   - tox

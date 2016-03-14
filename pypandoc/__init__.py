@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement, absolute_import
+from __future__ import with_statement, absolute_import, print_function
 
 import subprocess
 import sys
@@ -9,10 +9,13 @@ import re
 
 from .py3compat import string_types, cast_bytes, cast_unicode
 
+from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
+
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.1.3'
 __license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path']
+__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version',
+           'get_pandoc_path', 'download_pandoc']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
@@ -138,11 +141,18 @@ def _process_file(source, input_type, to, format, extra_args, outputfile=None,
         f = ['--filter=' + x for x in filters]
         args.extend(f)
 
+    # To get access to pandoc-citeproc when we use a included copy of pandoc,
+    # we need to add the pypandoc/files dir to the PATH
+    new_env = os.environ.copy()
+    files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
+    new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
+
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE if string_input else None,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+        stderr=subprocess.PIPE,
+        env=new_env)
 
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
@@ -262,7 +272,8 @@ def get_pandoc_path():
     to be callable (i.e. we could get version information from `pandoc --version`).
     If `PYPANDOC_PANDOC` is set and valid, it will return that value. If the environment
     variable is not set, either the full path to the included pandoc or the pandoc in
-    `PATH` (whatever is the higher version) will be returned.
+    `PATH` or a pandoc in some of the more usual (platform specific) install locations
+    (whatever is the higher version) will be returned.
 
     If a cached path is found, it will return the cached path and stop probing Pandoc
     (unless :func:`clean_pandocpath_cache()` is called).
@@ -280,19 +291,43 @@ def _ensure_pandoc_path():
         included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
         search_paths = ["pandoc",  included_pandoc]
+        pf = "linux" if sys.platform.startswith("linux") else sys.platform
+        try:
+            search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc"))
+        except:
+            # not one of the know platforms...
+            pass
+        if pf == "linux":
+            # Currently we install into ~/bin, but this is equally likely...
+            search_paths.append("~/.bin/pandoc")
+        # Also add the interpreter script path, as that's where pandoc could be
+        # installed if it's an environment and the environment wasn't activated
+        if pf == "win32":
+            search_paths.append(os.path.join(sys.exec_prefix, "Scripts"))
+            # on windows, Library\bin could also be used, but that's already in
+            # path by the interpreter!
+        else:
+            search_paths.append(os.path.join(sys.exec_prefix, "bin"))
         # If a user added the complete path to pandoc to an env, use that as the
         # only way to get pandoc so that a user can overwrite even a higher
         # version in some other places.
         if os.getenv('PYPANDOC_PANDOC', None):
             search_paths = [os.getenv('PYPANDOC_PANDOC')]
         for path in search_paths:
+            # Needed for windows and subprocess which can't expand it on it's
+            # own...
+            path = os.path.expanduser(path)
             curr_version = [0, 0, 0]
             version_string = "0.0.0"
+            # print("Trying: %s" % path)
             try:
                 version_string = _get_pandoc_version(path)
-            except:
+            except Exception as e:
                 # we can't use that path...
-                # print(e)
+                if os.path.exists(path):
+                    # path exist but is not useable -> not executable?
+                    print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
+                    print(e, file=sys.stderr)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
@@ -334,7 +369,8 @@ def _ensure_pandoc_path():
 
             """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
-                          "to your PATH or install pypandoc wheels with included pandoc.")
+                          "to your PATH or or call pypandoc.download_pandoc(...) or\n"
+                          "install pypandoc wheels with included pandoc.")
 
 
 # -----------------------------------------------------------------------------
