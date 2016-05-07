@@ -8,6 +8,19 @@ from pypandoc.py3compat import unicode_type
 import os
 import sys
 
+import contextlib
+import shutil
+
+@contextlib.contextmanager
+def closed_tempfile(suffix, text=None):
+    with tempfile.NamedTemporaryFile('w+t', suffix=suffix, delete=False) as test_file:
+        file_name = test_file.name
+        if text:
+            test_file.write(text)
+            test_file.flush()
+    yield file_name
+    shutil.rmtree(file_name, ignore_errors=True)
+
 
 class TestPypandoc(unittest.TestCase):
 
@@ -51,36 +64,22 @@ class TestPypandoc(unittest.TestCase):
             pypandoc.convert("ok", format='invalid', to='rest')
         self.assertRaises(RuntimeError, f)
 
-    # We can't use skipIf as it is not available in py2.6
-    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
     def test_basic_conversion_from_file(self):
-        # This will not work on windows:
-        # http://docs.python.org/2/library/tempfile.html
-        if sys.platform.startswith("win"):
-            return
-        with tempfile.NamedTemporaryFile('w+t', suffix='.md') as test_file:
-            file_name = test_file.name
-            test_file.write('#some title\n')
-            test_file.flush()
-
+        with closed_tempfile('.md', text='#some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
-    # We can't use skipIf as it is not available in py2.6
-    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
-    def test_basic_conversion_from_file_with_format(self):
-        # This will not work on windows:
-        # http://docs.python.org/2/library/tempfile.html
-        if sys.platform.startswith("win"):
-            return
-        with tempfile.NamedTemporaryFile('w+t', suffix='.rst') as test_file:
-            file_name = test_file.name
-            test_file.write('#some title\n')
-            test_file.flush()
+            received = pypandoc.convert_file(file_name, 'rst')
+            self.assertEqualExceptForNewlineEnd(expected, received)
 
+    def test_basic_conversion_from_file_with_format(self):
+        with closed_tempfile('.md', text='#some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert(file_name, 'rst', format='md')
+            self.assertEqualExceptForNewlineEnd(expected, received)
+
+            received = pypandoc.convert_file(file_name, 'rst', format='md')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_string(self):
@@ -114,23 +113,13 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
 
     def test_basic_conversion_to_file(self):
-        # we just want to get a temp file name, where we can write to
-        tf = tempfile.NamedTemporaryFile(suffix='.rst', delete=False)
-        name = tf.name
-        tf.close()
-
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-
-        try:
-            received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=name)
+        with closed_tempfile('.rst',) as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            with open(name) as f:
+            with open(file_name) as f:
                 written = f.read()
             self.assertEqualExceptForNewlineEnd(expected, written)
-        except:
-            raise
-        finally:
-            os.remove(name)
 
         # to odf does not work without a file
         def f():
@@ -219,35 +208,18 @@ class TestPypandoc(unittest.TestCase):
             print("Skipping: travis is running on old pandoc, no docx")
             return
 
-        tf = tempfile.NamedTemporaryFile(suffix='.docx', delete=False)
-        name = tf.name
-        tf.close()
-
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-
-        try:
+        with closed_tempfile('.docx') as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             # let's just test conversion (to and) from docx, testing e.g. odt
             # as well would really be testing pandoc rather than pypandoc
-            received = pypandoc.convert('#some title\n', to='docx', format='md', outputfile=name)
+            received = pypandoc.convert('#some title\n', to='docx', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            received = pypandoc.convert(name, to='rst')
+            received = pypandoc.convert(file_name, to='rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
-        except:
-            raise
-        finally:
-            os.remove(name)
 
     def test_pdf_conversion(self):
-        tf = tempfile.NamedTemporaryFile(suffix='.pdf', delete=False)
-        name = tf.name
-        tf.close()
-
-        try:
-            pypandoc.convert('#some title\n', to='pdf', format='md', outputfile=name)
-        except:
-            raise
-        finally:
-            os.remove(name)
+        with closed_tempfile('.md', text='#some title\n') as file_name:
+            pypandoc.convert('#some title\n', to='pdf', format='md', outputfile=file_name)
 
     def test_get_pandoc_path(self):
         result = pypandoc.get_pandoc_path()
