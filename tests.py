@@ -11,6 +11,7 @@ import sys
 import contextlib
 import shutil
 
+
 @contextlib.contextmanager
 def closed_tempfile(suffix, text=None):
     with tempfile.NamedTemporaryFile('w+t', suffix=suffix, delete=False) as test_file:
@@ -243,6 +244,15 @@ class TestPypandoc(unittest.TestCase):
 
         for filepath in files:
             self.assertRaises(RuntimeError, f, filepath)
+
+    def test_convert_text_with_existing_file(self):
+        with closed_tempfile('.md', text='#some title\n') as file_name:
+            received = pypandoc.convert_text(file_name, 'rst', format='md')
+            self.assertTrue("title" not in received)
+
+            # The following is a problematic case
+            received = pypandoc.convert(file_name, 'rst', format='md')
+            self.assertTrue("title" in received)
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
