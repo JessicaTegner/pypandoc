@@ -303,11 +303,10 @@ def _ensure_pandoc_path():
         # Also add the interpreter script path, as that's where pandoc could be
         # installed if it's an environment and the environment wasn't activated
         if pf == "win32":
-            search_paths.append(os.path.join(sys.exec_prefix, "Scripts"))
-            # on windows, Library\bin could also be used, but that's already in
-            # path by the interpreter!
-        else:
-            search_paths.append(os.path.join(sys.exec_prefix, "bin"))
+            search_paths.append(os.path.join(sys.exec_prefix, "Scripts", "pandoc"))
+        # bin can also be used on windows (conda at leats has it in path), so
+        # include it unconditionally
+        search_paths.append(os.path.join(sys.exec_prefix, "bin", "pandoc"))
         # If a user added the complete path to pandoc to an env, use that as the
         # only way to get pandoc so that a user can overwrite even a higher
         # version in some other places.
