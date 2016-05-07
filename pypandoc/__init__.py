@@ -48,14 +48,7 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
-    return _convert(_read_file, _process_file, source, to,
-                    format, extra_args, encoding=encoding,
-                    outputfile=outputfile, filters=filters)
-
-
-def _convert(reader, processor, source, to, format=None, extra_args=(), encoding=None,
-             outputfile=None, filters=None):
-    source, format, input_type = reader(source, format, encoding=encoding)
+    source, format, input_type = _read_file(source, format, encoding=encoding)
 
     formats = {
         'dbk': 'docbook',
@@ -90,7 +83,7 @@ def _convert(reader, processor, source, to, format=None, extra_args=(), encoding
             'Output to %s only works by using a outputfile.' % base_to_format
         )
 
-    return processor(source, input_type, to, format, extra_args,
+    return _process_file(source, input_type, to, format, extra_args,
                      outputfile=outputfile, filters=filters)
 
 
