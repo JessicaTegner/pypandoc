@@ -88,6 +88,10 @@ class TestPypandoc(unittest.TestCase):
         received = pypandoc.convert('#some title', 'rst', format='md')
         self.assertEqualExceptForNewlineEnd(expected, received)
 
+        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+        received = pypandoc.convert_text('#some title', 'rst', format='md')
+        self.assertEqualExceptForNewlineEnd(expected, received)
+
     def test_conversion_with_markdown_extensions(self):
         input = '<s>strike</s>'
         expected_with_extension = u'~~strike~~'
@@ -248,6 +252,25 @@ class TestPypandoc(unittest.TestCase):
     def test_get_pandoc_path(self):
         result = pypandoc.get_pandoc_path()
         assert "pandoc" in result
+
+    def test_call_with_nonexisting_file(self):
+        files = ['/file/does/not/exists.md',
+                 '',
+                 42,
+                 None
+                 ]
+
+        def f(filepath):
+            pypandoc.convert(filepath, 'rst')
+
+        for filepath in files:
+            self.assertRaises(RuntimeError, f, filepath)
+
+        def f(filepath):
+            pypandoc.convert_file(filepath, 'rst')
+
+        for filepath in files:
+            self.assertRaises(RuntimeError, f, filepath)
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep

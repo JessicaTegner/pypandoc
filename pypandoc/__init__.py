@@ -56,6 +56,9 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
     else:
         source = _as_unicode(source, encoding)
         input_type = 'string'
+        if not format:
+            raise RuntimeError("Format missing, but need one (identified source as text as no "
+                               "file with that name was found).")
     return _convert_input(source, format, input_type, to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters)
 
@@ -137,6 +140,9 @@ def _identify_path(source):
     except UnicodeEncodeError:
         path = os.path.exists(source.encode('utf-8'))
     except ValueError:
+        path = False
+    except TypeError:
+        # source is None...
         path = False
     return path
 
