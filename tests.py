@@ -9,20 +9,6 @@ import os
 import sys
 
 
-def test_converter(to, format=None, extra_args=()):
-
-    def reader(*args, **kwargs):
-        return source, format, input_type
-
-    def processor(*args, **kwargs):
-        return 'ok'
-
-    source = 'foo'
-    input_type = 'string'
-
-    return pypandoc._convert(reader, processor, source, to, format, extra_args)
-
-
 class TestPypandoc(unittest.TestCase):
 
     def setUp(self):
@@ -53,19 +39,17 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(major in [0, 1])
 
     def test_converts_valid_format(self):
-        self.assertEqual(test_converter(format='md', to='rest'), 'ok')
+        self.assertEqualExceptForNewlineEnd(pypandoc.convert("ok", format='md', to='rest'), 'ok')
 
     def test_does_not_convert_to_invalid_format(self):
-        try:
-            test_converter(format='md', to='invalid')
-        except RuntimeError:
-            pass
+        def f():
+            pypandoc.convert("ok", format='md', to='invalid')
+        self.assertRaises(RuntimeError, f)
 
     def test_does_not_convert_from_invalid_format(self):
-        try:
-            test_converter(format='invalid', to='rest')
-        except RuntimeError:
-            pass
+        def f():
+            pypandoc.convert("ok", format='invalid', to='rest')
+        self.assertRaises(RuntimeError, f)
 
     # We can't use skipIf as it is not available in py2.6
     # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
