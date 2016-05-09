@@ -6,6 +6,7 @@ import sys
 import textwrap
 import os
 import re
+import warnings
 
 from .py3compat import string_types, cast_bytes, cast_unicode
 
@@ -21,7 +22,7 @@ __all__ = ['convert', 'convert_file', 'convert_text',
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
-    """Converts given `source` from `format` `to` another.
+    """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes or a file path (see encoding)
 
@@ -49,6 +50,10 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
+    msg = ("Due to possible ambiguity, 'convert()' is deprecated. "
+           "Use 'convert_file()'  or 'convert_text()'.")
+    warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
     path = _identify_path(source)
     if path:
         format = _identify_format_from_path(source, format)
@@ -66,7 +71,7 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None):
 
-    """Converts given `source` from `format` `to` another.
+    """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
 
@@ -99,7 +104,7 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None):
-    """Converts given `source` from `format` `to` another.
+    """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
 
