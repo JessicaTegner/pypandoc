@@ -59,6 +59,17 @@ pandoc is available for many different platforms:
 - [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
   - Or see http://johnmacfarlane.net/pandoc/installing.html
 
+###  Specifying the location of pandoc binaries
+
+You can specify the location of pandoc binaries at runtime using the `PYPANDOC_PANDOC` environment variable:
+
+```python
+import os
+os.environ.setdefault('PYPANDOC_PANDOC', '/home/x/whatever/pandoc')
+```
+
+This is useful if pandoc is installed but your Python program, e.g. a web server with a special user, cannot find the binaries.
+
 ## Usage
 
 The basic invocation looks like this: `pypandoc.convert('input', 'output format')`. `pypandoc`
