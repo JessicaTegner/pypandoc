@@ -14,9 +14,7 @@ pypandoc uses pandoc, so it needs an available installation of pandoc. For some 
 prebuilt package.
 
 If pandoc is already installed (`pandoc` is in the PATH), pypandoc uses the version with the
-higher version number and if both are the same, the already installed version. You can point
-to a specific version by setting the environment variable `PYPANDOC_PANDOC` to the full path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variabel is set, this is the only
-place where pandoc is searched for.
+higher version number and if both are the same, the already installed version. See [Specifying the location of pandoc binaries](#specifying_binaries) for more.
 
 To use pandoc filters, you must have the relevant filter installed on your machine.
 
@@ -58,6 +56,17 @@ pandoc is available for many different platforms:
   [here](http://johnmacfarlane.net/pandoc/installing.html)
 - [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
   - Or see http://johnmacfarlane.net/pandoc/installing.html
+
+### <a name="specifying_binaries"></a>Specifying the location of pandoc binaries
+
+You can point to a specific pandoc version by setting the environment variable `PYPANDOC_PANDOC` to the full path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variable is set, this is the only place where pandoc is searched for.
+
+In certain cases, e.g. pandoc is installed but a web server with its own user cannot find the binaries, it is useful to specify the location at runtime:
+
+```python
+import os
+os.environ.setdefault('PYPANDOC_PANDOC', '/home/x/whatever/pandoc')
+```
 
 ## Usage
 
