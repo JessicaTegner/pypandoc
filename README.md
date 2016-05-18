@@ -57,7 +57,7 @@ pandoc is available for many different platforms:
 - [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
   - Or see http://johnmacfarlane.net/pandoc/installing.html
 
-### <a name="specifying_binaries"></a> Specifying the location of pandoc binaries
+### <a name="specifying_binaries"></a>Specifying the location of pandoc binaries
 
 You can point to a specific pandoc version by setting the environment variable `PYPANDOC_PANDOC` to the full path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variable is set, this is the only place where pandoc is searched for.
 
