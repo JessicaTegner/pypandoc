@@ -6,6 +6,7 @@ import sys
 import textwrap
 import os
 import re
+import warnings
 
 from .py3compat import string_types, cast_bytes, cast_unicode
 
@@ -14,13 +15,14 @@ from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.1.3'
 __license__ = 'MIT'
-__all__ = ['convert', 'get_pandoc_formats', 'get_pandoc_version',
-           'get_pandoc_path', 'download_pandoc']
+__all__ = ['convert', 'convert_file', 'convert_text',
+           'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
+           'download_pandoc']
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
-    """Converts given `source` from `format` `to` another.
+    """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes or a file path (see encoding)
 
@@ -48,15 +50,135 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
-    return _convert(_read_file, _process_file, source, to,
-                    format, extra_args, encoding=encoding,
-                    outputfile=outputfile, filters=filters)
+    msg = ("Due to possible ambiguity, 'convert()' is deprecated. "
+           "Use 'convert_file()'  or 'convert_text()'.")
+    warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
+    path = _identify_path(source)
+    if path:
+        format = _identify_format_from_path(source, format)
+        input_type = 'path'
+    else:
+        source = _as_unicode(source, encoding)
+        input_type = 'string'
+        if not format:
+            raise RuntimeError("Format missing, but need one (identified source as text as no "
+                               "file with that name was found).")
+    return _convert_input(source, format, input_type, to, extra_args=extra_args,
+                          outputfile=outputfile, filters=filters)
 
 
-def _convert(reader, processor, source, to, format=None, extra_args=(), encoding=None,
-             outputfile=None, filters=None):
-    source, format, input_type = reader(source, format, encoding=encoding)
+def convert_text(source, to, format, extra_args=(), encoding='utf-8',
+                 outputfile=None, filters=None):
 
+    """Converts given `source` from `format` to `to`.
+
+    :param str source: Unicode string or bytes (see encoding)
+
+    :param str to: format into which the input should be converted; can be one of
+            `pypandoc.get_pandoc_formats()[1]`
+
+    :param str format: the format of the inputs; can be one of `pypandoc.get_pandoc_formats()[1]`
+
+    :param list extra_args: extra arguments (list of strings) to be passed to pandoc
+            (Default value = ())
+
+    :param str encoding: the encoding of the input bytes (Default value = 'utf-8')
+
+    :param str outputfile: output will be written to outfilename or the converted content
+            returned if None (Default value = None)
+
+    :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
+
+    :returns: converted string (unicode) or an empty string if an outputfile was given
+    :rtype: unicode
+
+    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
+    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
+            path.
+    """
+    source = _as_unicode(source, encoding)
+    return _convert_input(source, format, 'string', to, extra_args=extra_args,
+                          outputfile=outputfile, filters=filters)
+
+
+def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
+                 outputfile=None, filters=None):
+    """Converts given `source` from `format` to `to`.
+
+    :param str source_file: file path (see encoding)
+
+    :param str to: format into which the input should be converted; can be one of
+            `pypandoc.get_pandoc_formats()[1]`
+
+    :param str format: the format of the inputs; will be inferred from the source_file with an
+            known filename extension; can be one of `pypandoc.get_pandoc_formats()[1]`
+            (Default value = None)
+
+    :param list extra_args: extra arguments (list of strings) to be passed to pandoc
+            (Default value = ())
+
+    :param str encoding: the encoding of the file or the input bytes (Default value = 'utf-8')
+
+    :param str outputfile: output will be written to outfilename or the converted content
+            returned if None (Default value = None)
+
+    :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
+
+    :returns: converted string (unicode) or an empty string if an outputfile was given
+    :rtype: unicode
+
+    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
+    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
+            path.
+    """
+    if not _identify_path(source_file):
+        raise RuntimeError("source_file is not a valid path")
+    format = _identify_format_from_path(source_file, format)
+    return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
+                          outputfile=outputfile, filters=filters)
+
+
+def _identify_path(source):
+    try:
+        path = os.path.exists(source)
+    except UnicodeEncodeError:
+        path = os.path.exists(source.encode('utf-8'))
+    except ValueError:
+        path = False
+    except TypeError:
+        # source is None...
+        path = False
+    return path
+
+
+def _identify_format_from_path(sourcefile, format):
+    return format or os.path.splitext(sourcefile)[1].strip('.')
+
+
+def _as_unicode(source, encoding):
+    if encoding != 'utf-8':
+        # if a source and a different encoding is given, try to decode the the source into a
+        # unicode string
+        try:
+            source = cast_unicode(source, encoding=encoding)
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            pass
+    return source
+
+
+def _identify_input_type(source, format, encoding='utf-8'):
+    path = _identify_path(source)
+    if path:
+        format = _identify_format_from_path(source, format)
+        input_type = 'path'
+    else:
+        source = _as_unicode(source, encoding)
+        input_type = 'string'
+    return source, format, input_type
+
+
+def _validate_formats(format, to, outputfile):
     formats = {
         'dbk': 'docbook',
         'md': 'markdown',
@@ -89,36 +211,15 @@ def _convert(reader, processor, source, to, format=None, extra_args=(), encoding
         raise RuntimeError(
             'Output to %s only works by using a outputfile.' % base_to_format
         )
-
-    return processor(source, input_type, to, format, extra_args,
-                     outputfile=outputfile, filters=filters)
+    return format, to
 
 
-def _read_file(source, format, encoding='utf-8'):
-    try:
-        path = os.path.exists(source)
-    except UnicodeEncodeError:
-        path = os.path.exists(source.encode('utf-8'))
-    except ValueError:
-        path = ''
-    if path:
-        format = format or os.path.splitext(source)[1].strip('.')
-        input_type = 'path'
-    else:
-        if encoding != 'utf-8':
-            # if a source and a different encoding is given, try to decode the the source into a
-            # unicode string
-            try:
-                source = cast_unicode(source, encoding=encoding)
-            except (UnicodeDecodeError, UnicodeEncodeError):
-                pass
-        input_type = 'string'
-    return source, format, input_type
-
-
-def _process_file(source, input_type, to, format, extra_args, outputfile=None,
-                  filters=None):
+def _convert_input(source, format, input_type, to, extra_args=(), outputfile=None,
+                   filters=None):
     _ensure_pandoc_path()
+
+    format, to = _validate_formats(format, to, outputfile)
+
     string_input = input_type == 'string'
     input_file = [source] if not string_input else []
     args = [__pandoc_path, '--from=' + format]

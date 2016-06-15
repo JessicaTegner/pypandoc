@@ -4,23 +4,100 @@
 import unittest
 import tempfile
 import pypandoc
-from pypandoc.py3compat import unicode_type
+from pypandoc.py3compat import unicode_type, string_types
 import os
 import sys
+import warnings
+
+import contextlib
+import shutil
 
 
-def test_converter(to, format=None, extra_args=()):
+@contextlib.contextmanager
+def closed_tempfile(suffix, text=None):
+    with tempfile.NamedTemporaryFile('w+t', suffix=suffix, delete=False) as test_file:
+        file_name = test_file.name
+        if text:
+            test_file.write(text)
+            test_file.flush()
+    yield file_name
+    shutil.rmtree(file_name, ignore_errors=True)
 
-    def reader(*args, **kwargs):
-        return source, format, input_type
 
-    def processor(*args, **kwargs):
-        return 'ok'
+# Stolen from pandas
+def is_list_like(arg):
+    return (hasattr(arg, '__iter__') and
+            not isinstance(arg, string_types))
 
-    source = 'foo'
-    input_type = 'string'
 
-    return pypandoc._convert(reader, processor, source, to, format, extra_args)
+@contextlib.contextmanager
+def assert_produces_warning(expected_warning=Warning, filter_level="always",
+                            clear=None, check_stacklevel=True):
+    """
+    Context manager for running code that expects to raise (or not raise)
+    warnings.  Checks that code raises the expected warning and only the
+    expected warning. Pass ``False`` or ``None`` to check that it does *not*
+    raise a warning. Defaults to ``exception.Warning``, baseclass of all
+    Warnings. (basically a wrapper around ``warnings.catch_warnings``).
+    >>> import warnings
+    >>> with assert_produces_warning():
+    ...     warnings.warn(UserWarning())
+    ...
+    >>> with assert_produces_warning(False):
+    ...     warnings.warn(RuntimeWarning())
+    ...
+    Traceback (most recent call last):
+        ...
+    AssertionError: Caused unexpected warning(s): ['RuntimeWarning'].
+    >>> with assert_produces_warning(UserWarning):
+    ...     warnings.warn(RuntimeWarning())
+    Traceback (most recent call last):
+        ...
+    AssertionError: Did not see expected warning of class 'UserWarning'.
+    ..warn:: This is *not* thread-safe.
+    """
+    with warnings.catch_warnings(record=True) as w:
+
+        if clear is not None:
+            # make sure that we are clearning these warnings
+            # if they have happened before
+            # to guarantee that we will catch them
+            if not is_list_like(clear):
+                clear = [clear]
+            for m in clear:
+                try:
+                    m.__warningregistry__.clear()
+                except:
+                    pass
+
+        saw_warning = False
+        warnings.simplefilter(filter_level)
+        yield w
+        extra_warnings = []
+
+        for actual_warning in w:
+            if (expected_warning and issubclass(actual_warning.category,
+                                                expected_warning)):
+                saw_warning = True
+
+                if check_stacklevel and issubclass(actual_warning.category,
+                                                   (FutureWarning,
+                                                    DeprecationWarning)):
+                    from inspect import getframeinfo, stack
+                    caller = getframeinfo(stack()[2][0])
+                    msg = ("Warning not set with correct stacklevel. "
+                           "File where warning is raised: {0} != {1}. "
+                           "Warning message: {2}".format(
+                               actual_warning.filename, caller.filename,
+                               actual_warning.message))
+                    assert actual_warning.filename == caller.filename, msg
+            else:
+                extra_warnings.append(actual_warning.category.__name__)
+        if expected_warning:
+            assert saw_warning, ("Did not see expected warning of class %r."
+                                 % expected_warning.__name__)
+        assert not extra_warnings, ("Caused unexpected warning(s): %r."
+                                    % extra_warnings)
 
 
 class TestPypandoc(unittest.TestCase):
@@ -53,55 +130,43 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(major in [0, 1])
 
     def test_converts_valid_format(self):
-        self.assertEqual(test_converter(format='md', to='rest'), 'ok')
+        self.assertEqualExceptForNewlineEnd(pypandoc.convert("ok", format='md', to='rest'), 'ok')
 
     def test_does_not_convert_to_invalid_format(self):
-        try:
-            test_converter(format='md', to='invalid')
-        except RuntimeError:
-            pass
+        def f():
+            pypandoc.convert("ok", format='md', to='invalid')
+        self.assertRaises(RuntimeError, f)
 
     def test_does_not_convert_from_invalid_format(self):
-        try:
-            test_converter(format='invalid', to='rest')
-        except RuntimeError:
-            pass
+        def f():
+            pypandoc.convert("ok", format='invalid', to='rest')
+        self.assertRaises(RuntimeError, f)
 
-    # We can't use skipIf as it is not available in py2.6
-    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
     def test_basic_conversion_from_file(self):
-        # This will not work on windows:
-        # http://docs.python.org/2/library/tempfile.html
-        if sys.platform.startswith("win"):
-            return
-        with tempfile.NamedTemporaryFile('w+t', suffix='.md') as test_file:
-            file_name = test_file.name
-            test_file.write('#some title\n')
-            test_file.flush()
-
+        with closed_tempfile('.md', text='#some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
-    # We can't use skipIf as it is not available in py2.6
-    # @unittest.skipIf(sys.platform.startswith("win"), "NamedTemporaryFile does not work on Windows")
-    def test_basic_conversion_from_file_with_format(self):
-        # This will not work on windows:
-        # http://docs.python.org/2/library/tempfile.html
-        if sys.platform.startswith("win"):
-            return
-        with tempfile.NamedTemporaryFile('w+t', suffix='.rst') as test_file:
-            file_name = test_file.name
-            test_file.write('#some title\n')
-            test_file.flush()
+            received = pypandoc.convert_file(file_name, 'rst')
+            self.assertEqualExceptForNewlineEnd(expected, received)
 
+    def test_basic_conversion_from_file_with_format(self):
+        with closed_tempfile('.md', text='#some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert(file_name, 'rst', format='md')
+            self.assertEqualExceptForNewlineEnd(expected, received)
+
+            received = pypandoc.convert_file(file_name, 'rst', format='md')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_string(self):
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
         received = pypandoc.convert('#some title', 'rst', format='md')
+        self.assertEqualExceptForNewlineEnd(expected, received)
+
+        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+        received = pypandoc.convert_text('#some title', 'rst', format='md')
         self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_conversion_with_markdown_extensions(self):
@@ -126,23 +191,13 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
 
     def test_basic_conversion_to_file(self):
-        # we just want to get a temp file name, where we can write to
-        tf = tempfile.NamedTemporaryFile(suffix='.rst', delete=False)
-        name = tf.name
-        tf.close()
-
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-
-        try:
-            received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=name)
+        with closed_tempfile('.rst',) as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            with open(name) as f:
+            with open(file_name) as f:
                 written = f.read()
             self.assertEqualExceptForNewlineEnd(expected, written)
-        except:
-            raise
-        finally:
-            os.remove(name)
 
         # to odf does not work without a file
         def f():
@@ -231,39 +286,55 @@ class TestPypandoc(unittest.TestCase):
             print("Skipping: travis is running on old pandoc, no docx")
             return
 
-        tf = tempfile.NamedTemporaryFile(suffix='.docx', delete=False)
-        name = tf.name
-        tf.close()
-
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-
-        try:
+        with closed_tempfile('.docx') as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             # let's just test conversion (to and) from docx, testing e.g. odt
             # as well would really be testing pandoc rather than pypandoc
-            received = pypandoc.convert('#some title\n', to='docx', format='md', outputfile=name)
+            received = pypandoc.convert('#some title\n', to='docx', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            received = pypandoc.convert(name, to='rst')
+            received = pypandoc.convert(file_name, to='rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
-        except:
-            raise
-        finally:
-            os.remove(name)
 
     def test_pdf_conversion(self):
-        tf = tempfile.NamedTemporaryFile(suffix='.pdf', delete=False)
-        name = tf.name
-        tf.close()
-
-        try:
-            pypandoc.convert('#some title\n', to='pdf', format='md', outputfile=name)
-        except:
-            raise
-        finally:
-            os.remove(name)
+        with closed_tempfile('.md', text='#some title\n') as file_name:
+            pypandoc.convert('#some title\n', to='pdf', format='md', outputfile=file_name)
 
     def test_get_pandoc_path(self):
         result = pypandoc.get_pandoc_path()
         assert "pandoc" in result
+
+    def test_call_with_nonexisting_file(self):
+        files = ['/file/does/not/exists.md',
+                 '',
+                 42,
+                 None
+                 ]
+
+        def f(filepath):
+            pypandoc.convert(filepath, 'rst')
+
+        for filepath in files:
+            self.assertRaises(RuntimeError, f, filepath)
+
+        def f(filepath):
+            pypandoc.convert_file(filepath, 'rst')
+
+        for filepath in files:
+            self.assertRaises(RuntimeError, f, filepath)
+
+    def test_convert_text_with_existing_file(self):
+        with closed_tempfile('.md', text='#some title\n') as file_name:
+            received = pypandoc.convert_text(file_name, 'rst', format='md')
+            self.assertTrue("title" not in received)
+
+            # The following is a problematic case
+            received = pypandoc.convert(file_name, 'rst', format='md')
+            self.assertTrue("title" in received)
+
+    def test_depreaction_warnings(self):
+        # convert itself is deprecated...
+        with assert_produces_warning(DeprecationWarning):
+            pypandoc.convert('#some title\n', to='rst', format='md')
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
