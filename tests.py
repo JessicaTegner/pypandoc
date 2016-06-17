@@ -6,6 +6,7 @@ import tempfile
 import pypandoc
 from pypandoc.py3compat import unicode_type, string_types
 import os
+import io
 import sys
 import warnings
 
@@ -195,7 +196,7 @@ class TestPypandoc(unittest.TestCase):
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert('#some title\n', to='rst', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            with open(file_name) as f:
+            with io.open(file_name) as f:
                 written = f.read()
             self.assertEqualExceptForNewlineEnd(expected, written)
 
@@ -296,8 +297,33 @@ class TestPypandoc(unittest.TestCase):
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_pdf_conversion(self):
-        with closed_tempfile('.md', text='#some title\n') as file_name:
-            pypandoc.convert('#some title\n', to='pdf', format='md', outputfile=file_name)
+        with closed_tempfile('.pdf') as file_name:
+            ret = pypandoc.convert_text('#some title\n', to='pdf', format='md', outputfile=file_name)
+            assert ret == ""
+            with io.open(file_name, mode='rb') as f:
+                written = f.read()
+            assert written[:4] == b"%PDF"
+            # TODO: find a test for the content?
+
+        def f():
+            # needs an outputfile
+            pypandoc.convert_text('#some title\n', to='pdf', format='md')
+
+        self.assertRaises(RuntimeError, f)
+
+        def f():
+            # outputfile needs to end in pdf
+            with closed_tempfile('.WRONG') as file_name:
+                pypandoc.convert_text('#some title\n', to='pdf', format='md', outputfile=file_name)
+
+        self.assertRaises(RuntimeError, f)
+
+        def f():
+            # no extensions allowed
+            with closed_tempfile('.pdf') as file_name:
+                pypandoc.convert_text('#some title\n', to='pdf+somethign', format='md', outputfile=file_name)
+
+        self.assertRaises(RuntimeError, f)
 
     def test_get_pandoc_path(self):
         result = pypandoc.get_pandoc_path()

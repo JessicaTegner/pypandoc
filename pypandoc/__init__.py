@@ -179,15 +179,20 @@ def _identify_input_type(source, format, encoding='utf-8'):
 
 
 def _validate_formats(format, to, outputfile):
-    formats = {
-        'dbk': 'docbook',
-        'md': 'markdown',
-        'rest': 'rst',
-        'tex': 'latex',
-    }
+    def normalize_format(fmt):
+        formats = {
+            'dbk': 'docbook',
+            'md': 'markdown',
+            'tex': 'latex',
+        }
+        fmt = formats.get(fmt, fmt)
+        # rst format can have extensions
+        if fmt[:4] == "rest":
+            fmt = "rst"+fmt[4:]
+        return fmt
 
-    format = formats.get(format, format)
-    to = formats.get(to, to)
+    format = normalize_format(format)
+    to = normalize_format(to)
 
     if not format:
         raise RuntimeError('Missing format!')
@@ -207,10 +212,23 @@ def _validate_formats(format, to, outputfile):
 
     # list from https://github.com/jgm/pandoc/blob/master/pandoc.hs
     # `[...] where binaries = ["odt","docx","epub","epub3"] [...]`
-    if base_to_format in ["odt", "docx", "epub", "epub3"] and not outputfile:
+    # pdf has the same restriction
+    if base_to_format in ["odt", "docx", "epub", "epub3", "pdf"] and not outputfile:
         raise RuntimeError(
             'Output to %s only works by using a outputfile.' % base_to_format
         )
+
+    if base_to_format == "pdf":
+        # pdf formats needs to actually have a to format of latex and a
+        # filename with an ending pf .pdf
+        if outputfile[-4:] != ".pdf":
+            raise RuntimeError('PDF output needs an outputfile with ".pdf" as a fileending.')
+        # to is not allowed to contain pdf, but must point to latex
+        # it's also not allowed to contain extensions according to the docs
+        if to != base_to_format:
+            raise RuntimeError("PDF output can't contain any extensions: %s" % to)
+        to = "latex"
+
     return format, to
 
 
@@ -224,9 +242,7 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     input_file = [source] if not string_input else []
     args = [__pandoc_path, '--from=' + format]
 
-    # #59 - pdf output won't work with `--to` set!
-    if to is not 'pdf':
-        args.append('--to=' + to)
+    args.append('--to=' + to)
 
     args += input_file
 
