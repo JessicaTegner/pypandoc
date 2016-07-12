@@ -7,6 +7,7 @@ import textwrap
 import os
 import re
 import warnings
+import tempfile
 
 from .py3compat import string_types, cast_bytes, cast_unicode
 
@@ -344,10 +345,14 @@ def get_pandoc_formats():
 # copied and adapted from jupyter_nbconvert/utils/pandoc.py, Modified BSD License
 
 def _get_pandoc_version(pandoc_path):
+    new_env = os.environ.copy()
+    if 'HOME' not in os.environ:
+        new_env['HOME'] = tempfile.gettempdir()
     p = subprocess.Popen(
         [pandoc_path, '--version'],
         stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE,
+        env=new_env)
     comm = p.communicate()
     out_lines = comm[0].decode().splitlines(False)
     if p.returncode != 0 or len(out_lines) == 0:
