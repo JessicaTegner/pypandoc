@@ -24,7 +24,7 @@ Install via `pip install pypandoc`.
 
 Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc/) include
 pandoc. If there is no prebuilt binary available, you have to
-[install `pandoc` yourself](#installing-pandoc).
+[install `pandoc` yourself](#installing-pandoc-manually).
 
 If you use Linux and have [your own wheelhouse](http://wheel.readthedocs.org/en/latest/#usage),
 you can build a wheel which include `pandoc` with
