@@ -65,7 +65,7 @@ don't need to add it to `PATH`.
 
 #### Installing pandoc manually
 
-Installing manually via the system mechanismen is also possible. Such installation mechanismen
+Installing manually via the system mechanism is also possible. Such installation mechanism
 make `pandoc` available on many more platforms:
 
 - Ubuntu/Debian: `sudo apt-get install pandoc`
@@ -84,9 +84,13 @@ have to change `PATH` yourself or set the full path to `pandoc` in
 
 ### <a name="specifying_binaries"></a>Specifying the location of pandoc binaries
 
-You can point to a specific pandoc version by setting the environment variable `PYPANDOC_PANDOC` to the full path to the pandoc binary (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`). If this environment variable is set, this is the only place where pandoc is searched for.
+You can point to a specific pandoc version by setting the environment variable
+`PYPANDOC_PANDOC` to the full path to the pandoc binary
+(`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`).
+If this environment variable is set, this is the only place where pandoc is searched for.
 
-In certain cases, e.g. pandoc is installed but a web server with its own user cannot find the binaries, it is useful to specify the location at runtime:
+In certain cases, e.g. pandoc is installed but a web server with its own user
+cannot find the binaries, it is useful to specify the location at runtime:
 
 ```python
 import os
