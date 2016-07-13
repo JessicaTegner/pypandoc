@@ -23,7 +23,7 @@ __all__ = ['convert', 'convert_file', 'convert_text',
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             outputfile=None, filters=None):
-    """Converts given `source` from `format` to `to`.
+    """Converts given `source` from `format` to `to` (deprecated).
 
     :param str source: Unicode string or bytes or a file path (see encoding)
 
