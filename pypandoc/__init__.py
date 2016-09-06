@@ -206,7 +206,10 @@ def _validate_formats(format, to, outputfile):
                 _get_base_format(format), ', '.join(from_formats)))
 
     base_to_format = _get_base_format(to)
-    if base_to_format not in to_formats:
+
+    file_extension = os.path.splitext(base_to_format)[1]
+
+    if base_to_format not in to_formats and file_extension != '.lua':
         raise RuntimeError(
             'Invalid output format! Expected one of these: ' +
             ', '.join(to_formats))
