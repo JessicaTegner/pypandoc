@@ -12,6 +12,7 @@ import warnings
 
 import contextlib
 import shutil
+import subprocess
 
 
 @contextlib.contextmanager
@@ -149,8 +150,13 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
-            received = pypandoc.convert_file(file_name, 'rst')
-            self.assertEqualExceptForNewlineEnd(expected, received)
+    def test_convert_with_custom_writer(self):
+        lua_file_content = self.create_sample_lua()
+        with closed_tempfile('.md', text='#title\n') as file_name:
+            with closed_tempfile('.lua', text=lua_file_content) as lua_file_name:
+                expected = u'<h1 id="title">title</h1>{0}'.format(os.linesep)
+                received = pypandoc.convert_file(file_name, lua_file_name)
+                self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_file_with_format(self):
         with closed_tempfile('.md', text='#some title\n') as file_name:
@@ -361,6 +367,14 @@ class TestPypandoc(unittest.TestCase):
         # convert itself is deprecated...
         with assert_produces_warning(DeprecationWarning):
             pypandoc.convert('#some title\n', to='rst', format='md')
+
+
+    def create_sample_lua(self):
+        args = [pypandoc.get_pandoc_path(), '--print-default-data-file', 'sample.lua']
+        p = subprocess.Popen(args, stdout=subprocess.PIPE)
+        out, err = p.communicate()
+        return out.decode('utf-8')
+
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
