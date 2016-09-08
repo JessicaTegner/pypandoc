@@ -368,13 +368,11 @@ class TestPypandoc(unittest.TestCase):
         with assert_produces_warning(DeprecationWarning):
             pypandoc.convert('#some title\n', to='rst', format='md')
 
-
     def create_sample_lua(self):
         args = [pypandoc.get_pandoc_path(), '--print-default-data-file', 'sample.lua']
         p = subprocess.Popen(args, stdout=subprocess.PIPE)
         out, err = p.communicate()
         return out.decode('utf-8')
-
 
     def assertEqualExceptForNewlineEnd(self, expected, received):
         # output written to a file does not seem to have os.linesep
