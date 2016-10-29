@@ -209,7 +209,9 @@ def _validate_formats(format, to, outputfile):
 
     file_extension = os.path.splitext(base_to_format)[1]
 
-    if base_to_format not in to_formats and file_extension != '.lua':
+    if (base_to_format not in to_formats and
+        base_to_format != "pdf" and  # pdf is handled later # noqa: E127
+        file_extension != '.lua'):
         raise RuntimeError(
             'Invalid output format! Expected one of these: ' +
             ', '.join(to_formats))
@@ -323,6 +325,36 @@ def _get_base_format(format):
 def get_pandoc_formats():
     '''
     Dynamic preprocessor for Pandoc formats.
+    Return 2 lists. "from_formats" and "to_formats".
+    '''
+    _ensure_pandoc_path()
+    p = subprocess.Popen(
+        [__pandoc_path, '--list-output-formats'],
+        stdin=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE)
+
+    comm = p.communicate()
+    out = comm[0].decode().splitlines(False)
+    if p.returncode != 0:
+        # try the old version and see if that returns something
+        return get_pandoc_formats_pre_1_18()
+
+    p = subprocess.Popen(
+        [__pandoc_path, '--list-input-formats'],
+        stdin=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdout=subprocess.PIPE)
+
+    comm = p.communicate()
+    in_ = comm[0].decode().splitlines(False)
+
+    return [f.strip() for f in in_], [f.strip() for f in out]
+
+
+def get_pandoc_formats_pre_1_18():
+    '''
+    Dynamic preprocessor for Pandoc formats for version < 1.18.
     Return 2 lists. "from_formats" and "to_formats".
     '''
     _ensure_pandoc_path()

@@ -48,5 +48,5 @@ if sys.version_info[0] >= 3:
 else:
     PY3 = False
 
-    string_types = (str, unicode)
-    unicode_type = unicode
+    string_types = (str, unicode)  # noqa: F821
+    unicode_type = unicode  # noqa: F821
