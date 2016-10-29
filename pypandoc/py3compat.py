@@ -45,8 +45,28 @@ if sys.version_info[0] >= 3:
 
     string_types = (str,)
     unicode_type = str
+
+    # from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
+    from urllib.parse import urljoin, urlparse
+    from urllib.request import pathname2url, url2pathname
+
+    def path2url(path):
+        return urljoin('file:', pathname2url(path))
+
+    def url2path(url):
+        return url2pathname(urlparse(url).path)
+
 else:
     PY3 = False
 
     string_types = (str, unicode)  # noqa: F821
     unicode_type = unicode  # noqa: F821
+
+    from urlparse import urljoin, urlparse
+    import urllib
+
+    def path2url(path):
+        return urljoin('file:', urllib.pathname2url(path))
+
+    def url2path(url):
+        return urllib.url2pathname(urlparse(url).path)

@@ -9,7 +9,7 @@ import re
 import warnings
 import tempfile
 
-from .py3compat import string_types, cast_bytes, cast_unicode
+from .py3compat import string_types, cast_bytes, cast_unicode, urlparse, url2path
 
 from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 
@@ -141,15 +141,30 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
 
 
 def _identify_path(source):
+    # guard against problems
+    if source is None or not isinstance(source, string_types):
+        return False
+
+    path = False
+    try:
+        source = cast_unicode(source)
+    except UnicodeEncodeError:
+        source = cast_unicode(source, 'utf-8')
+
     try:
         path = os.path.exists(source)
-    except UnicodeEncodeError:
-        path = os.path.exists(source.encode('utf-8'))
-    except ValueError:
-        path = False
-    except TypeError:
-        # source is None...
-        path = False
+    except:
+        pass  # still path == False
+
+    if not path:
+        # check if it's an URL
+        result = urlparse(source)
+        if result.scheme and result.netloc and result.path:
+            # complete uri including one with a network path
+            path = True
+        elif result.scheme == "file" and result.path:
+            path = path = os.path.exists(url2path(source))
+
     return path
 
 
