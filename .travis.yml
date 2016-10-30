@@ -23,15 +23,12 @@ addons:
 install:
   - travis_retry pip install tox
   # only download pandoc, the tests should work without a install of pypandoc
-  - python setup.py download_pandoc
+  - python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+  - export PATH=~/bin/;$PATH
 
 script:
   - ./pypandoc/files/pandoc -v
   - tox
-
-after_success:
-  # remove pandoc again as we don't want it in the uploaded sdist
-  - rm -r ./pypandoc/files
 
 deploy:
   provider: pypi
