@@ -4,11 +4,11 @@ python:
  - 3.5 # otherwise we can't run tox 3.5 tests
 env:
   matrix:
+    - TOXENV=py35
     - TOXENV=py26
     - TOXENV=py27
     - TOXENV=py33
     - TOXENV=py34
-    - TOXENV=py35
     - TOXENV=pypy
     - TOXENV=flake8
 addons:
@@ -28,3 +28,14 @@ install:
 script:
   - ./pypandoc/files/pandoc -v
   - tox
+
+deploy:
+  provider: pypi
+  distributions: sdist
+  user: janschulz
+  password:
+    secure: uxmjO7Q0MP0YZb1pdAkKn7TdLdFU1lJqrnSR5DpjzPpJRlGMUph0MIrtHtU1CsbMya//Wwszae77pEqAIDpQ5mHlfF3mPxSO8TWvYu6XZdkmmTKf3rIaJgYoOIz1VdyHsti5SIHMBE749eUykTwNrqV4OR+lk3fpdZmy8shl7+U=
+  on:
+    tags: true
+    repo: bebraw/pypandoc
+    condition: $TOXENV == py35
