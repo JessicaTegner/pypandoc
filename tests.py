@@ -4,7 +4,7 @@
 import unittest
 import tempfile
 import pypandoc
-from pypandoc.py3compat import unicode_type, string_types
+from pypandoc.py3compat import unicode_type, string_types, path2url
 import os
 import io
 import sys
@@ -149,6 +149,24 @@ class TestPypandoc(unittest.TestCase):
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
+
+    def test_basic_conversion_from_file_url(self):
+        # this currently doesn't work: https://github.com/jgm/pandoc/issues/3196
+        return
+        with closed_tempfile('.md', text='#some title\n') as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            # this keeps the : (which should be '|' on windows but pandoc
+            # doesn't like it
+            file_url = path2url(file_name)
+            assert pypandoc._identify_path(file_url)
+
+            received = pypandoc.convert(file_url, 'rst')
+            self.assertEqualExceptForNewlineEnd(expected, received)
+
+    def test_basic_conversion_from_http_url(self):
+        url = 'https://raw.githubusercontent.com/bebraw/pypandoc/master/README.md'
+        received = pypandoc.convert(url, 'html')
+        assert "GPL2 license" in received
 
     def test_convert_with_custom_writer(self):
         lua_file_content = self.create_sample_lua()
@@ -329,6 +347,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_call_with_nonexisting_file(self):
         files = ['/file/does/not/exists.md',
+                 'file:///file/does/not/exists.md'
                  '',
                  42,
                  None
