@@ -1,11 +1,14 @@
+cache:
+  - c:\miktex -> appveyor.yml
+
 environment:
-    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
-    # /E:ON and /V:ON options are not enabled in the batch script intepreter
-    # See: http://stackoverflow.com/a/13751649/163740
-    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
-    TWINE_PASSWORD:
-      secure: vwvitc1udvvzJrSNBbxQrtNKPACCOpSM3kteJK6UBR8=
-    TWINE_USERNAME: janschulz
+  # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+  # /E:ON and /V:ON options are not enabled in the batch script intepreter
+  # See: http://stackoverflow.com/a/13751649/163740
+  CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
+  TWINE_PASSWORD:
+    secure: vwvitc1udvvzJrSNBbxQrtNKPACCOpSM3kteJK6UBR8=
+  TWINE_USERNAME: janschulz
 
   matrix:
 
@@ -13,33 +16,17 @@ environment:
     # a later point release.
     # See: http://www.appveyor.com/docs/installed-software#python
 
-    - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.x" # currently 2.7.9
-      PYTHON_ARCH: "32"
-
     - PYTHON: "C:\\Python27-x64"
       PYTHON_VERSION: "2.7.x" # currently 2.7.9
       PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python33"
-      PYTHON_VERSION: "3.3.x" # currently 3.3.5
-      PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python33-x64"
       PYTHON_VERSION: "3.3.x" # currently 3.3.5
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.x" # currently 3.4.3
-      PYTHON_ARCH: "32"
-
     - PYTHON: "C:\\Python34-x64"
       PYTHON_VERSION: "3.4.x" # currently 3.4.3
       PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5.x"
-      PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python35-x64"
       PYTHON_VERSION: "3.5.x"
@@ -74,20 +61,28 @@ install:
   # Check that we have the expected version and architecture for Python
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  
+  # Install miktex to get pdflatex, if we don't get it from the cache
+  - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe appveyor DownloadFile http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable.exe
+  - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe 7z x miktex-portable.exe -oC:\miktex >NUL
+  - set "PATH=%PATH%;c:\miktex\texmfs\install\miktex\bin"
+  # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
+  # this adds this to the registry!
+  - initexmf --set-config-value "[MPM]AutoInstall=1"
+
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
   - "pip install --disable-pip-version-check --user --upgrade pip"
 
-  - "%CMD_IN_ENV% pip install tox"
-  - "%CMD_IN_ENV% pip install twine"
+  - "%CMD_IN_ENV% pip install twine wheel"
 
 build_script:
   - "%CMD_IN_ENV% python setup.py download_pandoc"
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% tox"
+  - "%CMD_IN_ENV% python tests.py"
 
 after_test:
   # If tests are successful, create binary packages for the project.
@@ -100,6 +95,6 @@ artifacts:
 
 on_success:
   - ps: >-
-      if ($env:APPVEYOR_REPO_TAG) {
+      if ($env:APPVEYOR_REPO_TAG -eq "true") {
         twine upload dist/*.whl
       }
