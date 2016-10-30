@@ -27,7 +27,7 @@ install:
   - export PATH=~/bin:$PATH
 
 script:
-  - ./pypandoc/files/pandoc -v
+  - ~/bin/pandoc -v
   - tox
 
 deploy:
