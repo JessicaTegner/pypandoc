@@ -24,7 +24,7 @@ install:
   - travis_retry pip install tox
   # only download pandoc, the tests should work without a install of pypandoc
   - python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
-  - export PATH=~/bin/;$PATH
+  - export PATH=~/bin:$PATH
 
 script:
   - ./pypandoc/files/pandoc -v
