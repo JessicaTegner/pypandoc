@@ -1,3 +1,6 @@
+cache:
+  - c:\miktex -> appveyor.yml
+
 environment:
   # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
   # /E:ON and /V:ON options are not enabled in the batch script intepreter
@@ -63,9 +66,9 @@ install:
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   
-  # Install miktex to get pdflatex
-  - ps: Start-FileDownload 'http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable.exe'
-  - 7z x miktex-portable.exe -oC:\miktex >NUL
+  # Install miktex to get pdflatex, if we don't get it from the cache
+  - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe appveyor DownloadFile http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable.exe
+  - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe 7z x miktex-portable.exe -oC:\miktex >NUL
   - set "PATH=%PATH%;c:\miktex\texmfs\install\miktex\bin"
 
 
