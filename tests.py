@@ -213,10 +213,6 @@ class TestPypandoc(unittest.TestCase):
         self.assertRaises(RuntimeError, f)
 
     def test_conversion_with_citeproc_filter(self):
-        if os.environ.get('CI', None):
-            print("Skipping: there is a bug with citeproc on travis.")
-            return
-
         # we just want to get a temp file name, where we can write to
         filters = ['pandoc-citeproc']
         written = pypandoc.convert('./filter_test.md', to='html', format='md',
@@ -289,10 +285,6 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(isinstance(written, unicode_type))
 
     def test_conversion_from_non_plain_text_file(self):
-        if 'CI' in os.environ:
-            print("Skipping: travis is running on old pandoc, no docx")
-            return
-
         with closed_tempfile('.docx') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             # let's just test conversion (to and) from docx, testing e.g. odt
