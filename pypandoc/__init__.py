@@ -14,7 +14,7 @@ from .py3compat import string_types, cast_bytes, cast_unicode, urlparse
 from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 
 __author__ = u'Juho Vepsäläinen'
-__version__ = '1.2.0.900'
+__version__ = '1.3.0'
 __license__ = 'MIT'
 __all__ = ['convert', 'convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
