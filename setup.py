@@ -69,8 +69,8 @@ if is_build_wheel:
                 msg = "Including pandoc in wheel needs wheel >=0.27 but found %s.\nPlease update wheel!"
                 raise RuntimeError(msg % wheel.__version__)
         except ImportError:
-            # No wheel installed, the user will get an error at a different place...
-            pass
+            # the real error will happen further down...
+            print("No wheel installed, please install 'wheel'...")
         print("forcing platform specific wheel name...")
         from distutils.util import get_platform
         sys.argv.insert(pos_bdist_wheel + 1, '--plat-name')
