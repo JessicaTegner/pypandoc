@@ -17,22 +17,18 @@ environment:
     # See: http://www.appveyor.com/docs/installed-software#python
 
     - PYTHON: "C:\\Python27-x64"
-      TOXENV: py27
       PYTHON_VERSION: "2.7.x" # currently 2.7.9
       PYTHON_ARCH: "64"
 
     - PYTHON: "C:\\Python33-x64"
-      TOXENV: py33
       PYTHON_VERSION: "3.3.x" # currently 3.3.5
       PYTHON_ARCH: "64"
 
     - PYTHON: "C:\\Python34-x64"
-      TOXENV: py34
       PYTHON_VERSION: "3.4.x" # currently 3.4.3
       PYTHON_ARCH: "64"
 
     - PYTHON: "C:\\Python35-x64"
-      TOXENV: py35
       PYTHON_VERSION: "3.5.x"
       PYTHON_ARCH: "64"
 
@@ -79,7 +75,6 @@ install:
   # about it being out of date.
   - "pip install --disable-pip-version-check --user --upgrade pip"
 
-  - "%CMD_IN_ENV% pip install tox"
   - "%CMD_IN_ENV% pip install twine wheel"
 
 build_script:
@@ -87,7 +82,7 @@ build_script:
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% tox"
+  - "%CMD_IN_ENV% python tests.py"
 
 after_test:
   # If tests are successful, create binary packages for the project.
