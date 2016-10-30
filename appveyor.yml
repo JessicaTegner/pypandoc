@@ -80,7 +80,7 @@ install:
   - "pip install --disable-pip-version-check --user --upgrade pip"
 
   - "%CMD_IN_ENV% pip install tox"
-  - "%CMD_IN_ENV% pip install twine"
+  - "%CMD_IN_ENV% pip install twine wheel"
 
 build_script:
   - "%CMD_IN_ENV% python setup.py download_pandoc"
