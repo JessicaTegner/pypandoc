@@ -147,14 +147,12 @@ def _identify_path(source):
 
     path = False
     try:
-        source = cast_unicode(source)
+        path = os.path.exists(source)
     except UnicodeEncodeError:
-        source = cast_unicode(source, 'utf-8')
-
-    try:
+        source = source.encode('utf-8')
         path = os.path.exists(source)
     except:
-        pass  # still path == False
+        path  # still false
 
     if not path:
         # check if it's an URL
