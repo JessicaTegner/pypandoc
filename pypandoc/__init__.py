@@ -9,7 +9,7 @@ import re
 import warnings
 import tempfile
 
-from .py3compat import string_types, cast_bytes, cast_unicode, urlparse, url2path
+from .py3compat import string_types, cast_bytes, cast_unicode, urlparse
 
 from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 
@@ -159,11 +159,15 @@ def _identify_path(source):
     if not path:
         # check if it's an URL
         result = urlparse(source)
-        if result.scheme and result.netloc and result.path:
-            # complete uri including one with a network path
+        if result.scheme in ["http", "https"]:
             path = True
-        elif result.scheme == "file" and result.path:
-            path = path = os.path.exists(url2path(source))
+        # unfortunately, pandoc currently doesn't support anything else currently
+        # https://github.com/jgm/pandoc/issues/319
+        # elif result.scheme and result.netloc and result.path:
+        #     # complete uri including one with a network path
+        #     path = True
+        # elif result.scheme == "file" and result.path:
+        #     path = path = os.path.exists(url2path(source))
 
     return path
 
