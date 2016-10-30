@@ -13,35 +13,23 @@ environment:
     # a later point release.
     # See: http://www.appveyor.com/docs/installed-software#python
 
-    - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.x" # currently 2.7.9
-      PYTHON_ARCH: "32"
-
     - PYTHON: "C:\\Python27-x64"
+      TOXENV: py27
       PYTHON_VERSION: "2.7.x" # currently 2.7.9
       PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python33"
-      PYTHON_VERSION: "3.3.x" # currently 3.3.5
-      PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python33-x64"
+      TOXENV: py33
       PYTHON_VERSION: "3.3.x" # currently 3.3.5
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python34"
-      PYTHON_VERSION: "3.4.x" # currently 3.4.3
-      PYTHON_ARCH: "32"
-
     - PYTHON: "C:\\Python34-x64"
+      TOXENV: py34
       PYTHON_VERSION: "3.4.x" # currently 3.4.3
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5.x"
-      PYTHON_ARCH: "32"
-
     - PYTHON: "C:\\Python35-x64"
+      TOXENV: py35
       PYTHON_VERSION: "3.5.x"
       PYTHON_ARCH: "64"
 
@@ -74,6 +62,12 @@ install:
   # Check that we have the expected version and architecture for Python
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  
+  # Install miktex to get pdflatex
+  - ps: Start-FileDownload 'http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable.exe'
+  - 7z x miktex-portable.exe -oC:\miktex >NUL
+  - set "PATH=%PATH%;c:\miktex\texmfs\install\miktex\bin"
+
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
