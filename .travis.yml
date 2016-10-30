@@ -29,6 +29,10 @@ script:
   - ./pypandoc/files/pandoc -v
   - tox
 
+after_success:
+  # remove pandoc again as we don't want it in the uploaded sdist
+  - rm -r ./pypandoc/files
+
 deploy:
   provider: pypi
   distributions: sdist
