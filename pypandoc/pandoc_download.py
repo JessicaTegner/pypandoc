@@ -17,13 +17,17 @@ except ImportError:
 # Uses sys.platform keys, but removes the 2 from linux2
 # Adding a new platform means implementing unpacking in "DownloadPandocCommand"
 # and adding the URL here
-PANDOC_URLS = {
-    "win32": "https://github.com/jgm/pandoc/releases/download/1.18/pandoc-1.18-windows.msi",
-    "linux": "https://github.com/jgm/pandoc/releases/download/1.18/pandoc-1.18-1-amd64.deb",
-    "darwin": "https://github.com/jgm/pandoc/releases/download/1.18/pandoc-1.18-osx.pkg"
-}
-
+# When updating pandoc version, update the following 2 variables
 INCLUDED_PANDOC_VERSION = "1.18"
+DEB_SUBFFIX = "-1"
+
+URL_BASE = "https://github.com/jgm/pandoc/releases/download/" + INCLUDED_PANDOC_VERSION + "/pandoc-" + INCLUDED_PANDOC_VERSION
+
+PANDOC_URLS = {
+    "win32": URL_BASE + "-windows.msi",
+    "linux": URL_BASE + DEB_SUBFFIX + "-amd64.deb",
+    "darwin": URL_BASE + "-osx.pkg"
+}
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
