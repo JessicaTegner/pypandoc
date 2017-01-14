@@ -21,7 +21,8 @@ except ImportError:
 INCLUDED_PANDOC_VERSION = "1.19.1"
 DEB_SUBFFIX = "-1"
 
-URL_BASE = "https://github.com/jgm/pandoc/releases/download/" + INCLUDED_PANDOC_VERSION + "/pandoc-" + INCLUDED_PANDOC_VERSION
+URL_BASE = "https://github.com/jgm/pandoc/releases/download/" + \
+    INCLUDED_PANDOC_VERSION + "/pandoc-" + INCLUDED_PANDOC_VERSION
 
 PANDOC_URLS = {
     "win32": URL_BASE + "-windows.msi",
