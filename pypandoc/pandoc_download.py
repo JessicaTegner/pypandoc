@@ -14,13 +14,18 @@ except ImportError:
     from urllib import urlopen
 
 
-# Uses sys.platform keys, but removes the 2 from linux2
-# Adding a new platform means implementing unpacking in "DownloadPandocCommand"
-# and adding the URL here
+DEFAULT_TARGET_FOLDER = {
+    "win32": "~\\AppData\\Local\\Pandoc",
+    "linux": "~/bin",
+    "darwin": "~/Applications/pandoc"
+}
 
 
-def _get_pandoc_url(version=None):
+def _get_pandoc_urls(version=None):
     """Get the urls of pandoc's binaries
+    Uses sys.platform keys, but removes the 2 from linux2
+    Adding a new platform means implementing unpacking in "DownloadPandocCommand"
+    and adding the URL here
     :param str version: pandoc version. e.g. "1.19.1"
     :return: str pandoc_urls: a dictionary with keys as system platform
         and values as the url pointing to respective binaries
@@ -36,18 +41,6 @@ def _get_pandoc_url(version=None):
         "darwin": url_base + "-osx.pkg"
     }
     return pandoc_urls
-
-
-# When updating pandoc version, update the following variable
-INCLUDED_PANDOC_VERSION = "1.19.1"
-PANDOC_URLS = _get_pandoc_url(INCLUDED_PANDOC_VERSION)
-
-
-DEFAULT_TARGET_FOLDER = {
-    "win32": "~\\AppData\\Local\\Pandoc",
-    "linux": "~/bin",
-    "darwin": "~/Applications/pandoc"
-}
 
 
 def _make_executable(path):
@@ -136,7 +129,7 @@ def _handle_win32(filename, targetfolder):
     print("* Done.")
 
 
-def download_pandoc(url=None, targetfolder=None):
+def download_pandoc(url=None, targetfolder=None, version=None):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -151,6 +144,12 @@ def download_pandoc(url=None, targetfolder=None):
         location: `~/bin` on Linux, `~/Applications/pandoc` on Mac OS X, and
         `~\\AppData\\Local\\Pandoc` on Windows.
     """
+    # get pandoc_urls
+    if version is None:
+        # hard-code version for now
+        version = "1.19.1"
+    pandoc_urls = _get_pandoc_urls(version)
+
     pf = sys.platform
 
     # compatibility with py3
@@ -159,11 +158,11 @@ def download_pandoc(url=None, targetfolder=None):
         if platform.architecture()[0] != "64bit":
             raise RuntimeError("Linux pandoc is only compiled for 64bit.")
 
-    if pf not in PANDOC_URLS:
+    if pf not in pandoc_urls:
         raise RuntimeError("Can't handle your platform (only Linux, Mac OS X, Windows).")
 
     if url is None:
-        url = PANDOC_URLS[pf]
+        url = pandoc_urls[pf]
 
     filename = url.split("/")[-1]
     if os.path.isfile(filename):
