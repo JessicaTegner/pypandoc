@@ -13,6 +13,8 @@ try:
 except ImportError:
     from urllib import urlopen
 
+# hard-code version for now
+INCLUDED_PANDOC_VERSION = "1.19.1"
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
@@ -146,8 +148,7 @@ def download_pandoc(url=None, targetfolder=None, version=None):
     """
     # get pandoc_urls
     if version is None:
-        # hard-code version for now
-        version = "1.19.1"
+        version = INCLUDED_PANDOC_VERSION
     pandoc_urls = _get_pandoc_urls(version)
 
     pf = sys.platform
