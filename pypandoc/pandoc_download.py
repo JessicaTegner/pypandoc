@@ -17,18 +17,31 @@ except ImportError:
 # Uses sys.platform keys, but removes the 2 from linux2
 # Adding a new platform means implementing unpacking in "DownloadPandocCommand"
 # and adding the URL here
-# When updating pandoc version, update the following 2 variables
+
+
+def _get_pandoc_url(version=None):
+    """Get the urls of pandoc's binaries
+    :param str version: pandoc version. e.g. "1.19.1"
+    :return: str pandoc_urls: a dictionary with keys as system platform
+        and values as the url pointing to respective binaries
+    """
+    deb_subffix = "-1"
+
+    url_base = "https://github.com/jgm/pandoc/releases/download/" + \
+        version + "/pandoc-" + version
+
+    pandoc_urls = {
+        "win32": url_base + "-windows.msi",
+        "linux": url_base + deb_subffix + "-amd64.deb",
+        "darwin": url_base + "-osx.pkg"
+    }
+    return pandoc_urls
+
+
+# When updating pandoc version, update the following variable
 INCLUDED_PANDOC_VERSION = "1.19.1"
-DEB_SUBFFIX = "-1"
+PANDOC_URLS = _get_pandoc_url(INCLUDED_PANDOC_VERSION)
 
-URL_BASE = "https://github.com/jgm/pandoc/releases/download/" + \
-    INCLUDED_PANDOC_VERSION + "/pandoc-" + INCLUDED_PANDOC_VERSION
-
-PANDOC_URLS = {
-    "win32": URL_BASE + "-windows.msi",
-    "linux": URL_BASE + DEB_SUBFFIX + "-amd64.deb",
-    "darwin": URL_BASE + "-osx.pkg"
-}
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
