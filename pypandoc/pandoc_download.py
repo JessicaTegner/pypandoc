@@ -45,7 +45,7 @@ def _get_pandoc_urls(version="latest"):
     # regex for the binaries
     regex = re.compile(r"/jgm/pandoc/releases/download/.*\.(?:msi|deb|pkg)")
     # a list of urls to the bainaries
-    pandoc_urls_list = regex.findall(content.decode())
+    pandoc_urls_list = regex.findall(content.decode("utf-8"))
     # actual pandoc version
     version = pandoc_urls_list[0].split('/')[5]
     # dict that lookup the platform from binary extension
@@ -55,7 +55,9 @@ def _get_pandoc_urls(version="latest"):
         'pkg': 'darwin'
     }
     # parse pandoc_urls from list to dict
-    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
+    # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
+    # pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
+    pandoc_urls = dict((ext2platform[url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
     return pandoc_urls, version
 
 
