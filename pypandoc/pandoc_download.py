@@ -7,14 +7,13 @@ import tempfile
 import os.path
 import subprocess
 import platform
+import re
 
 try:
     from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
 
-# hard-code version for now
-INCLUDED_PANDOC_VERSION = "1.19.1"
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
@@ -23,26 +22,41 @@ DEFAULT_TARGET_FOLDER = {
 }
 
 
-def _get_pandoc_urls(version=None):
+def _get_pandoc_urls(version="latest"):
     """Get the urls of pandoc's binaries
     Uses sys.platform keys, but removes the 2 from linux2
     Adding a new platform means implementing unpacking in "DownloadPandocCommand"
     and adding the URL here
-    :param str version: pandoc version. e.g. "1.19.1"
+
+    :param str version: pandoc version.
+        Valid values are either a valid pandoc version e.g. "1.19.1", or "latest"
+        Default: "latest".
+
     :return: str pandoc_urls: a dictionary with keys as system platform
         and values as the url pointing to respective binaries
+
+    :return: str version: actual pandoc version. (e.g. "lastest" will be resolved to the actual one)
     """
-    deb_subffix = "-1"
-
-    url_base = "https://github.com/jgm/pandoc/releases/download/" + \
-        version + "/pandoc-" + version
-
-    pandoc_urls = {
-        "win32": url_base + "-windows.msi",
-        "linux": url_base + deb_subffix + "-amd64.deb",
-        "darwin": url_base + "-osx.pkg"
+    # url to pandoc download page
+    url = "https://github.com/jgm/pandoc/releases/" + ("tag/" if version != "latest" else "") + version
+    # read the HTML content
+    response = urlopen(url)
+    content = response.read()
+    # regex for the binaries
+    regex = re.compile(r"/jgm/pandoc/releases/download/.*\.(?:msi|deb|pkg)")
+    # a list of urls to the bainaries
+    pandoc_urls_list = regex.findall(content.decode())
+    # actual pandoc version
+    version = pandoc_urls_list[0].split('/')[5]
+    # dict that lookup the platform from binary extension
+    ext2platform = {
+        'msi': 'wind32',
+        'deb': 'linux',
+        'pkg': 'darwin'
     }
-    return pandoc_urls
+    # parse pandoc_urls from list to dict
+    pandoc_urls = {ext2platform[url[-3:]]: url for url in pandoc_urls_list}
+    return pandoc_urls, version
 
 
 def _make_executable(path):
@@ -131,7 +145,7 @@ def _handle_win32(filename, targetfolder):
     print("* Done.")
 
 
-def download_pandoc(url=None, targetfolder=None, version=None):
+def download_pandoc(url=None, targetfolder=None, version="latest"):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -147,9 +161,7 @@ def download_pandoc(url=None, targetfolder=None, version=None):
         `~\\AppData\\Local\\Pandoc` on Windows.
     """
     # get pandoc_urls
-    if version is None:
-        version = INCLUDED_PANDOC_VERSION
-    pandoc_urls = _get_pandoc_urls(version)
+    pandoc_urls, _ = _get_pandoc_urls(version)
 
     pf = sys.platform
 
