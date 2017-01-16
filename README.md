@@ -63,6 +63,8 @@ download_pandoc()
 The default install location is included in the search path for `pandoc`, so you
 don't need to add it to `PATH`.
 
+By default, the latest pandoc version is installed. If you want to specify your own version, say 1.19.1, use `download_pandoc(version='1.19.1')` instead.
+
 #### Installing pandoc manually
 
 Installing manually via the system mechanism is also possible. Such installation mechanism
