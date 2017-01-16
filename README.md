@@ -19,7 +19,7 @@ Pypandoc uses pandoc, so it needs an available installation of pandoc. For some 
 prebuilt package.
 
 If pandoc is already installed (i.e. pandoc is in the `PATH`), pypandoc uses the version with the
-higher version number, and if both are the same, the already installed version. See [Specifying the location of pandoc binaries] for more.
+higher version number, and if both are the same, the already installed version. See [Specifying the location of pandoc binaries](#specifying-the-location-of-pandoc-binaries) for more.
 
 To use pandoc filters, you must have the relevant filters installed on your machine.
 
