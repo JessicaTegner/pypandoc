@@ -51,7 +51,7 @@ def _get_pandoc_urls(version="latest"):
     version = pandoc_urls_list[0].split('/')[5]
     # dict that lookup the platform from binary extension
     ext2platform = {
-        'msi': 'wind32',
+        'msi': 'win32',
         'deb': 'linux',
         'pkg': 'darwin'
     }
