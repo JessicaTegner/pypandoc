@@ -55,7 +55,7 @@ def _get_pandoc_urls(version="latest"):
         'pkg': 'darwin'
     }
     # parse pandoc_urls from list to dict
-    pandoc_urls = {ext2platform[url[-3:]]: url for url in pandoc_urls_list}
+    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
     return pandoc_urls, version
 
 
