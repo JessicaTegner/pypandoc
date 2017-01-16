@@ -1,8 +1,13 @@
 # pypandoc
 
 [![Build Status](https://travis-ci.org/bebraw/pypandoc.svg?branch=master)](https://travis-ci.org/bebraw/pypandoc)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/bebraw/pypandoc?svg=true)](https://ci.appveyor.com/project/bebraw/pypandoc)
+[![GitHub Releases](https://img.shields.io/github/tag/bebraw/pypandoc.svg?label=github+release)](https://github.com/bebraw/pypandoc/releases)
 [![PyPI version](https://badge.fury.io/py/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
 [![conda version](https://anaconda.org/conda-forge/pypandoc/badges/version.svg)](https://anaconda.org/conda-forge/pypandoc/)
+[![Development Status](https://img.shields.io/pypi/status/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
+[![Python version](https://img.shields.io/pypi/pyversions/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
+![License](https://img.shields.io/pypi/l/pypandoc.svg)
 
 pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/), a universal
 document converter.
