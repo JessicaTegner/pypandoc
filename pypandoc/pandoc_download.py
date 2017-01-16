@@ -38,7 +38,8 @@ def _get_pandoc_urls(version="latest"):
     :return: str version: actual pandoc version. (e.g. "lastest" will be resolved to the actual one)
     """
     # url to pandoc download page
-    url = "https://github.com/jgm/pandoc/releases/" + ("tag/" if version != "latest" else "") + version
+    url = "https://github.com/jgm/pandoc/releases/" + \
+        ("tag/" if version != "latest" else "") + version
     # read the HTML content
     response = urlopen(url)
     content = response.read()
@@ -57,7 +58,8 @@ def _get_pandoc_urls(version="latest"):
     # parse pandoc_urls from list to dict
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
     # pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
-    pandoc_urls = dict((ext2platform[url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
+    pandoc_urls = dict((ext2platform[
+                       url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
     return pandoc_urls, version
 
 
