@@ -9,7 +9,7 @@
 [![Python version](https://img.shields.io/pypi/pyversions/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
 ![License](https://img.shields.io/pypi/l/pypandoc.svg)
 
-pypandoc provides a thin wrapper for [pandoc](http://johnmacfarlane.net/pandoc/), a universal
+pypandoc provides a thin wrapper for [pandoc](https://pandoc.org), a universal
 document converter.
 
 ## Installation
@@ -31,7 +31,7 @@ Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc
 pandoc. If there is no prebuilt binary available, you have to
 [install `pandoc` yourself](#installing-pandoc-manually).
 
-If you use Linux and have [your own wheelhouse](http://wheel.readthedocs.org/en/latest/#usage),
+If you use Linux and have [your own wheelhouse](https://wheel.readthedocs.org/en/latest/#usage),
 you can build a wheel which include `pandoc` with
 `python setup.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
 on 64bit intel systems, as we only download it from the
@@ -79,9 +79,9 @@ make `pandoc` available on many more platforms:
 - Mac OS X with Homebrew: `brew install pandoc pandoc-citeproc Caskroom/cask/mactex`
 - Machine with Haskell: `cabal-install pandoc`
 - Windows: There is an installer available
-  [here](http://johnmacfarlane.net/pandoc/installing.html)
-- [FreeBSD port](http://www.freshports.org/textproc/pandoc/)
-  - Or see http://johnmacfarlane.net/pandoc/installing.html
+  [here](https://pandoc.org/installing.html)
+- [FreeBSD port](https://www.freshports.org/textproc/pandoc/)
+  - Or see [Pandoc - Installing pandoc](https://pandoc.org/installing.html)
 
 Be aware that not all install mechanismen put `pandoc` in `PATH`, so you either
 have to change `PATH` yourself or set the full path to `pandoc` in
@@ -153,7 +153,7 @@ output = pypandoc.convert(
 # output == '<h2 id="primary-heading">Primary Heading</h2>\r\n'
 ```
 pypandoc now supports easy addition of
-[pandoc filters](http://johnmacfarlane.net/pandoc/scripting.html).
+[pandoc filters](https://pandoc.org/scripting.html).
 
 ```python
 filters = ['pandoc-citeproc']
@@ -168,7 +168,7 @@ output = pd.convert_file(source=filename,
 Please pass any filters in as a list and not as a string.
 
 Please refer to `pandoc -h` and the
-[official documentation](http://johnmacfarlane.net/pandoc/README.html) for further details.
+[official documentation](https://pandoc.org/MANUAL.html) for further details.
 
 > Note: the old way of using `convert(input, output)` is deprecated as in some cases it wasn't
 possible to determine whether the input should be used as a filename or as text.
@@ -202,8 +202,8 @@ print(pypandoc.get_pandoc_formats())
 ## Related
 
 * [pydocverter](https://github.com/msabramo/pydocverter) is a client for a service called
-[Docverter](http://www.docverter.com/), which offers `pandoc` as a service (plus some extra goodies).
-* See [pyandoc](http://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a `pandoc`
+[Docverter](https://www.docverter.com), which offers `pandoc` as a service (plus some extra goodies).
+* See [pyandoc](https://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a `pandoc`
 wrapper from Kenneth Reitz. This one hasn't been active in a while though.
 
 ## Contributing
@@ -223,7 +223,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Daniel Sanchez](https://github.com/ErunamoJAZZ) - Automatic parsing of input/output formats
 * [Thomas G.](https://github.com/coldfix) - Python 3 support
 * [Ben Jao Ming](https://github.com/benjaoming) - Fail gracefully if `pandoc` is missing
-* [Ross Crawford-d'Heureuse](http://github.com/rosscdh) - Encode input in UTF-8 and add Django
+* [Ross Crawford-d'Heureuse](https://github.com/rosscdh) - Encode input in UTF-8 and add Django
   example
 * [Michael Chow](https://github.com/machow) - Decode output in UTF-8
 * [Janusz Skonieczny](https://github.com/wooyek) - Support Windows newlines and allow encoding to
@@ -245,4 +245,4 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 
 ## License
 
-`pypandoc` is available under MIT license. See LICENSE for more details. `pandoc` itself is [available under the GPL2 license](https://github.com/jgm/pandoc/blob/master/COPYING).
+`pypandoc` is available under MIT license. See LICENSE for more details. `pandoc` itself is [available under the GPL2 license](https://github.com/jgm/pandoc/blob/master/COPYING.md).
