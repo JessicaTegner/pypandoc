@@ -9,19 +9,19 @@
 [![Python version](https://img.shields.io/pypi/pyversions/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
 ![License](https://img.shields.io/pypi/l/pypandoc.svg)
 
-pypandoc provides a thin wrapper for [pandoc](https://pandoc.org), a universal
+Pypandoc provides a thin wrapper for [pandoc](https://pandoc.org), a universal
 document converter.
 
 ## Installation
 
-pypandoc uses `pandoc`, so it needs an available installation of `pandoc`. For some common cases
-(wheels, conda packages), pypandoc already includes `pandoc` (and `pandoc_citeproc`) in it's
+Pypandoc uses pandoc, so it needs an available installation of pandoc. For some common cases
+(wheels, conda packages), pypandoc already includes pandoc (and pandoc-citeproc) in it's
 prebuilt package.
 
-If `pandoc` is already installed (`pandoc` is in the PATH), `pypandoc` uses the version with the
-higher version number and if both are the same, the already installed version. See [Specifying the location of pandoc binaries](#specifying_binaries) for more.
+If pandoc is already installed (i.e. pandoc is in the `PATH`), pypandoc uses the version with the
+higher version number, and if both are the same, the already installed version. See [Specifying the location of pandoc binaries](#specifying_binaries) for more.
 
-To use `pandoc` filters, you must have the relevant filter installed on your machine.
+To use pandoc filters, you must have the relevant filters installed on your machine.
 
 ### Installing via pip
 
@@ -29,18 +29,18 @@ Install via `pip install pypandoc`.
 
 Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc/) include
 pandoc. If there is no prebuilt binary available, you have to
-[install `pandoc` yourself](#installing-pandoc-manually).
+[install pandoc yourself](#installing-pandoc-manually).
 
 If you use Linux and have [your own wheelhouse](https://wheel.readthedocs.org/en/latest/#usage),
-you can build a wheel which include `pandoc` with
+you can build a wheel which include pandoc with
 `python setup.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
 on 64bit intel systems, as we only download it from the
-[official source](https://github.com/jgm/pandoc/releases).
+[official releases](https://github.com/jgm/pandoc/releases).
 
 ### Installing via conda
 
-`pypandoc` is included in [conda-forge](https://conda-forge.github.io/). The conda packages will
-also install the `pandoc` package, so `pandoc` is available in the installation.
+Pypandoc is included in [conda-forge](https://conda-forge.github.io/). The conda packages will
+also install the pandoc package, so pandoc is available in the installation.
 
 Install via `conda install -c conda-forge pypandoc`.
 
@@ -50,28 +50,28 @@ use `conda install pypandoc` directly and also lets you update via `conda update
 
 ### Installing pandoc
 
-If you don't get `pandoc` installed via a prebuild wheel which includes `pandoc` or via the
-conda package dependencies, you need to install `pandoc` by yourself.
+If you don't get pandoc installed via a prebuild wheel which includes pandoc or via the
+conda package dependencies, you need to install pandoc by yourself.
 
 #### Installing pandoc via pypandoc
 
-Installing via pypandoc is possible on Windows, Mac OS X or Linux (Intel-based):
+Installing via pypandoc is possible on Windows, Mac OS X or Linux (Intel-based, 64-bit):
 
 ```python
-# expects a installed pypandoc: pip install pypandoc
+# expects an installed pypandoc: pip install pypandoc
 from pypandoc.pandoc_download import download_pandoc
 # see the documentation how to customize the installation path
-# but be aware that you then need to include it in the PATH
+# but be aware that you then need to include it in the `PATH`
 download_pandoc()
 ```
 
-The default install location is included in the search path for `pandoc`, so you
+The default install location is included in the search path for pandoc, so you
 don't need to add it to `PATH`.
 
 #### Installing pandoc manually
 
 Installing manually via the system mechanism is also possible. Such installation mechanism
-make `pandoc` available on many more platforms:
+make pandoc available on many more platforms:
 
 - Ubuntu/Debian: `sudo apt-get install pandoc`
 - Fedora/Red Hat: `sudo yum install pandoc`
@@ -83,14 +83,14 @@ make `pandoc` available on many more platforms:
 - [FreeBSD port](https://www.freshports.org/textproc/pandoc/)
   - Or see [Pandoc - Installing pandoc](https://pandoc.org/installing.html)
 
-Be aware that not all install mechanismen put `pandoc` in `PATH`, so you either
-have to change `PATH` yourself or set the full path to `pandoc` in
+Be aware that not all install mechanisms put pandoc in `PATH`, so you either
+have to change `PATH` yourself or set the full `PATH` to pandoc in
 `PYPANDOC_PANDOC`. See the next section for more information.
 
 ### <a name="specifying_binaries"></a>Specifying the location of pandoc binaries
 
 You can point to a specific pandoc version by setting the environment variable
-`PYPANDOC_PANDOC` to the full path to the pandoc binary
+`PYPANDOC_PANDOC` to the full `PATH` to the pandoc binary
 (`PYPANDOC_PANDOC=/home/x/whatever/pandoc` or `PYPANDOC_PANDOC=c:\pandoc\pandoc.exe`).
 If this environment variable is set, this is the only place where pandoc is searched for.
 
@@ -104,7 +104,7 @@ os.environ.setdefault('PYPANDOC_PANDOC', '/home/x/whatever/pandoc')
 
 ## Usage
 
-There are two basic ways to use `pypandoc`: with input files or with input
+There are two basic ways to use pypandoc: with input files or with input
 strings.
 
 
@@ -126,7 +126,7 @@ output = pypandoc.convert_text('#some title', 'rst', format='md')
 `convert_text` expects this string to be unicode or utf-8 encoded bytes. `convert_*` will always
 return a unicode string.
 
-It's also possible to directly let `pandoc` write the output to a file. This is the only way to
+It's also possible to directly let pandoc write the output to a file. This is the only way to
 convert to some output formats (e.g. odt, docx, epub, epub3, pdf). In that case `convert_*()` will
 return an empty string.
 
@@ -138,7 +138,7 @@ assert output == ""
 ```
 
 In addition to `format`, it is possible to pass `extra_args`.
-That makes it possible to access various `pandoc` options easily.
+That makes it possible to access various pandoc options easily.
 
 ```python
 output = pypandoc.convert_text(
@@ -152,6 +152,7 @@ output = pypandoc.convert(
     extra_args=['--base-header-level=2'])
 # output == '<h2 id="primary-heading">Primary Heading</h2>\r\n'
 ```
+
 pypandoc now supports easy addition of
 [pandoc filters](https://pandoc.org/scripting.html).
 
@@ -165,6 +166,7 @@ output = pd.convert_file(source=filename,
                          extra_args=pdoc_args,
                          filters=filters)
 ```
+
 Please pass any filters in as a list and not as a string.
 
 Please refer to `pandoc -h` and the
@@ -189,21 +191,21 @@ it won't work. This gotcha has to do with the way
 
 ## Getting Pandoc Version
 
-As it can be useful sometimes to check what Pandoc version is available at your system or which
-particular `pandoc` binary is used by `pypandoc`. For that, `pypandoc` provides the following
+As it can be useful sometimes to check what pandoc version is available at your system or which
+particular pandoc binary is used by pypandoc. For that, pypandoc provides the following
 utility functions. Example:
 
 ```
 print(pypandoc.get_pandoc_version())
-print(pypandoc.get_pandoc_path())
+print(pypandoc.get_pandoc_`PATH`())
 print(pypandoc.get_pandoc_formats())
 ```
 
 ## Related
 
 * [pydocverter](https://github.com/msabramo/pydocverter) is a client for a service called
-[Docverter](https://www.docverter.com), which offers `pandoc` as a service (plus some extra goodies).
-* See [pyandoc](https://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a `pandoc`
+[Docverter](https://www.docverter.com), which offers pandoc as a service (plus some extra goodies).
+* See [pyandoc](https://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a pandoc
 wrapper from Kenneth Reitz. This one hasn't been active in a while though.
 
 ## Contributing
@@ -222,27 +224,27 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Valentin Haenel](https://github.com/esc) - String conversion fix
 * [Daniel Sanchez](https://github.com/ErunamoJAZZ) - Automatic parsing of input/output formats
 * [Thomas G.](https://github.com/coldfix) - Python 3 support
-* [Ben Jao Ming](https://github.com/benjaoming) - Fail gracefully if `pandoc` is missing
+* [Ben Jao Ming](https://github.com/benjaoming) - Fail gracefully if pandoc is missing
 * [Ross Crawford-d'Heureuse](https://github.com/rosscdh) - Encode input in UTF-8 and add Django
   example
 * [Michael Chow](https://github.com/machow) - Decode output in UTF-8
 * [Janusz Skonieczny](https://github.com/wooyek) - Support Windows newlines and allow encoding to
   be specified.
 * [gabeos](https://github.com/gabeos) - Fix help parsing
-* [Marc Abramowitz](https://github.com/msabramo) - Make `setup.py` fail hard if `pandoc` is
+* [Marc Abramowitz](https://github.com/msabramo) - Make `setup.py` fail hard if pandoc is
   missing, Travis, Dockerfile, PyPI badge, Tox, PEP-8, improved documentation
 * [Daniel L.](https://github.com/mcktrtl) - Add `extra_args` example to README
 * [Amy Guy](https://github.com/rhiaro) - Exception handling for unicode errors
 * [Florian Eßer](https://github.com/flesser) - Allow Markdown extensions in output format
 * [Philipp Wendler](https://github.com/PhilippWendler) - Allow Markdown extensions in input format
-* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of Pandoc, return code checking, get_pandoc_version. Helped to fix the Travis build, new `convert_*` API
+* [Jan Schulz](https://github.com/JanSchulz) - Handling output to a file, Travis to work on newer version of pandoc, return code checking, get_pandoc_version. Helped to fix the Travis build, new `convert_*` API
 * [Aaron Gonzales](https://github.com/xysmas) - Added better filter handling
 * [David Lukes](https://github.com/dlukes) - Enabled input from non-plain-text files and made sure tests clean up template files correctly if they fail
 * [valholl](https://github.com/valholl) - Set up licensing information correctly and include examples to distribution version
-* [Cyrille Rossant](https://github.com/rossant) - Fixed bug by trimming out stars in the list of `pandoc` formats. Helped to fix the Travis build.
-* [Paul Osborne](https://github.com/posborne) - Don't require `pandoc` to install pypandoc.
+* [Cyrille Rossant](https://github.com/rossant) - Fixed bug by trimming out stars in the list of pandoc formats. Helped to fix the Travis build.
+* [Paul Osborne](https://github.com/posborne) - Don't require pandoc to install pypandoc.
 * [Felix Yan](https://github.com/felixonmars) - Added installation instructions for Arch Linux.
 
 ## License
 
-`pypandoc` is available under MIT license. See LICENSE for more details. `pandoc` itself is [available under the GPL2 license](https://github.com/jgm/pandoc/blob/master/COPYING.md).
+Pypandoc is available under MIT license. See LICENSE for more details. Pandoc itself is [available under the GPL2 license](https://github.com/jgm/pandoc/blob/master/COPYING.md).
