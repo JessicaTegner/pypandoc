@@ -19,7 +19,7 @@ Pypandoc uses pandoc, so it needs an available installation of pandoc. For some 
 prebuilt package.
 
 If pandoc is already installed (i.e. pandoc is in the `PATH`), pypandoc uses the version with the
-higher version number, and if both are the same, the already installed version. See [Specifying the location of pandoc binaries](#specifying_binaries) for more.
+higher version number, and if both are the same, the already installed version. See [Specifying the location of pandoc binaries] for more.
 
 To use pandoc filters, you must have the relevant filters installed on your machine.
 
@@ -87,7 +87,7 @@ Be aware that not all install mechanisms put pandoc in `PATH`, so you either
 have to change `PATH` yourself or set the full `PATH` to pandoc in
 `PYPANDOC_PANDOC`. See the next section for more information.
 
-### <a name="specifying_binaries"></a>Specifying the location of pandoc binaries
+### Specifying the location of pandoc binaries
 
 You can point to a specific pandoc version by setting the environment variable
 `PYPANDOC_PANDOC` to the full `PATH` to the pandoc binary
