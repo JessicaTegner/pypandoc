@@ -66,7 +66,7 @@ download_pandoc()
 ```
 
 The default install location is included in the search path for pandoc, so you
-don't need to add it to `PATH`.
+don't need to add it to the `PATH`.
 
 #### Installing pandoc manually
 
@@ -83,8 +83,8 @@ make pandoc available on many more platforms:
 - [FreeBSD port](https://www.freshports.org/textproc/pandoc/)
   - Or see [Pandoc - Installing pandoc](https://pandoc.org/installing.html)
 
-Be aware that not all install mechanisms put pandoc in `PATH`, so you either
-have to change `PATH` yourself or set the full `PATH` to pandoc in
+Be aware that not all install mechanisms put pandoc in the `PATH`, so you either
+have to change the `PATH` yourself or set the full `PATH` to pandoc in
 `PYPANDOC_PANDOC`. See the next section for more information.
 
 ### Specifying the location of pandoc binaries
@@ -197,7 +197,7 @@ utility functions. Example:
 
 ```
 print(pypandoc.get_pandoc_version())
-print(pypandoc.get_pandoc_`PATH`())
+print(pypandoc.get_pandoc_path())
 print(pypandoc.get_pandoc_formats())
 ```
 
