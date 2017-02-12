@@ -10,7 +10,11 @@ env:
     - TOXENV=py33
     - TOXENV=py34
     - TOXENV=pypy
+    - TOXENV=pypy3
     - TOXENV=flake8
+matrix:
+  allow_failures:
+    - env: TOXENV=pypy3
 addons:
   apt:
     packages:
