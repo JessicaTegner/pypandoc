@@ -332,19 +332,19 @@ class TestPypandoc(unittest.TestCase):
 
         self.assertRaises(RuntimeError, f)
 
-        def f():
-            # outputfile needs to end in pdf
-            with closed_tempfile('.WRONG') as file_name:
+        # outputfile needs to end in pdf
+        with closed_tempfile('.WRONG') as file_name:
+            def f():
                 pypandoc.convert_text('#some title\n', to='pdf', format='md', outputfile=file_name)
 
-        self.assertRaises(RuntimeError, f)
+            self.assertRaises(RuntimeError, f)
 
-        def f():
-            # no extensions allowed
-            with closed_tempfile('.pdf') as file_name:
+        # no extensions allowed
+        with closed_tempfile('.pdf') as file_name:
+            def f():
                 pypandoc.convert_text('#some title\n', to='pdf+somethign', format='md', outputfile=file_name)
 
-        self.assertRaises(RuntimeError, f)
+            self.assertRaises(RuntimeError, f)
 
     def test_get_pandoc_path(self):
         result = pypandoc.get_pandoc_path()
