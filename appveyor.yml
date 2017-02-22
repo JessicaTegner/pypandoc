@@ -32,6 +32,10 @@ environment:
       PYTHON_VERSION: "3.5.x"
       PYTHON_ARCH: "64"
 
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x"
+      PYTHON_ARCH: "64"
+
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
@@ -96,6 +100,7 @@ artifacts:
 on_success:
   - ps: >-
       if ($env:APPVEYOR_REPO_TAG -eq "true") {
+        # we produce version independent packages, so once per "big" version is enough
         if ($env:PYTHON_VERSION -eq "3.5.x" -or $env:PYTHON_VERSION -eq "2.7.x") {
           twine upload dist/*.whl
         }
