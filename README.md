@@ -68,6 +68,8 @@ download_pandoc()
 The default install location is included in the search path for pandoc, so you
 don't need to add it to the `PATH`.
 
+By default, the latest pandoc version is installed. If you want to specify your own version, say 1.19.1, use `download_pandoc(version='1.19.1')` instead.
+
 #### Installing pandoc manually
 
 Installing manually via the system mechanism is also possible. Such installation mechanism
@@ -245,7 +247,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Cyrille Rossant](https://github.com/rossant) - Fixed bug by trimming out stars in the list of pandoc formats. Helped to fix the Travis build.
 * [Paul Osborne](https://github.com/posborne) - Don't require pandoc to install pypandoc.
 * [Felix Yan](https://github.com/felixonmars) - Added installation instructions for Arch Linux.
-* [Kolen Cheung](https://github.com/ickc) - Implement `_get_pandoc_urls` for installing arbitrary version as well as the latest version of pandoc.
+* [Kolen Cheung](https://github.com/ickc) - Implement `_get_pandoc_urls` for installing arbitrary version as well as the latest version of pandoc. Minor: README, Travis, setup.py.
 
 ## License
 
