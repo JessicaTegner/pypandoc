@@ -205,3 +205,4 @@ def download_pandoc(url=None, targetfolder=None, version="latest"):
     assert unpack is not None, "Can't handle download, only Linux, Windows and OS X are supported."
 
     unpack(filename, targetfolder)
+    os.remove(filename)
