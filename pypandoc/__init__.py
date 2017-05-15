@@ -437,7 +437,7 @@ def get_pandoc_version():
     return __version
 
 
-def get_pandoc_path():
+def get_pandoc_path(download=False):
     """Gets the Pandoc path if Pandoc is installed.
 
     It will return a path to pandoc which is used by pypandoc.
@@ -452,9 +452,18 @@ def get_pandoc_path():
     If a cached path is found, it will return the cached path and stop probing Pandoc
     (unless :func:`clean_pandocpath_cache()` is called).
 
+    :param bool download: if True, will download pandoc if not found.
+
     :raises OSError: if pandoc is not found
     """
-    _ensure_pandoc_path()
+    try:
+        _ensure_pandoc_path()
+    except OSError as e:
+        if download:
+            download_pandoc()
+            _ensure_pandoc_path()
+        else:
+            raise e
     return __pandoc_path
 
 
