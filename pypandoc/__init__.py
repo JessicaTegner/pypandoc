@@ -548,14 +548,15 @@ def _ensure_pandoc_path():
 
 def ensure_pandoc_installed():
     """Try to install pandoc if it isn't installed.
-    
+
     :raises OSError: if pandoc cannot be installed
     """
     try:
         _ensure_pandoc_path()
-    except OSError as e:
+    except OSError:
         download_pandoc()
         _ensure_pandoc_path()
+
 
 # -----------------------------------------------------------------------------
 # Internal state management
