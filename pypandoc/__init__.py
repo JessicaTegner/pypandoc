@@ -451,7 +451,7 @@ def get_pandoc_path(download=False):
 
     If a cached path is found, it will return the cached path and stop probing Pandoc
     (unless :func:`clean_pandocpath_cache()` is called).
-    
+
     :param bool download: if True, will download pandoc if not found.
 
     :raises OSError: if pandoc is not found
