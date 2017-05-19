@@ -149,8 +149,7 @@ def _identify_path(source):
     try:
         path = os.path.exists(source)
     except UnicodeEncodeError:
-        source = source.encode('utf-8')
-        path = os.path.exists(source)
+        path = os.path.exists(source.encode('utf-8'))
     except:
         path  # still false
 
