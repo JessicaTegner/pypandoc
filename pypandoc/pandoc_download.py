@@ -149,7 +149,7 @@ def _handle_win32(filename, targetfolder):
     print("* Done.")
 
 
-def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False):
+def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -207,5 +207,7 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False):
     assert unpack is not None, "Can't handle download, only Linux, Windows and OS X are supported."
 
     unpack(filename, targetfolder)
+    if delete_installer:
+        os.remove(filename)
     if quiet:
         sys.stdout = sys.__stdout__
