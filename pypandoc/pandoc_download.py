@@ -149,7 +149,7 @@ def _handle_win32(filename, targetfolder):
     print("* Done.")
 
 
-def download_pandoc(url=None, targetfolder=None, version="latest", delete_installer=False):
+def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -164,6 +164,8 @@ def download_pandoc(url=None, targetfolder=None, version="latest", delete_instal
         location: `~/bin` on Linux, `~/Applications/pandoc` on Mac OS X, and
         `~\\AppData\\Local\\Pandoc` on Windows.
     """
+    if quiet:
+        sys.stdout = open(os.devnull, 'w')
     # get pandoc_urls
     pandoc_urls, _ = _get_pandoc_urls(version)
 
@@ -207,3 +209,5 @@ def download_pandoc(url=None, targetfolder=None, version="latest", delete_instal
     unpack(filename, targetfolder)
     if delete_installer:
         os.remove(filename)
+    if quiet:
+        sys.stdout = sys.__stdout__
