@@ -149,7 +149,7 @@ def _handle_win32(filename, targetfolder):
     print("* Done.")
 
 
-def download_pandoc(url=None, targetfolder=None, version="latest"):
+def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -164,6 +164,8 @@ def download_pandoc(url=None, targetfolder=None, version="latest"):
         location: `~/bin` on Linux, `~/Applications/pandoc` on Mac OS X, and
         `~\\AppData\\Local\\Pandoc` on Windows.
     """
+    if quiet:
+        sys.stdout = open(os.devnull, 'w')
     # get pandoc_urls
     pandoc_urls, _ = _get_pandoc_urls(version)
 
@@ -205,3 +207,5 @@ def download_pandoc(url=None, targetfolder=None, version="latest"):
     assert unpack is not None, "Can't handle download, only Linux, Windows and OS X are supported."
 
     unpack(filename, targetfolder)
+    if quiet:
+        sys.stdout = sys.__stdout__
