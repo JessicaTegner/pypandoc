@@ -134,7 +134,7 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
             path.
     """
     if not _identify_path(source_file):
-        raise RuntimeError("source_file is not a valid path")
+        raise RuntimeError(source_file + " is not a valid path")
     format = _identify_format_from_path(source_file, format)
     return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters)
