@@ -82,8 +82,8 @@ make pandoc available on many more platforms:
 - Machine with Haskell: `cabal-install pandoc`
 - Windows: There is an installer available
   [here](https://pandoc.org/installing.html)
-- [FreeBSD port](https://www.freshports.org/textproc/pandoc/)
-  - Or see [Pandoc - Installing pandoc](https://pandoc.org/installing.html)
+- [FreeBSD with pkg:](https://www.freshports.org/textproc/hs-pandoc/) `pkg install hs-pandoc`
+- Or see [Pandoc - Installing pandoc](https://pandoc.org/installing.html)
 
 Be aware that not all install mechanisms put pandoc in the `PATH`, so you either
 have to change the `PATH` yourself or set the full `PATH` to pandoc in
