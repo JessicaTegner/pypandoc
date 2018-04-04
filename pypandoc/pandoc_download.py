@@ -82,7 +82,9 @@ def _handle_linux(filename, targetfolder):
         cmd = ["ar", "x", filename]
         # if only 3.5 is supported, should be `run(..., check=True)`
         subprocess.check_call(cmd)
-        cmd = ["tar", "xzf", "data.tar.gz"]
+        files = os.listdir(".")
+        archive_name = next(x for x in files if x.startswith('data.tar'))
+        cmd = ["tar", "xf", archive_name]
         subprocess.check_call(cmd)
         # pandoc and pandoc-citeproc are in ./usr/bin subfolder
         for exe in ["pandoc", "pandoc-citeproc"]:
