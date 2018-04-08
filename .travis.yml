@@ -14,10 +14,8 @@ matrix:
       env: TOXENV=py34
     - python: 3.5
       env: TOXENV=py35
-    - env: TOXENV=pypy
-    - env: TOXENV=flake8
   allow_failures:
-    - env: TOXENV=pypy3
+    - env: TOXENV=flake8
 addons:
   apt:
     packages:
