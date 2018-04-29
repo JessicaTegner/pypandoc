@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+
 from __future__ import with_statement
 
-import sys
 import locale
+import sys
 
 # compat code from IPython py3compat.py and encoding.py, which is licensed under the terms of the
 # Modified BSD License (also known as New or Revised or 3-Clause BSD)
@@ -50,10 +51,12 @@ if sys.version_info[0] >= 3:
     from urllib.parse import urljoin, urlparse
     from urllib.request import pathname2url, url2pathname
 
-    def path2url(path):
+
+    def path2url(path):  # noqa: E303
         return urljoin('file:', pathname2url(path))
 
-    def url2path(url):
+
+    def url2path(url):  # noqa: E303
         return url2pathname(urlparse(url).path)
 
 else:
@@ -65,8 +68,10 @@ else:
     from urlparse import urljoin, urlparse
     import urllib
 
-    def path2url(path):
+
+    def path2url(path):  # noqa: E303
         return urljoin('file:', urllib.pathname2url(path))
 
-    def url2path(url):
+
+    def url2path(url):  # noqa: E303
         return urllib.url2pathname(urlparse(url).path)

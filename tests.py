@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
-import tempfile
-import pypandoc
-from pypandoc.py3compat import unicode_type, string_types, path2url
-import os
-import io
-import sys
-import warnings
-
 import contextlib
+import io
+import os
 import shutil
 import subprocess
+import sys
+import tempfile
+import unittest
+import warnings
+
+import pypandoc
+from pypandoc.py3compat import path2url, string_types, unicode_type
 
 
 @contextlib.contextmanager
@@ -74,8 +74,9 @@ def assert_produces_warning(expected_warning=Warning, filter_level="always",
             for m in clear:
                 try:
                     m.__warningregistry__.clear()
-                except:
-                    pass
+                except Exception as e:
+                    # ignore...
+                    print(str(e))
 
         saw_warning = False
         warnings.simplefilter(filter_level)
@@ -92,11 +93,11 @@ def assert_produces_warning(expected_warning=Warning, filter_level="always",
                                                     DeprecationWarning)):
                     from inspect import getframeinfo, stack
                     caller = getframeinfo(stack()[2][0])
-                    msg = ("Warning not set with correct stacklevel. "
-                           "File where warning is raised: {0} != {1}. "
-                           "Warning message: {2}".format(
-                               actual_warning.filename, caller.filename,
-                               actual_warning.message))
+                    msg = (("Warning not set with correct stacklevel. " +
+                            "File where warning is raised: {0} != {1}. " +
+                            "Warning message: {2}").format(
+                        actual_warning.filename, caller.filename,
+                        actual_warning.message))
                     assert actual_warning.filename == caller.filename, msg
             else:
                 extra_warnings.append(actual_warning.category.__name__)
@@ -142,11 +143,13 @@ class TestPypandoc(unittest.TestCase):
     def test_does_not_convert_to_invalid_format(self):
         def f():
             pypandoc.convert("ok", format='md', to='invalid')
+
         self.assertRaises(RuntimeError, f)
 
     def test_does_not_convert_from_invalid_format(self):
         def f():
             pypandoc.convert("ok", format='invalid', to='rest')
+
         self.assertRaises(RuntimeError, f)
 
     def test_basic_conversion_from_file(self):
@@ -212,16 +215,15 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
 
     def test_conversion_from_markdown_with_extensions(self):
+        # Aparently without the extension, ~~ gets turned into different code
+        # depending on the pandoc version. So we do not test for that anymore...
         input = u'~~strike~~'
         expected_with_extension = u'<p><del>strike</del></p>'
-        #expected_without_extension = u'<p><sub><sub>strike</sub></sub></p>'
         received_with_extension = pypandoc.convert(input, 'html', format=u'markdown+strikeout')
-        #received_without_extension = pypandoc.convert(input, 'html', format=u'markdown-strikeout')
         self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
-        #self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
 
     def test_basic_conversion_to_file(self):
-        with closed_tempfile('.rst',) as file_name:
+        with closed_tempfile('.rst', ) as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert('# some title\n', to='rst', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
@@ -233,6 +235,7 @@ class TestPypandoc(unittest.TestCase):
         def f():
             pypandoc.convert('# some title\n', to='odf', format='md',
                              outputfile=None)
+
         self.assertRaises(RuntimeError, f)
 
     def test_conversion_with_citeproc_filter(self):
@@ -276,6 +279,7 @@ class TestPypandoc(unittest.TestCase):
         # pandoc dies on wrong commandline arguments
         def f():
             pypandoc.convert('<h1>Primary Heading</h1>', 'md', format='html', extra_args=["--blah"])
+
         self.assertRaises(RuntimeError, f)
 
     def test_unicode_input(self):
@@ -292,15 +296,18 @@ class TestPypandoc(unittest.TestCase):
         # Only use german umlauts in th next test, as iso-8859-15 covers that
         expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
         bytes = u'<h1>üäö€</h1>'.encode("iso-8859-15")
+
         # Without encoding, this fails as we expect utf-8 per default
 
         def f():
             pypandoc.convert(bytes, 'md', format='html')
+
         self.assertRaises(RuntimeError, f)
 
         def f():
             # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
             pypandoc.convert(bytes, 'md', format='html', encoding="utf-16")
+
         self.assertRaises(RuntimeError, f)
         # with the right encoding it should work...
         written = pypandoc.convert(bytes, 'md', format='html', encoding="iso-8859-15")
@@ -390,7 +397,7 @@ class TestPypandoc(unittest.TestCase):
         out, err = p.communicate()
         return out.decode('utf-8')
 
-    def assertEqualExceptForNewlineEnd(self, expected, received):
+    def assertEqualExceptForNewlineEnd(self, expected, received): # noqa
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
         expected = expected.replace(os.linesep, "\n")
