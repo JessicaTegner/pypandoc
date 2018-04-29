@@ -67,7 +67,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   
   # Install miktex to get pdflatex, if we don't get it from the cache
-  - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe appveyor DownloadFile http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable.exe
+  - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe appveyor DownloadFile http://mirrors.ctan.org/systems/win32/miktex/setup/windows-x86/miktex-portable.exe
   - if not exist c:\miktex\texmfs\install\miktex\bin\pdflatex.exe 7z x miktex-portable.exe -oC:\miktex >NUL
   - set "PATH=%PATH%;c:\miktex\texmfs\install\miktex\bin"
   # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
