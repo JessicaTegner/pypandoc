@@ -71,7 +71,7 @@ install:
   # about it being out of date.
   - "pip install --disable-pip-version-check --user --upgrade pip"
 
-  - "%CMD_IN_ENV% pip install twine wheel"
+  - "%CMD_IN_ENV% python -m pip install twine wheel"
 
 build_script:
   - "%CMD_IN_ENV% python setup.py download_pandoc"
