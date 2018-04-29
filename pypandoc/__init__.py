@@ -10,7 +10,7 @@ import textwrap
 import warnings
 
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, string_types, urlparse
+from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.4'
@@ -157,13 +157,11 @@ def _identify_path(source):
         result = urlparse(source)
         if result.scheme in ["http", "https"]:
             path = True
-        # unfortunately, pandoc currently doesn't support anything else currently
-        # https://github.com/jgm/pandoc/issues/319
-        # elif result.scheme and result.netloc and result.path:
-        #     # complete uri including one with a network path
-        #     path = True
-        # elif result.scheme == "file" and result.path:
-        #     path = path = os.path.exists(url2path(source))
+        elif result.scheme and result.netloc and result.path:
+            # complete uri including one with a network path
+            path = True
+        elif result.scheme == "file" and result.path:
+            path = path = os.path.exists(url2path(source))
 
     return path
 
