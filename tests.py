@@ -16,19 +16,27 @@ from pypandoc.py3compat import path2url, string_types, unicode_type
 
 
 @contextlib.contextmanager
-def closed_tempfile(suffix, text=None, dir_name=None):
-    if dir_name:
-        dir_name = tempfile.mkdtemp(suffix=dir_name)
-    with tempfile.NamedTemporaryFile('w+t', suffix=suffix, delete=False, dir=dir_name) as test_file:
-        file_name = test_file.name
-        if text:
-            test_file.write(text)
-            test_file.flush()
-    yield file_name
-    if dir_name:
-        shutil.rmtree(dir_name, ignore_errors=True)
-    else:
-        os.remove(file_name)
+def closed_tempfile(suffix, text=None, dir_name=None, check_case=False):
+    file_name = None
+    try:
+        if dir_name:
+            dir_name = tempfile.mkdtemp(suffix=dir_name)
+
+        with tempfile.NamedTemporaryFile('w+t', suffix=suffix, delete=False, dir=dir_name) as test_file:
+            file_name = test_file.name
+            if text:
+                test_file.write(text)
+                test_file.flush()
+        if check_case and file_name != file_name.lower():
+            # there is a bug in pandoc which can't work with uppercase lua files
+            # https://github.com/jgm/pandoc/issues/4610
+            raise unittest.SkipTest("pandoc has problems with uppercase filenames, got %s" % file_name)
+        yield file_name
+    finally:
+        if dir_name:
+            shutil.rmtree(dir_name, ignore_errors=True)
+        elif file_name:
+            os.remove(file_name)
 
 
 # Stolen from pandas
@@ -179,7 +187,8 @@ class TestPypandoc(unittest.TestCase):
     def test_convert_with_custom_writer(self):
         lua_file_content = self.create_sample_lua()
         with closed_tempfile('.md', text='# title\n') as file_name:
-            with closed_tempfile('.lua', text=lua_file_content, dir_name="foo-bar+baz") as lua_file_name:
+            with closed_tempfile('.lua', text=lua_file_content, dir_name="foo-bar+baz",
+                                 check_case=True) as lua_file_name:
                 expected = u'<h1 id="title">title</h1>{0}'.format(os.linesep)
                 received = pypandoc.convert_file(file_name, lua_file_name)
                 self.assertEqualExceptForNewlineEnd(expected, received)
@@ -397,7 +406,7 @@ class TestPypandoc(unittest.TestCase):
         out, err = p.communicate()
         return out.decode('utf-8')
 
-    def assertEqualExceptForNewlineEnd(self, expected, received): # noqa
+    def assertEqualExceptForNewlineEnd(self, expected, received):  # noqa
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n
         expected = expected.replace(os.linesep, "\n")
