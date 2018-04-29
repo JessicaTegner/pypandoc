@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement, absolute_import, print_function
+from __future__ import absolute_import, print_function, with_statement
 
-import subprocess
-import sys
-import textwrap
 import os
 import re
-import warnings
+import subprocess
+import sys
 import tempfile
+import textwrap
+import warnings
 
-from .py3compat import string_types, cast_bytes, cast_unicode, urlparse
-
-from pypandoc.pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
+from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
+from .py3compat import cast_bytes, cast_unicode, string_types, urlparse
 
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.4'
@@ -71,7 +70,6 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None):
-
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -150,8 +148,9 @@ def _identify_path(source):
         path = os.path.exists(source)
     except UnicodeEncodeError:
         path = os.path.exists(source.encode('utf-8'))
-    except:
-        path  # still false
+    except:  # noqa
+        # still false
+        pass
 
     if not path:
         # check if it's an URL
@@ -205,7 +204,7 @@ def _validate_formats(format, to, outputfile):
         fmt = formats.get(fmt, fmt)
         # rst format can have extensions
         if fmt[:4] == "rest":
-            fmt = "rst"+fmt[4:]
+            fmt = "rst" + fmt[4:]
         return fmt
 
     format = normalize_format(format)
@@ -226,11 +225,11 @@ def _validate_formats(format, to, outputfile):
     file_extension = os.path.splitext(to)[1]
 
     if (base_to_format not in to_formats and
-        base_to_format != "pdf" and  # pdf is handled later # noqa: E127
-        file_extension != '.lua'):
+            base_to_format != "pdf" and  # pdf is handled later # noqa: E127
+            file_extension != '.lua'):
         raise RuntimeError(
             'Invalid output format! Got %s but expected one of these: %s' % (
-                 base_to_format, ', '.join(to_formats)))
+                base_to_format, ', '.join(to_formats)))
 
     # list from https://github.com/jgm/pandoc/blob/master/pandoc.hs
     # `[...] where binaries = ["odt","docx","epub","epub3"] [...]`
@@ -269,7 +268,7 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     args += input_file
 
     if outputfile:
-        args.append("--output="+outputfile)
+        args.append("--output=" + outputfile)
 
     args.extend(extra_args)
 
@@ -463,11 +462,11 @@ def _ensure_pandoc_path():
     if __pandoc_path is None:
         included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
-        search_paths = ["pandoc",  included_pandoc]
+        search_paths = ["pandoc", included_pandoc]
         pf = "linux" if sys.platform.startswith("linux") else sys.platform
         try:
             search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc"))
-        except:
+        except:  # noqa
             # not one of the know platforms...
             pass
         if pf == "linux":

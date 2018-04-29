@@ -87,7 +87,7 @@ setup(
     license = 'MIT',
     description = 'Thin wrapper for pandoc.',
     long_description = long_description,
-    author = module.__author__,
+    author = module.__author__.encode('utf8'),
     author_email = 'bebraw@gmail.com',
     packages = ['pypandoc'],
     package_data={'pypandoc': ['files/*']},

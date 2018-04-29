@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import os
-import shutil
-import tempfile
 import os.path
-import subprocess
 import platform
 import re
+import shutil
+import subprocess
+import sys
+import tempfile
 
 try:
     from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
-
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
@@ -39,7 +38,7 @@ def _get_pandoc_urls(version="latest"):
     """
     # url to pandoc download page
     url = "https://github.com/jgm/pandoc/releases/" + \
-        ("tag/" if version != "latest" else "") + version
+          ("tag/" if version != "latest" else "") + version
     # read the HTML content
     response = urlopen(url)
     content = response.read()
@@ -59,19 +58,18 @@ def _get_pandoc_urls(version="latest"):
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
     # pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
     pandoc_urls = dict((ext2platform[
-                       url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
+                            url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
     return pandoc_urls, version
 
 
 def _make_executable(path):
     mode = os.stat(path).st_mode
-    mode |= (mode & 0o444) >> 2    # copy R bits to X
+    mode |= (mode & 0o444) >> 2  # copy R bits to X
     print("* Making %s executeable..." % (path))
     os.chmod(path, mode)
 
 
 def _handle_linux(filename, targetfolder):
-
     print("* Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
