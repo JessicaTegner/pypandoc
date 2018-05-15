@@ -75,6 +75,7 @@ install:
 
 build_script:
   - "%CMD_IN_ENV% python setup.py download_pandoc"
+  - "%CMD_IN_ENV% pypandoc\\files\\pandoc --version"
 
 test_script:
   # Run the project tests

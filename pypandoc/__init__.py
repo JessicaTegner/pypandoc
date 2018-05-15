@@ -10,7 +10,7 @@ import textwrap
 import warnings
 
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, string_types, urlparse
+from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.4'
@@ -143,29 +143,27 @@ def _identify_path(source):
     if source is None or not isinstance(source, string_types):
         return False
 
-    path = False
+    is_path = False
     try:
-        path = os.path.exists(source)
+        is_path = os.path.exists(source)
     except UnicodeEncodeError:
-        path = os.path.exists(source.encode('utf-8'))
+        is_path = os.path.exists(source.encode('utf-8'))
     except:  # noqa
         # still false
         pass
 
-    if not path:
+    if not is_path:
         # check if it's an URL
         result = urlparse(source)
         if result.scheme in ["http", "https"]:
-            path = True
-        # unfortunately, pandoc currently doesn't support anything else currently
-        # https://github.com/jgm/pandoc/issues/319
-        # elif result.scheme and result.netloc and result.path:
-        #     # complete uri including one with a network path
-        #     path = True
-        # elif result.scheme == "file" and result.path:
-        #     path = path = os.path.exists(url2path(source))
+            is_path = True
+        elif result.scheme and result.netloc and result.path:
+            # complete uri including one with a network path
+            is_path = True
+        elif result.scheme == "file" and result.path:
+            is_path = os.path.exists(url2path(source))
 
-    return path
+    return is_path
 
 
 def _identify_format_from_path(sourcefile, format):

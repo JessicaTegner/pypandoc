@@ -166,9 +166,9 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
+    @unittest.skipIf(sys.platform.startswith("win"), "File based urls do not work on windows: "
+                                                     "https://github.com/jgm/pandoc/issues/4613")
     def test_basic_conversion_from_file_url(self):
-        # this currently doesn't work: https://github.com/jgm/pandoc/issues/3196
-        return
         with closed_tempfile('.md', text='# some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             # this keeps the : (which should be '|' on windows but pandoc
