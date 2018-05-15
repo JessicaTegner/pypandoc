@@ -15,7 +15,7 @@ document converter.
 ## Installation
 
 Pypandoc uses pandoc, so it needs an available installation of pandoc. For some common cases
-(wheels, conda packages), pypandoc already includes pandoc (and pandoc-citeproc) in it's
+(wheels, conda packages), pypandoc already includes pandoc (and pandoc-citeproc) in its
 prebuilt package.
 
 If pandoc is already installed (i.e. pandoc is in the `PATH`), pypandoc uses the version with the
@@ -162,11 +162,11 @@ pypandoc now supports easy addition of
 filters = ['pandoc-citeproc']
 pdoc_args = ['--mathjax',
              '--smart']
-output = pd.convert_file(source=filename,
-                         to='html5',
-                         format='md',
-                         extra_args=pdoc_args,
-                         filters=filters)
+output = pypandoc.convert_file(filename,
+                               to='html5',
+                               format='md',
+                               extra_args=pdoc_args,
+                               filters=filters)
 ```
 
 Please pass any filters in as a list and not as a string.
