@@ -162,11 +162,11 @@ pypandoc now supports easy addition of
 filters = ['pandoc-citeproc']
 pdoc_args = ['--mathjax',
              '--smart']
-output = pd.convert_file(source=filename,
-                         to='html5',
-                         format='md',
-                         extra_args=pdoc_args,
-                         filters=filters)
+output = pypandoc.convert_file(source=filename,
+                               to='html5',
+                               format='md',
+                               extra_args=pdoc_args,
+                               filters=filters)
 ```
 
 Please pass any filters in as a list and not as a string.
