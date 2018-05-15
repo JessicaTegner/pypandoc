@@ -15,7 +15,7 @@ document converter.
 ## Installation
 
 Pypandoc uses pandoc, so it needs an available installation of pandoc. For some common cases
-(wheels, conda packages), pypandoc already includes pandoc (and pandoc-citeproc) in it's
+(wheels, conda packages), pypandoc already includes pandoc (and pandoc-citeproc) in its
 prebuilt package.
 
 If pandoc is already installed (i.e. pandoc is in the `PATH`), pypandoc uses the version with the
