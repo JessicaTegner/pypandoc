@@ -474,6 +474,13 @@ def _ensure_pandoc_path(quiet=False):
         # installed if it's an environment and the environment wasn't activated
         if pf == "win32":
             search_paths.append(os.path.join(sys.exec_prefix, "Scripts", "pandoc"))
+
+            # Since this only runs on Windows, use Windows slashes
+            if os.getenv('ProgramFiles', None):
+                search_paths.append(os.path.expandvars("${ProgramFiles}\\Pandoc\\Pandoc"))
+            if os.getenv('ProgramFiles(x86)', None):
+                search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\Pandoc"))
+
         # bin can also be used on windows (conda at leats has it in path), so
         # include it unconditionally
         search_paths.append(os.path.join(sys.exec_prefix, "bin", "pandoc"))
