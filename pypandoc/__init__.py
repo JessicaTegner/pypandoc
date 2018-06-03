@@ -454,7 +454,7 @@ def get_pandoc_path():
     return __pandoc_path
 
 
-def _ensure_pandoc_path():
+def _ensure_pandoc_path(quiet=False):
     global __pandoc_path
 
     if __pandoc_path is None:
@@ -495,8 +495,9 @@ def _ensure_pandoc_path():
                 # we can't use that path...
                 if os.path.exists(path):
                     # path exist but is not useable -> not executable?
-                    print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
-                    print(e, file=sys.stderr)
+                    if not quiet:
+                        print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
+                        print(e, file=sys.stderr)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
@@ -511,47 +512,55 @@ def _ensure_pandoc_path():
                     break
 
         if __pandoc_path is None:
-            if os.path.exists('/usr/local/bin/brew'):
-                sys.stderr.write(textwrap.dedent("""\
-                    Maybe try:
+            # Only print hints if requested
+            if not quiet:
+                if os.path.exists('/usr/local/bin/brew'):
+                    sys.stderr.write(textwrap.dedent("""\
+                        Maybe try:
 
-                        brew install pandoc
-                """))
-            elif os.path.exists('/usr/bin/apt-get'):
-                sys.stderr.write(textwrap.dedent("""\
-                    Maybe try:
+                            brew install pandoc
+                    """))
+                elif os.path.exists('/usr/bin/apt-get'):
+                    sys.stderr.write(textwrap.dedent("""\
+                        Maybe try:
 
-                        sudo apt-get install pandoc
-                """))
-            elif os.path.exists('/usr/bin/yum'):
-                sys.stderr.write(textwrap.dedent("""\
-                    Maybe try:
+                            sudo apt-get install pandoc
+                    """))
+                elif os.path.exists('/usr/bin/yum'):
+                    sys.stderr.write(textwrap.dedent("""\
+                        Maybe try:
 
                         sudo yum install pandoc
+                    """))
+                sys.stderr.write(textwrap.dedent("""\
+                    See http://johnmacfarlane.net/pandoc/installing.html
+                    for installation options
                 """))
-            sys.stderr.write(textwrap.dedent("""\
-                See http://johnmacfarlane.net/pandoc/installing.html
-                for installation options
-            """))
-            sys.stderr.write(textwrap.dedent("""\
-                ---------------------------------------------------------------
+                sys.stderr.write(textwrap.dedent("""\
+                    ---------------------------------------------------------------
 
-            """))
+                """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
                           "to your PATH or or call pypandoc.download_pandoc(...) or\n"
                           "install pypandoc wheels with included pandoc.")
 
 
-def ensure_pandoc_installed():
+def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
     """Try to install pandoc if it isn't installed.
+
+    Parameters are passed to download_pandoc()
 
     :raises OSError: if pandoc cannot be installed
     """
     try:
-        _ensure_pandoc_path()
+        # Perform the test quietly if asked
+        _ensure_pandoc_path(quiet=quiet)
+
     except OSError:
-        download_pandoc()
-        _ensure_pandoc_path()
+        download_pandoc(url=url, targetfolder=targetfolder, version=version, quiet=quiet, delete_installer=delete_installer)
+
+        # Show errors in case of secondary failure
+        _ensure_pandoc_path(quiet=False)
 
 
 # -----------------------------------------------------------------------------
