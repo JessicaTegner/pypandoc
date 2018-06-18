@@ -64,12 +64,12 @@ install:
   - set "PATH=%PATH%;c:\miktex\texmfs\install\miktex\bin"
   # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
   # this adds this to the registry!
-  - initexmf --set-config-value "[MPM]AutoInstall=1"
+  - initexmf --admin --set-config-value "[MPM]AutoInstall=1"
 
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
-  - "pip install --disable-pip-version-check --user --upgrade pip"
+  - "%CMD_IN_ENV% python -m pip install --disable-pip-version-check --user --upgrade pip"
 
   - "%CMD_IN_ENV% python -m pip install twine wheel"
 
