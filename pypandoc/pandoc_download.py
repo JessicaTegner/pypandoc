@@ -42,7 +42,6 @@ def _make_executable(path):
 def _handle_linux(filename, targetfolder):
 
     print("* Unpacking %s to tempfolder..." % (filename))
-
     tempfolder = tempfile.mkdtemp()
     cur_wd = os.getcwd()
     filename = os.path.abspath(filename)
