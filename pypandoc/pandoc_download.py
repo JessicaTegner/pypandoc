@@ -167,9 +167,9 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
     if quiet:
         sys.stdout = open(os.devnull, 'w')
 
-    if url is None:
-        pf = sys.platform
+    pf = sys.platform
 
+    if url is None:
         # compatibility with py3
         if pf.startswith("linux"):
             pf = "linux"
