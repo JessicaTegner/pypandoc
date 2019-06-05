@@ -166,21 +166,21 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
     """
     if quiet:
         sys.stdout = open(os.devnull, 'w')
-    # get pandoc_urls
-    pandoc_urls, _ = _get_pandoc_urls(version)
-
-    pf = sys.platform
-
-    # compatibility with py3
-    if pf.startswith("linux"):
-        pf = "linux"
-        if platform.architecture()[0] != "64bit":
-            raise RuntimeError("Linux pandoc is only compiled for 64bit.")
-
-    if pf not in pandoc_urls:
-        raise RuntimeError("Can't handle your platform (only Linux, Mac OS X, Windows).")
 
     if url is None:
+        pf = sys.platform
+
+        # compatibility with py3
+        if pf.startswith("linux"):
+            pf = "linux"
+            if platform.architecture()[0] != "64bit":
+                raise RuntimeError("Linux pandoc is only compiled for 64bit.")
+
+        # get pandoc_urls
+        pandoc_urls, _ = _get_pandoc_urls(version)
+        if pf not in pandoc_urls:
+            raise RuntimeError("Can't handle your platform (only Linux, Mac OS X, Windows).")
+
         url = pandoc_urls[pf]
 
     filename = url.split("/")[-1]
