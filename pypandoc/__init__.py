@@ -489,11 +489,11 @@ def _ensure_pandoc_path(quiet=False):
         # version in some other places.
         if os.getenv('PYPANDOC_PANDOC', None):
             search_paths = [os.getenv('PYPANDOC_PANDOC')]
+        curr_version = [0, 0, 0]
         for path in search_paths:
             # Needed for windows and subprocess which can't expand it on it's
             # own...
             path = os.path.expanduser(path)
-            curr_version = [0, 0, 0]
             version_string = "0.0.0"
             # print("Trying: %s" % path)
             try:
@@ -510,13 +510,11 @@ def _ensure_pandoc_path(quiet=False):
             while len(version) < len(curr_version):
                 version.append(0)
             # print("%s, %s" % (path, version))
-            for pos in range(len(curr_version)):
-                # Only use the new version if it is any bigger...
-                if version[pos] > curr_version[pos]:
-                    # print("Found: %s" % path)
-                    __pandoc_path = path
-                    curr_version = version
-                    break
+            # Only use the new version if it is any bigger...
+            if version > curr_version:
+                # print("Found: %s" % path)
+                __pandoc_path = path
+                curr_version = version
 
         if __pandoc_path is None:
             # Only print hints if requested
