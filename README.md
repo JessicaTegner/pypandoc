@@ -249,6 +249,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Felix Yan](https://github.com/felixonmars) - Added installation instructions for Arch Linux.
 * [Kolen Cheung](https://github.com/ickc) - Implement `_get_pandoc_urls` for installing arbitrary version as well as the latest version of pandoc. Minor: README, Travis, setup.py.
 * [Rebecca Heineman](https://github.com/burgerbecky) - Added scanning code for finding pandoc in Windows
+* [Andrew Barraford](https://github.com/abarrafo) - Download destination.
  
 ## License
 

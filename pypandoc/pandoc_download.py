@@ -149,7 +149,7 @@ def _handle_win32(filename, targetfolder):
     print("* Done.")
 
 
-def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
+def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False, download_folder=None):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -160,9 +160,12 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
         the latest available release at the time pypandoc was released.
 
     :param str targetfolder: directory, where the binaries should be installed
-        to. If no `targetfolder` is give, uses a platform specific user
+        to. If no `targetfolder` is given, uses a platform specific user
         location: `~/bin` on Linux, `~/Applications/pandoc` on Mac OS X, and
         `~\\AppData\\Local\\Pandoc` on Windows.
+
+    :param str download_folder: Directory, where the installer should download files before unpacking
+        to the target folder. If no `download_folder` is given, uses the current directory. example: `/tmp/`, `/tmp`
     """
     if quiet:
         sys.stdout = open(os.devnull, 'w')
@@ -184,6 +187,13 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
         url = pandoc_urls[pf]
 
     filename = url.split("/")[-1]
+
+    if download_folder is not None:
+        if download_folder.endswith('/'):
+            download_folder = download_folder[:-1]
+
+        filename = os.path.expanduser(download_folder) + '/' + filename
+
     if os.path.isfile(filename):
         print("* Using already downloaded file %s" % (filename))
     else:
