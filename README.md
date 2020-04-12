@@ -121,7 +121,7 @@ output = pypandoc.convert_file('somefile.txt', 'rst', format='md')
 
 # alternatively you could just pass some string. In this case you need to
 # define the input format:
-output = pypandoc.convert_text('#some title', 'rst', format='md')
+output = pypandoc.convert_text('# some title', 'rst', format='md')
 # output == 'some title\r\n==========\r\n\r\n'
 ```
 
