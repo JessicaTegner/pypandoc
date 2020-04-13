@@ -414,6 +414,7 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqual(expected.rstrip('\n'), received.rstrip('\n'))
 
 
-suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
-ret = unittest.TextTestRunner(verbosity=2).run(suite)
-sys.exit(0 if ret.wasSuccessful() else 1)
+if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
+    ret = unittest.TextTestRunner(verbosity=2).run(suite)
+    sys.exit(0 if ret.wasSuccessful() else 1)
