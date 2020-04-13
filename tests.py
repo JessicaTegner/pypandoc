@@ -146,24 +146,24 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(major in [0, 1, 2])
 
     def test_converts_valid_format(self):
-        self.assertEqualExceptForNewlineEnd(pypandoc.convert("ok", format='md', to='rest'), 'ok')
+        self.assertEqualExceptForNewlineEnd(pypandoc.convert_text("ok", format='md', to='rest'), 'ok')
 
     def test_does_not_convert_to_invalid_format(self):
         def f():
-            pypandoc.convert("ok", format='md', to='invalid')
+            pypandoc.convert_text("ok", format='md', to='invalid')
 
         self.assertRaises(RuntimeError, f)
 
     def test_does_not_convert_from_invalid_format(self):
         def f():
-            pypandoc.convert("ok", format='invalid', to='rest')
+            pypandoc.convert_text("ok", format='invalid', to='rest')
 
         self.assertRaises(RuntimeError, f)
 
     def test_basic_conversion_from_file(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-            received = pypandoc.convert(file_name, 'rst')
+            received = pypandoc.convert_file(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     @unittest.skipIf(sys.platform.startswith("win"), "File based urls do not work on windows: "
@@ -176,12 +176,12 @@ class TestPypandoc(unittest.TestCase):
             file_url = path2url(file_name)
             assert pypandoc._identify_path(file_url)
 
-            received = pypandoc.convert(file_url, 'rst')
+            received = pypandoc.convert_file(file_url, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_http_url(self):
         url = 'https://raw.githubusercontent.com/bebraw/pypandoc/master/README.md'
-        received = pypandoc.convert(url, 'html')
+        received = pypandoc.convert_file(url, 'html')
         assert "GPL2 license" in received
 
     def test_convert_with_custom_writer(self):
@@ -196,7 +196,7 @@ class TestPypandoc(unittest.TestCase):
     def test_basic_conversion_from_file_with_format(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-            received = pypandoc.convert(file_name, 'rst', format='md')
+            received = pypandoc.convert_file(file_name, 'rst', format='md')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
             received = pypandoc.convert_file(file_name, 'rst', format='md')
@@ -204,7 +204,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_basic_conversion_from_string(self):
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-        received = pypandoc.convert('# some title', 'rst', format='md')
+        received = pypandoc.convert_text('# some title', 'rst', format='md')
         self.assertEqualExceptForNewlineEnd(expected, received)
 
         expected = u'some title{0}=========={0}{0}'.format(os.linesep)
@@ -215,9 +215,9 @@ class TestPypandoc(unittest.TestCase):
         input = '<s>strike</s>'
         expected_with_extension = u'~~strike~~'
         expected_without_extension = u'<s>strike</s>'
-        received_with_extension = pypandoc.convert(input, 'markdown+strikeout',
+        received_with_extension = pypandoc.convert_text(input, 'markdown+strikeout',
                                                    format='html')
-        received_without_extension = pypandoc.convert(input,
+        received_without_extension = pypandoc.convert_text(input,
                                                       'markdown-strikeout',
                                                       format='html')
         self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
@@ -228,13 +228,13 @@ class TestPypandoc(unittest.TestCase):
         # depending on the pandoc version. So we do not test for that anymore...
         input = u'~~strike~~'
         expected_with_extension = u'<p><del>strike</del></p>'
-        received_with_extension = pypandoc.convert(input, 'html', format=u'markdown+strikeout')
+        received_with_extension = pypandoc.convert_text(input, 'html', format=u'markdown+strikeout')
         self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
 
     def test_basic_conversion_to_file(self):
         with closed_tempfile('.rst', ) as file_name:
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
-            received = pypandoc.convert('# some title\n', to='rst', format='md', outputfile=file_name)
+            received = pypandoc.convert_text('# some title\n', to='rst', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
             with io.open(file_name) as f:
                 written = f.read()
@@ -242,7 +242,7 @@ class TestPypandoc(unittest.TestCase):
 
         # to odf does not work without a file
         def f():
-            pypandoc.convert('# some title\n', to='odf', format='md',
+            pypandoc.convert_text('# some title\n', to='odf', format='md',
                              outputfile=None)
 
         self.assertRaises(RuntimeError, f)
@@ -250,7 +250,7 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_with_citeproc_filter(self):
         # we just want to get a temp file name, where we can write to
         filters = ['pandoc-citeproc']
-        written = pypandoc.convert('./filter_test.md', to='html', format='md',
+        written = pypandoc.convert_file('./filter_test.md', to='html', format='md',
                                    outputfile=None, filters=filters)
         import re as re
         # only properly converted file will have this in it
@@ -262,7 +262,7 @@ class TestPypandoc(unittest.TestCase):
 
         # make sure that it splits the filter line
         for filters in ['pandoc-citeproc', u'pandoc-citeproc']:
-            written = pypandoc.convert('./filter_test.md', to='html', format='md',
+            written = pypandoc.convert_file('./filter_test.md', to='html', format='md',
                                        outputfile=None, filters=filters)
             # only properly converted file will have this in it
             found = re.search(r'Fenner', written)
@@ -274,7 +274,7 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_with_empty_filter(self):
         # we just want to get a temp file name, where we can write to
         filters = ''
-        written = pypandoc.convert('./filter_test.md', to='html', format='md',
+        written = pypandoc.convert_file('./filter_test.md', to='html', format='md',
                                    outputfile=None, filters=filters)
         import re as re
         # This should not use the pandoc-citeproc module and will not find the
@@ -287,18 +287,18 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_error(self):
         # pandoc dies on wrong commandline arguments
         def f():
-            pypandoc.convert('<h1>Primary Heading</h1>', 'md', format='html', extra_args=["--blah"])
+            pypandoc.convert_text('<h1>Primary Heading</h1>', 'md', format='html', extra_args=["--blah"])
 
         self.assertRaises(RuntimeError, f)
 
     def test_unicode_input(self):
         # make sure that pandoc always returns unicode and does not mishandle it
         expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
-        written = pypandoc.convert(u'<h1>üäöîôû</h1>', 'md', format='html')
+        written = pypandoc.convert_text(u'<h1>üäöîôû</h1>', 'md', format='html')
         self.assertTrue(isinstance(written, unicode_type))
         self.assertEqualExceptForNewlineEnd(expected, written)
         bytes = u'<h1>üäöîôû</h1>'.encode("utf-8")
-        written = pypandoc.convert(bytes, 'md', format='html')
+        written = pypandoc.convert_text(bytes, 'md', format='html')
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, unicode_type))
 
@@ -309,17 +309,17 @@ class TestPypandoc(unittest.TestCase):
         # Without encoding, this fails as we expect utf-8 per default
 
         def f():
-            pypandoc.convert(bytes, 'md', format='html')
+            pypandoc.convert_text(bytes, 'md', format='html')
 
         self.assertRaises(RuntimeError, f)
 
         def f():
             # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
-            pypandoc.convert(bytes, 'md', format='html', encoding="utf-16")
+            pypandoc.convert_text(bytes, 'md', format='html', encoding="utf-16")
 
         self.assertRaises(RuntimeError, f)
         # with the right encoding it should work...
-        written = pypandoc.convert(bytes, 'md', format='html', encoding="iso-8859-15")
+        written = pypandoc.convert_text(bytes, 'md', format='html', encoding="iso-8859-15")
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, unicode_type))
 
@@ -328,9 +328,9 @@ class TestPypandoc(unittest.TestCase):
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             # let's just test conversion (to and) from docx, testing e.g. odt
             # as well would really be testing pandoc rather than pypandoc
-            received = pypandoc.convert('# some title\n', to='docx', format='md', outputfile=file_name)
+            received = pypandoc.convert_text('# some title\n', to='docx', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            received = pypandoc.convert(file_name, to='rst')
+            received = pypandoc.convert_file(file_name, to='rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_pdf_conversion(self):
@@ -375,12 +375,6 @@ class TestPypandoc(unittest.TestCase):
                  ]
 
         def f(filepath):
-            pypandoc.convert(filepath, 'rst')
-
-        for filepath in files:
-            self.assertRaises(RuntimeError, f, filepath)
-
-        def f(filepath):
             pypandoc.convert_file(filepath, 'rst')
 
         for filepath in files:
@@ -392,7 +386,7 @@ class TestPypandoc(unittest.TestCase):
             self.assertTrue("title" not in received)
 
             # The following is a problematic case
-            received = pypandoc.convert(file_name, 'rst', format='md')
+            received = pypandoc.convert_file(file_name, 'rst', format='md')
             self.assertTrue("title" in received)
 
     def test_depreaction_warnings(self):
