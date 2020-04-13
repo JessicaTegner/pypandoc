@@ -76,8 +76,8 @@ install:
   - "%CMD_IN_ENV% python -m pip install twine wheel"
 
 build_script:
-  - "%CMD_IN_ENV% python setup.py download_pandoc"
-  - "%CMD_IN_ENV% pypandoc\\files\\pandoc --version"
+  - "%CMD_IN_ENV% python -c 'from pypandoc import download_pandoc as dp; dp();"
+  - "%CMD_IN_ENV% pandoc --version"
 
 test_script:
   # Run the project tests

@@ -277,18 +277,12 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
         f = ['--filter=' + x for x in filters]
         args.extend(f)
 
-    # To get access to pandoc-citeproc when we use a included copy of pandoc,
-    # we need to add the pypandoc/files dir to the PATH
-    new_env = os.environ.copy()
-    files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
-    new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
-
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE if string_input else None,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        env=new_env)
+        env=os.environ)
 
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
@@ -547,7 +541,7 @@ def _ensure_pandoc_path(quiet=False):
                 """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
                           "to your PATH or or call pypandoc.download_pandoc(...) or\n"
-                          "install pypandoc wheels with included pandoc.")
+                          "install py-pandoc which packages pandoc as wheels.")
 
 
 def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
