@@ -221,3 +221,23 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
         os.remove(filename)
     if quiet:
         sys.stdout = sys.__stdout__
+
+
+
+def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
+    """Try to install pandoc if it isn't installed.
+
+    Parameters are passed to download_pandoc()
+
+    :raises OSError: if pandoc cannot be installed
+    """
+    from pypandoc import _ensure_pandoc_path
+    try:
+        # Perform the test quietly if asked
+        _ensure_pandoc_path(quiet=quiet)
+
+    except OSError:
+        download_pandoc(url=url, targetfolder=targetfolder, version=version, quiet=quiet, delete_installer=delete_installer)
+
+        # Show errors in case of secondary failure
+        _ensure_pandoc_path(quiet=False)

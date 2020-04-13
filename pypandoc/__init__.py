@@ -9,7 +9,7 @@ import tempfile
 import textwrap
 import warnings
 
-from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
+from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc, ensure_pandoc_installed
 from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
@@ -542,24 +542,6 @@ def _ensure_pandoc_path(quiet=False):
             raise OSError("No pandoc was found: either install pandoc and add it\n"
                           "to your PATH or or call pypandoc.download_pandoc(...) or\n"
                           "install py-pandoc which packages pandoc as wheels.")
-
-
-def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
-    """Try to install pandoc if it isn't installed.
-
-    Parameters are passed to download_pandoc()
-
-    :raises OSError: if pandoc cannot be installed
-    """
-    try:
-        # Perform the test quietly if asked
-        _ensure_pandoc_path(quiet=quiet)
-
-    except OSError:
-        download_pandoc(url=url, targetfolder=targetfolder, version=version, quiet=quiet, delete_installer=delete_installer)
-
-        # Show errors in case of secondary failure
-        _ensure_pandoc_path(quiet=False)
 
 
 # -----------------------------------------------------------------------------
