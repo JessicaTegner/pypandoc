@@ -271,6 +271,16 @@ class TestPypandoc(unittest.TestCase):
             found = re.search(r'10.1038', written)
             self.assertTrue(found.group() == '10.1038')
 
+    def test_conversion_with_lua_filter(self):
+        # example filter taken from: https://pandoc.org/lua-filters.html
+        filters = ['smallcaps.lua']  # converts bold to smallcaps
+        md_text = '# heading\n**emphasis**'
+        filtered_text = pypandoc.convert_text(md_text, 'html', format='md', filters=filters)
+        import re as re
+        # only properly converted file will have this in it
+        found = re.search(r'smallcaps', filtered_text)
+        self.assertTrue(found.group() == 'smallcaps')
+
     def test_conversion_with_empty_filter(self):
         # we just want to get a temp file name, where we can write to
         filters = ''

@@ -274,8 +274,13 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     if filters is not None:
         if isinstance(filters, string_types):
             filters = filters.split()
-        f = ['--filter=' + x for x in filters]
-        args.extend(f)
+        filter_args = []
+        for f in filters:
+            if f.lower().endswith('.lua'):
+                filter_args.append('--lua-filter=' + f)
+            else:
+                filter_args.append('--filter=' + f)
+        args.extend(filter_args)
 
     # To get access to pandoc-citeproc when we use a included copy of pandoc,
     # we need to add the pypandoc/files dir to the PATH
