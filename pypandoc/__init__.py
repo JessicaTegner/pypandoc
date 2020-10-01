@@ -92,7 +92,7 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
-    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
+    :raises RuntimeError: if any of the inputs are not valid or if pandoc fails with an error
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
@@ -127,7 +127,7 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
-    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
+    :raises RuntimeError: if any of the inputs are not valid or if pandoc fails with an error
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
@@ -256,6 +256,9 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     _ensure_pandoc_path()
 
     format, to = _validate_formats(format, to, outputfile)
+
+    if isinstance(extra_args, string_types):
+        raise RuntimeError("extra_args most be of type list, got {}.".format(type(extra_args)))
 
     string_input = input_type == 'string'
     input_file = [source] if not string_input else []
