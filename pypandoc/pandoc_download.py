@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from packaging.version import parse as verparse
 
 try:
     from urllib.request import urlopen
@@ -58,7 +59,7 @@ def _get_pandoc_urls(version="latest"):
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
     # pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
     pandoc_urls = dict((ext2platform[
-                            url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
+        url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
     return pandoc_urls, version
 
 
@@ -69,7 +70,7 @@ def _make_executable(path):
     os.chmod(path, mode)
 
 
-def _handle_linux(filename, targetfolder):
+def _handle_linux(filename, targetfolder, version):
     print("* Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
@@ -85,7 +86,11 @@ def _handle_linux(filename, targetfolder):
         cmd = ["tar", "xf", archive_name]
         subprocess.check_call(cmd)
         # pandoc and pandoc-citeproc are in ./usr/bin subfolder
-        for exe in ["pandoc", "pandoc-citeproc"]:
+        # pandoc-citeproc.exe not included in pandoc version > 2.11
+        files_to_copy = ["pandoc.exe"] \
+            if version == "latest" or verparse(version) > verparse('2.11') \
+            else ["pandoc.exe", "pandoc-citeproc.exe"]
+        for exe in files_to_copy:
             src = os.path.join(tempfolder, "usr", "bin", exe)
             dst = os.path.join(targetfolder, exe)
             print("* Copying %s to %s ..." % (exe, targetfolder))
@@ -100,7 +105,7 @@ def _handle_linux(filename, targetfolder):
         shutil.rmtree(tempfolder)
 
 
-def _handle_darwin(filename, targetfolder):
+def _handle_darwin(filename, targetfolder, version):
     print("* Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
@@ -116,7 +121,11 @@ def _handle_darwin(filename, targetfolder):
     subprocess.check_call(cmd)
 
     # pandoc and pandoc-citeproc are in the ./usr/local/bin subfolder
-    for exe in ["pandoc", "pandoc-citeproc"]:
+    # pandoc-citeproc.exe not included in pandoc version > 2.11
+    files_to_copy = ["pandoc.exe"] \
+        if version == "latest" or verparse(version) > verparse('2.11') \
+        else ["pandoc.exe", "pandoc-citeproc.exe"]
+    for exe in files_to_copy:
         src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
         dst = os.path.join(targetfolder, exe)
         print("* Copying %s to %s ..." % (exe, targetfolder))
@@ -128,17 +137,20 @@ def _handle_darwin(filename, targetfolder):
     print("* Done.")
 
 
-def _handle_win32(filename, targetfolder):
+def _handle_win32(filename, targetfolder, version):
     print("* Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
-
     cmd = ["msiexec", "/a", filename, "/qb", "TARGETDIR=%s" % (tempfolder)]
     # if only 3.5 is supported, should be `run(..., check=True)`
     subprocess.check_call(cmd)
 
     # pandoc.exe, pandoc-citeproc.exe, and the COPYRIGHT are in the Pandoc subfolder
-    for exe in ["pandoc.exe", "pandoc-citeproc.exe", "COPYRIGHT.txt"]:
+    # pandoc-citeproc.exe not included in pandoc version > 2.11
+    files_to_copy = ["pandoc.exe", "COPYRIGHT.txt"] \
+        if version == "latest" or verparse(version) > verparse('2.11') \
+        else ["pandoc.exe", "pandoc-citeproc.exe", "COPYRIGHT.txt"]
+    for exe in files_to_copy:
         src = os.path.join(tempfolder, "Pandoc", exe)
         dst = os.path.join(targetfolder, exe)
         print("* Copying %s to %s ..." % (exe, targetfolder))
@@ -215,8 +227,7 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
 
     unpack = globals().get("_handle_" + pf)
     assert unpack is not None, "Can't handle download, only Linux, Windows and OS X are supported."
-
-    unpack(filename, targetfolder)
+    unpack(filename, targetfolder, version)
     if delete_installer:
         os.remove(filename)
     if quiet:
