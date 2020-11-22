@@ -10,6 +10,7 @@ import sys
 import tempfile
 import unittest
 import warnings
+import functools
 
 import pypandoc
 from pypandoc.py3compat import path2url, string_types, unicode_type
@@ -292,8 +293,25 @@ class TestPypandoc(unittest.TestCase):
         self.assertRaises(RuntimeError, f)
 
     def test_unicode_input(self):
-        # make sure that pandoc always returns unicode and does not mishandle it
+        def version_at_least(dyn, fixed):
+            # warning: only accurate if the version are of the same length
+            if len(dyn) >= len(fixed):
+                comparisons = [dyn[i] >= fixed[i] for i in range(len(fixed))]
+                return functools.reduce(lambda a, b: a and b, comparisons)
+            else:
+                return False
+
+        # expected for pandoc < 2.11.2
         expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
+
+        version = [int(x) for x in pypandoc.get_pandoc_version().split(".")]
+        new_markdown_headings = version_at_least(version, [2, 11, 2])
+
+        # new style for pandoc >= 2.11.2
+        if new_markdown_headings:
+            expected = u'# üäöîôû'
+
+        # make sure that pandoc always returns unicode and does not mishandle it
         written = pypandoc.convert_text(u'<h1>üäöîôû</h1>', 'md', format='html')
         self.assertTrue(isinstance(written, unicode_type))
         self.assertEqualExceptForNewlineEnd(expected, written)
@@ -304,6 +322,9 @@ class TestPypandoc(unittest.TestCase):
 
         # Only use german umlauts in th next test, as iso-8859-15 covers that
         expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
+        if new_markdown_headings:
+            expected = u'# üäö€'
+
         bytes = u'<h1>üäö€</h1>'.encode("iso-8859-15")
 
         # Without encoding, this fails as we expect utf-8 per default
