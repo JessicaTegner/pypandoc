@@ -65,7 +65,7 @@ def _get_pandoc_urls(version="latest"):
 def _make_executable(path):
     mode = os.stat(path).st_mode
     mode |= (mode & 0o444) >> 2  # copy R bits to X
-    print("* Making %s executeable..." % (path))
+    print("* Making %s executable..." % (path))
     os.chmod(path, mode)
 
 
