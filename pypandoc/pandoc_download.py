@@ -85,12 +85,24 @@ def _handle_linux(filename, targetfolder):
         cmd = ["tar", "xf", archive_name]
         subprocess.check_call(cmd)
         # pandoc and pandoc-citeproc are in ./usr/bin subfolder
-        for exe in ["pandoc", "pandoc-citeproc"]:
-            src = os.path.join(tempfolder, "usr", "bin", exe)
-            dst = os.path.join(targetfolder, exe)
-            print("* Copying %s to %s ..." % (exe, targetfolder))
+
+        exe = "pandoc"
+        src = os.path.join(tempfolder, "usr", "bin", exe)
+        dst = os.path.join(targetfolder, exe)
+        print("* Copying %s to %s ..." % (exe, targetfolder))
+        shutil.copyfile(src, dst)
+        _make_executable(dst)
+
+        exe = "pandoc-citeproc"
+        src = os.path.join(tempfolder, "usr", "bin", exe)
+        dst = os.path.join(targetfolder, exe)
+        print("* Copying %s to %s ..." % (exe, targetfolder))
+        try:
             shutil.copyfile(src, dst)
             _make_executable(dst)
+        except FileNotFoundError:
+            print("Didn't copy pandoc-citeproc")
+
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
         dst = os.path.join(targetfolder, "copyright.pandoc")
         print("* Copying copyright to %s ..." % (targetfolder))
@@ -116,12 +128,23 @@ def _handle_darwin(filename, targetfolder):
     subprocess.check_call(cmd)
 
     # pandoc and pandoc-citeproc are in the ./usr/local/bin subfolder
-    for exe in ["pandoc", "pandoc-citeproc"]:
-        src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
-        dst = os.path.join(targetfolder, exe)
-        print("* Copying %s to %s ..." % (exe, targetfolder))
+
+    exe = "pandoc"
+    src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    shutil.copyfile(src, dst)
+    _make_executable(dst)
+
+    exe = "pandoc-citeproc"
+    src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    try:
         shutil.copyfile(src, dst)
         _make_executable(dst)
+    except FileNotFoundError:
+        print("Didn't copy pandoc-citeproc")
 
     # remove temporary dir
     shutil.rmtree(tempfolder)
@@ -138,11 +161,27 @@ def _handle_win32(filename, targetfolder):
     subprocess.check_call(cmd)
 
     # pandoc.exe, pandoc-citeproc.exe, and the COPYRIGHT are in the Pandoc subfolder
-    for exe in ["pandoc.exe", "pandoc-citeproc.exe", "COPYRIGHT.txt"]:
-        src = os.path.join(tempfolder, "Pandoc", exe)
-        dst = os.path.join(targetfolder, exe)
-        print("* Copying %s to %s ..." % (exe, targetfolder))
+
+    exe = "pandoc.exe"
+    src = os.path.join(tempfolder, "Pandoc", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    shutil.copyfile(src, dst)
+
+    exe = "pandoc-citeproc.exe"
+    src = os.path.join(tempfolder, "Pandoc", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    try:
         shutil.copyfile(src, dst)
+    except FileNotFoundError:
+        print("Didn't copy pandoc-citeproc.exe")
+
+    exe = "COPYRIGHT.txt"
+    src = os.path.join(tempfolder, "Pandoc", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    shutil.copyfile(src, dst)
 
     # remove temporary dir
     shutil.rmtree(tempfolder)
