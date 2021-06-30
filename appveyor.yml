@@ -7,7 +7,6 @@ environment:
     secure: vwvitc1udvvzJrSNBbxQrtNKPACCOpSM3kteJK6UBR8=
   TWINE_USERNAME: janschulz
 
-environment:
   matrix:
   - TOXENV: py27
   - TOXENV: py35
