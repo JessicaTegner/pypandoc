@@ -67,21 +67,20 @@ install:
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
-  - "%CMD_IN_ENV% python -m pip install --disable-pip-version-check --user --upgrade pip"
-
-  - "%CMD_IN_ENV% python -m pip install twine wheel"
+  - "python -m pip install --disable-pip-version-check --user --upgrade pip"
+  - "python -m pip install twine wheel"
 
 build_script:
-  - "%CMD_IN_ENV% python setup.py download_pandoc"
-  - "%CMD_IN_ENV% pypandoc\\files\\pandoc --version"
+  - "python setup.py download_pandoc"
+  - "pypandoc\\files\\pandoc --version"
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% python tests.py"
+  - "python tests.py"
 
 after_test:
   # If tests are successful, create binary packages for the project.
-  - "%CMD_IN_ENV% python setup.py bdist_wheel"
+  - "python setup.py bdist_wheel"
   - ps: "ls dist"
 
 artifacts:

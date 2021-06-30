@@ -275,7 +275,7 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected, written)
         bytes = u'<p>üäöîôû</p>'.encode("utf-8")
         written = pypandoc.convert_text(bytes, 'md', format='html')
-        self.assertEqualExceptForNewlineEnd(expected, written)
+        self.assertTrue(expected == written)
         self.assertTrue(isinstance(written, unicode_type))
 
         # Only use german umlauts in th next test, as iso-8859-15 covers that
