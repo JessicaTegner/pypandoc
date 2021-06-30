@@ -3,4 +3,3 @@ include LICENSE
 include tests.py
 include filter_test.md
 include examples/*
-
