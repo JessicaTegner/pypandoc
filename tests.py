@@ -273,7 +273,7 @@ class TestPypandoc(unittest.TestCase):
         written = pypandoc.convert_text(u'<p>üäöîôû</p>', 'md', format='html')
         self.assertTrue(isinstance(written, unicode_type))
         self.assertEqualExceptForNewlineEnd(expected, written)
-        bytes = u'<h1>üäöîôû</h1>'.encode("utf-8")
+        bytes = u'<p>üäöîôû</p>'.encode("utf-8")
         written = pypandoc.convert_text(bytes, 'md', format='html')
         self.assertEqualExceptForNewlineEnd(expected, written)
         self.assertTrue(isinstance(written, unicode_type))
