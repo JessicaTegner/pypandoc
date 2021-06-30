@@ -13,9 +13,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-10.15, windows-2019, ubuntu-latest]
-        runs-on: ${{ matrix.os }}
         python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
+        os: [macos-10.15, windows-2019]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
