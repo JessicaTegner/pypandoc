@@ -20,6 +20,7 @@ addons:
       # Some tests do a pdf conversion, so install latex which is needed for that.
       - texlive-latex-base
       - texlive-latex-extra
+      - texlive-generic-extra
       - texlive-generic-recommended
       - texlive-fonts-recommended
       - texlive-latex-recommended
