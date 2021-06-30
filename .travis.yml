@@ -1,4 +1,5 @@
 language: python
+dist: bionic
 sudo: false
 matrix:
   include:
@@ -20,7 +21,6 @@ addons:
       # Some tests do a pdf conversion, so install latex which is needed for that.
       - texlive-latex-base
       - texlive-latex-extra
-      - texlive-generic-extra
       - texlive-plain-generic
       - texlive-fonts-recommended
       - texlive-latex-recommended
