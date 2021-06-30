@@ -43,7 +43,8 @@ def _get_pandoc_urls(version="latest"):
     response = urlopen(url)
     content = response.read()
     # regex for the binaries
-    regex = re.compile(r"/jgm/pandoc/releases/download/.*\.(?:msi|deb|pkg)")
+    processor_architecture = "arm" if os.uname()[4].startswith("arm") else "amd"
+    regex = re.compile(r"/jgm/pandoc/releases/download/.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
     # a list of urls to the bainaries
     pandoc_urls_list = regex.findall(content.decode("utf-8"))
     # actual pandoc version
@@ -56,9 +57,7 @@ def _get_pandoc_urls(version="latest"):
     }
     # parse pandoc_urls from list to dict
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
-    # pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
-    pandoc_urls = dict((ext2platform[
-                            url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
+    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
     return pandoc_urls, version
 
 
