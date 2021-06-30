@@ -1,7 +1,7 @@
 # pypandoc
 
-[![Build Status](https://travis-ci.org/bebraw/pypandoc.svg?branch=master)](https://travis-ci.org/bebraw/pypandoc)
-[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/bebraw/pypandoc?svg=true)](https://ci.appveyor.com/project/bebraw/pypandoc)
+[![Build Status](https://travis-ci.com/NicklasTegner/pypandoc.svg?branch=master)](https://travis-ci.com/NicklasTegner/pypandoc)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/NicklasTegner/pypandoc?svg=true)](https://ci.appveyor.com/project/NicklasTegner/pypandoc)
 [![GitHub Releases](https://img.shields.io/github/tag/bebraw/pypandoc.svg?label=github+release)](https://github.com/bebraw/pypandoc/releases)
 [![PyPI version](https://badge.fury.io/py/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
 [![conda version](https://anaconda.org/conda-forge/pypandoc/badges/version.svg)](https://anaconda.org/conda-forge/pypandoc/)
