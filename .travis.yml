@@ -1,0 +1,43 @@
+language: python
+sudo: false
+matrix:
+  include:
+    - python: 3.8
+      env: TOXENV=py38
+    - python: 3.7
+      env: TOXENV=py37
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 2.7
+      env: TOXENV=py27
+  allow_failures:
+    - env: TOXENV=flake8
+addons:
+  apt:
+    packages:
+      # Some tests do a pdf conversion, so install latex which is needed for that.
+      - texlive-latex-base
+      - texlive-latex-extra
+      - texlive-fonts-recommended
+      - texlive-latex-recommended
+      - lmodern
+install:
+  - travis_retry python -m pip install tox
+  # only download pandoc, the tests should work without a install of pypandoc
+  - python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+  - export PATH=~/bin:$PATH
+
+script:
+  - ~/bin/pandoc -v
+  - tox
+
+deploy:
+  provider: pypi
+  distributions: sdist
+  user: janschulz
+  password:
+    secure: uxmjO7Q0MP0YZb1pdAkKn7TdLdFU1lJqrnSR5DpjzPpJRlGMUph0MIrtHtU1CsbMya//Wwszae77pEqAIDpQ5mHlfF3mPxSO8TWvYu6XZdkmmTKf3rIaJgYoOIz1VdyHsti5SIHMBE749eUykTwNrqV4OR+lk3fpdZmy8shl7+U=
+  on:
+    tags: true
+    repo: bebraw/pypandoc
+    condition: $TOXENV == py37
