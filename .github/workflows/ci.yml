@@ -29,7 +29,14 @@ jobs:
         python -m pip install pytest
         python setup.py develop
     - name: Download Pandoc
-      run: python setup.py download_pandoc
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt install pandoc
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            python setup.py download_pandoc
+          else
+            sudo brew install pandoc
+          fi
     - name: Test with pytest
       run: |
         python tests.py
