@@ -269,7 +269,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_unicode_input(self):
         # make sure that pandoc always returns unicode and does not mishandle it
-        expected = u'üäöîôû{0}======{0}{0}'.format(os.linesep)
+        expected = u'üäöîôû{0}'.format(os.linesep)
         written = pypandoc.convert_text(u'<h1>üäöîôû</h1>', 'md', format='html')
         self.assertTrue(isinstance(written, unicode_type))
         self.assertEqualExceptForNewlineEnd(expected, written)

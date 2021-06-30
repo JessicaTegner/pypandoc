@@ -43,7 +43,7 @@ def _get_pandoc_urls(version="latest"):
     response = urlopen(url)
     content = response.read()
     # regex for the binaries
-    processor_architecture = "arm" if os.uname()[4].startswith("arm") else "amd"
+    processor_architecture = "arm" if platform.uname()[4].startswith("arm") else "amd"
     regex = re.compile(r"/jgm/pandoc/releases/download/.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
     # a list of urls to the bainaries
     pandoc_urls_list = regex.findall(content.decode("utf-8"))
