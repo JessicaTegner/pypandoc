@@ -7,31 +7,14 @@ environment:
     secure: vwvitc1udvvzJrSNBbxQrtNKPACCOpSM3kteJK6UBR8=
   TWINE_USERNAME: janschulz
 
+environment:
   matrix:
-
-    # Pre-installed Python versions, which Appveyor may upgrade to
-    # a later point release.
-    # See: http://www.appveyor.com/docs/installed-software#python
-
-    - PYTHON: "C:\\Python27-x64"
-      PYTHON_VERSION: "2.7.x" # currently 2.7.9
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: "3.6.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python37-x64"
-      PYTHON_VERSION: "3.7.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python38-x64"
-      PYTHON_VERSION: "3.8.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python39-x64"
-      PYTHON_VERSION: "3.9.x"
-      PYTHON_ARCH: "64"
+  - TOXENV: py27
+  - TOXENV: py35
+  - TOXENV: py36
+  - TOXENV: py37
+  - TOXENV: py38
+  - TOXENV: py39
 
 install:
   # If there is a newer build queued for the same PR, cancel this one.
@@ -48,15 +31,6 @@ install:
 
   - ECHO "Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
-
-  # Install Python (from the official .msi of http://python.org) and pip when
-  # not already installed.
-  - ps: if (-not(Test-Path($env:PYTHON))) { & appveyor\install.ps1 }
-
-  # Prepend newly installed Python to the PATH of this build (this cannot be
-  # done from inside the powershell script as it would require to restart
-  # the parent CMD process).
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # Check that we have the expected version and architecture for Python
   - "python --version"
@@ -85,7 +59,8 @@ build_script:
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% python tests.py"
+  - "%CMD_IN_ENV% python -m pip install tox"
+  - "%CMD_IN_ENV% tox"
 
 after_test:
   # If tests are successful, create binary packages for the project.
