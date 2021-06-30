@@ -279,8 +279,8 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(isinstance(written, unicode_type))
 
         # Only use german umlauts in th next test, as iso-8859-15 covers that
-        expected = u'üäö€{0}===={0}{0}'.format(os.linesep)
-        bytes = u'<h1>üäö€</h1>'.encode("iso-8859-15")
+        expected = u'üäö€{0}'.format(os.linesep)
+        bytes = u'<p>üäö€</p>'.encode("iso-8859-15")
 
         # Without encoding, this fails as we expect utf-8 per default
 
