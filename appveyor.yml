@@ -38,8 +38,8 @@ install:
   # stolen from https://github.com/doxygen/doxygen/blob/master/appveyor.yml
   - appveyor-retry appveyor DownloadFile  https://miktex.org/download/win/miktexsetup-x64.zip
   - 7z e miktexsetup-x64.zip
-  - appveyor-retry miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential download
-  - miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential --shared install
+  - appveyor-retry ./miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential download
+  - ./miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential --shared install
   - refreshenv
   # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
   # this adds this to the registry!
