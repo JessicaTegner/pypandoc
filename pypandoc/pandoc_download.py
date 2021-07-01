@@ -43,7 +43,8 @@ def _get_pandoc_urls(version="latest"):
     response = urlopen(url)
     content = response.read()
     # regex for the binaries
-    regex = re.compile(r"/jgm/pandoc/releases/download/.*\.(?:msi|deb|pkg)")
+    processor_architecture = "arm" if platform.uname()[4].startswith("arm") else "amd"
+    regex = re.compile(r"/jgm/pandoc/releases/download/.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
     # a list of urls to the bainaries
     pandoc_urls_list = regex.findall(content.decode("utf-8"))
     # actual pandoc version
@@ -56,9 +57,7 @@ def _get_pandoc_urls(version="latest"):
     }
     # parse pandoc_urls from list to dict
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
-    # pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
-    pandoc_urls = dict((ext2platform[
-                            url_frag[-3:]], ("https://github.com" + url_frag)) for url_frag in pandoc_urls_list)
+    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
     return pandoc_urls, version
 
 
@@ -85,12 +84,21 @@ def _handle_linux(filename, targetfolder):
         cmd = ["tar", "xf", archive_name]
         subprocess.check_call(cmd)
         # pandoc and pandoc-citeproc are in ./usr/bin subfolder
-        for exe in ["pandoc", "pandoc-citeproc"]:
-            src = os.path.join(tempfolder, "usr", "bin", exe)
-            dst = os.path.join(targetfolder, exe)
-            print("* Copying %s to %s ..." % (exe, targetfolder))
+        exe = "pandoc"
+        src = os.path.join(tempfolder, "usr", "bin", exe)
+        dst = os.path.join(targetfolder, exe)
+        print("* Copying %s to %s ..." % (exe, targetfolder))
+        shutil.copyfile(src, dst)
+        _make_executable(dst)
+        exe = "pandoc-citeproc"
+        src = os.path.join(tempfolder, "usr", "bin", exe)
+        dst = os.path.join(targetfolder, exe)
+        print("* Copying %s to %s ..." % (exe, targetfolder))
+        try:
             shutil.copyfile(src, dst)
             _make_executable(dst)
+        except FileNotFoundError:
+            print("Didn't copy pandoc-citeproc")
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
         dst = os.path.join(targetfolder, "copyright.pandoc")
         print("* Copying copyright to %s ..." % (targetfolder))
@@ -116,12 +124,23 @@ def _handle_darwin(filename, targetfolder):
     subprocess.check_call(cmd)
 
     # pandoc and pandoc-citeproc are in the ./usr/local/bin subfolder
-    for exe in ["pandoc", "pandoc-citeproc"]:
-        src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
-        dst = os.path.join(targetfolder, exe)
-        print("* Copying %s to %s ..." % (exe, targetfolder))
+
+    exe = "pandoc"
+    src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    shutil.copyfile(src, dst)
+    _make_executable(dst)
+
+    exe = "pandoc-citeproc"
+    src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    try:
         shutil.copyfile(src, dst)
         _make_executable(dst)
+    except FileNotFoundError:
+        print("Didn't copy pandoc-citeproc")
 
     # remove temporary dir
     shutil.rmtree(tempfolder)
@@ -138,11 +157,27 @@ def _handle_win32(filename, targetfolder):
     subprocess.check_call(cmd)
 
     # pandoc.exe, pandoc-citeproc.exe, and the COPYRIGHT are in the Pandoc subfolder
-    for exe in ["pandoc.exe", "pandoc-citeproc.exe", "COPYRIGHT.txt"]:
-        src = os.path.join(tempfolder, "Pandoc", exe)
-        dst = os.path.join(targetfolder, exe)
-        print("* Copying %s to %s ..." % (exe, targetfolder))
+
+    exe = "pandoc.exe"
+    src = os.path.join(tempfolder, "Pandoc", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    shutil.copyfile(src, dst)
+
+    exe = "pandoc-citeproc.exe"
+    src = os.path.join(tempfolder, "Pandoc", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    try:
         shutil.copyfile(src, dst)
+    except FileNotFoundError:
+        print("Didn't copy pandoc-citeproc.exe")
+
+    exe = "COPYRIGHT.txt"
+    src = os.path.join(tempfolder, "Pandoc", exe)
+    dst = os.path.join(targetfolder, exe)
+    print("* Copying %s to %s ..." % (exe, targetfolder))
+    shutil.copyfile(src, dst)
 
     # remove temporary dir
     shutil.rmtree(tempfolder)

@@ -13,10 +13,6 @@ environment:
     # a later point release.
     # See: http://www.appveyor.com/docs/installed-software#python
 
-    - PYTHON: "C:\\Python27-x64"
-      PYTHON_VERSION: "2.7.x" # currently 2.7.9
-      PYTHON_ARCH: "64"
-
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: "3.6.x"
       PYTHON_ARCH: "64"
@@ -45,6 +41,16 @@ install:
   - ECHO "Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
 
+  # stolen from https://github.com/doxygen/doxygen/blob/master/appveyor.yml
+  - appveyor-retry appveyor DownloadFile  https://miktex.org/download/win/miktexsetup-x64.zip
+  - 7z e miktexsetup-x64.zip
+  - appveyor-retry miktexsetup_standalone.exe --local-package-repository=C:\miktex-repository --package-set=essential download
+  - miktexsetup_standalone.exe --local-package-repository=C:\miktex-repository --package-set=essential --shared install
+  - refreshenv
+  # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
+  # this adds this to the registry!
+  - initexmf --admin --set-config-value "[MPM]AutoInstall=1"
+
   # Install Python (from the official .msi of http://python.org) and pip when
   # not already installed.
   - ps: if (-not(Test-Path($env:PYTHON))) { & appveyor\install.ps1 }
@@ -58,34 +64,25 @@ install:
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
-  # stolen from https://github.com/doxygen/doxygen/blob/master/appveyor.yml
-  - appveyor-retry appveyor DownloadFile  https://miktex.org/download/win/miktexsetup-x64.zip
-  - 7z e miktexsetup-x64.zip
-  - appveyor-retry miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential download
-  - miktexsetup.exe --local-package-repository=C:\miktex-repository --package-set=essential --shared install
-  - refreshenv
-  # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
-  # this adds this to the registry!
-  - initexmf --admin --set-config-value "[MPM]AutoInstall=1"
-
-
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
-  - "%CMD_IN_ENV% python -m pip install --disable-pip-version-check --user --upgrade pip"
-
-  - "%CMD_IN_ENV% python -m pip install twine wheel"
+  - "python -m pip install --disable-pip-version-check --user --upgrade pip"
+  - "python -m pip install twine wheel"
 
 build_script:
-  - "%CMD_IN_ENV% python setup.py download_pandoc"
-  - "%CMD_IN_ENV% pypandoc\\files\\pandoc --version"
+  - "python --version"
+  - "python setup.py download_pandoc"
+  - "pypandoc\\files\\pandoc --version"
 
 test_script:
   # Run the project tests
-  - "%CMD_IN_ENV% python tests.py"
+  - "python --version"
+  - "python tests.py"
 
 after_test:
   # If tests are successful, create binary packages for the project.
-  - "%CMD_IN_ENV% python setup.py bdist_wheel"
+  - "python --version"
+  - "python setup.py bdist_wheel"
   - ps: "ls dist"
 
 artifacts:
