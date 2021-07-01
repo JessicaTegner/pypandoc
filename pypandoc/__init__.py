@@ -282,13 +282,14 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     new_env = os.environ.copy()
     files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
     new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
-
+    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE if string_input else None,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        env=new_env)
+        env=new_env,
+        creationflags=creation_flag)
 
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
@@ -341,11 +342,13 @@ def get_pandoc_formats():
     Return 2 lists. "from_formats" and "to_formats".
     '''
     _ensure_pandoc_path()
+    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
     p = subprocess.Popen(
         [__pandoc_path, '--list-output-formats'],
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE,
+        creationflags=creation_flag)
 
     comm = p.communicate()
     out = comm[0].decode().splitlines(False)
@@ -357,7 +360,8 @@ def get_pandoc_formats():
         [__pandoc_path, '--list-input-formats'],
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE,
+        creationflags=creation_flag)
 
     comm = p.communicate()
     in_ = comm[0].decode().splitlines(False)
@@ -371,10 +375,12 @@ def get_pandoc_formats_pre_1_18():
     Return 2 lists. "from_formats" and "to_formats".
     '''
     _ensure_pandoc_path()
+    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
     p = subprocess.Popen(
         [__pandoc_path, '-h'],
         stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE,
+        creationflags=creation_flag)
 
     comm = p.communicate()
     help_text = comm[0].decode().splitlines(False)
@@ -394,13 +400,15 @@ def get_pandoc_formats_pre_1_18():
 
 def _get_pandoc_version(pandoc_path):
     new_env = os.environ.copy()
+    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
     if 'HOME' not in os.environ:
         new_env['HOME'] = tempfile.gettempdir()
     p = subprocess.Popen(
         [pandoc_path, '--version'],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        env=new_env)
+        env=new_env,
+        creationflags=creation_flag)
     comm = p.communicate()
     out_lines = comm[0].decode().splitlines(False)
     if p.returncode != 0 or len(out_lines) == 0:
