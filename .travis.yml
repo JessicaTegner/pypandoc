@@ -42,5 +42,5 @@ deploy:
   password: $pypi_password
   on:
     tags: true
-    repo: nicklastegner/pypandoc
+    repo: NicklasTegner/pypandoc
     condition: $TOXENV == py37
