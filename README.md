@@ -224,6 +224,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 
 ## Contributors
 
+* [Nicklas Tegner](https://github.com/nicklastegner) - New maintainer as of 1. Juli 2021
 * [Valentin Haenel](https://github.com/esc) - String conversion fix
 * [Daniel Sanchez](https://github.com/ErunamoJAZZ) - Automatic parsing of input/output formats
 * [Thomas G.](https://github.com/coldfix) - Python 3 support
