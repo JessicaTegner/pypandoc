@@ -227,7 +227,7 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
         if download_folder.endswith('/'):
             download_folder = download_folder[:-1]
 
-        filename = os.path.expanduser(download_folder) + '/' + filename
+        filename = os.path.join(os.path.expanduser(download_folder), filename)
 
     if os.path.isfile(filename):
         print("* Using already downloaded file %s" % (filename))
