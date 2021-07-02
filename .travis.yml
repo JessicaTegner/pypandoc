@@ -38,10 +38,9 @@ script:
 deploy:
   provider: pypi
   distributions: sdist
-  user: janschulz
-  password:
-    secure: uxmjO7Q0MP0YZb1pdAkKn7TdLdFU1lJqrnSR5DpjzPpJRlGMUph0MIrtHtU1CsbMya//Wwszae77pEqAIDpQ5mHlfF3mPxSO8TWvYu6XZdkmmTKf3rIaJgYoOIz1VdyHsti5SIHMBE749eUykTwNrqV4OR+lk3fpdZmy8shl7+U=
+  user: __token__
+  password: $pypi_password
   on:
     tags: true
-    repo: bebraw/pypandoc
+    repo: nicklastegner/pypandoc
     condition: $TOXENV == py37
