@@ -39,7 +39,7 @@ deploy:
   provider: pypi
   distributions: sdist
   user: __token__
-  password: $pypi_token
+  password: $PYPI_TOKEN
   on:
     tags: true
     repo: NicklasTegner/pypandoc
