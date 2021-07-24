@@ -565,6 +565,10 @@ def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet
 
     :raises OSError: if pandoc cannot be installed
     """
+    # Append targetfolder to the PATH environment variable so it is found by subprocesses
+    if targetfolder is not None:
+        os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + os.path.abspath(os.path.expanduser(targetfolder))
+
     try:
         # Perform the test quietly if asked
         _ensure_pandoc_path(quiet=quiet)
