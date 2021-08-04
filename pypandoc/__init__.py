@@ -315,6 +315,12 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     except UnicodeDecodeError:
         # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
         raise RuntimeError('Pandoc output was not utf-8.')
+           
+    try:
+        stderr = stderr.decode('utf-8')
+    except UnicodeDecodeError:
+        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
+        raise RuntimeError('Pandoc output was not utf-8.')
 
     # check that pandoc returned successfully
     if p.returncode != 0:
