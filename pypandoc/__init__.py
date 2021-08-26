@@ -69,7 +69,7 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
 
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None):
+                 outputfile=None, filters=None, verify_format=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -98,11 +98,12 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     """
     source = _as_unicode(source, encoding)
     return _convert_input(source, format, 'string', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters)
+                          outputfile=outputfile, filters=filters,
+                          verify_format=verify_format)
 
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None):
+                 outputfile=None, filters=None, verify_format=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -135,7 +136,8 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
         raise RuntimeError("source_file is not a valid path")
     format = _identify_format_from_path(source_file, format)
     return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters)
+                          outputfile=outputfile, filters=filters,
+                          verify_format=verify_format)
 
 
 def _identify_path(source):
@@ -192,18 +194,20 @@ def _identify_input_type(source, format, encoding='utf-8'):
     return source, format, input_type
 
 
+def normalize_format(fmt):
+    formats = {
+        'dbk': 'docbook',
+        'md': 'markdown',
+        'tex': 'latex',
+    }
+    fmt = formats.get(fmt, fmt)
+    # rst format can have extensions
+    if fmt[:4] == "rest":
+        fmt = "rst" + fmt[4:]
+    return fmt
+
+
 def _validate_formats(format, to, outputfile):
-    def normalize_format(fmt):
-        formats = {
-            'dbk': 'docbook',
-            'md': 'markdown',
-            'tex': 'latex',
-        }
-        fmt = formats.get(fmt, fmt)
-        # rst format can have extensions
-        if fmt[:4] == "rest":
-            fmt = "rst" + fmt[4:]
-        return fmt
 
     format = normalize_format(format)
     to = normalize_format(to)
@@ -252,10 +256,14 @@ def _validate_formats(format, to, outputfile):
 
 
 def _convert_input(source, format, input_type, to, extra_args=(), outputfile=None,
-                   filters=None):
+                   filters=None, verify_format=True):
     _ensure_pandoc_path()
 
-    format, to = _validate_formats(format, to, outputfile)
+    if verify_format:
+        format, to = _validate_formats(format, to, outputfile)
+    else:
+        format = normalize_format(format)
+        to = normalize_format(to)
 
     string_input = input_type == 'string'
     input_file = [source] if not string_input else []
