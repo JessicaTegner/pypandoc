@@ -13,7 +13,7 @@ from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
-__version__ = '1.6.3'
+__version__ = '1.6.4'
 __license__ = 'MIT'
 __all__ = ['convert', 'convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
