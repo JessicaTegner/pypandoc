@@ -279,21 +279,21 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(isinstance(written, unicode_type))
 
         # Only use german umlauts in th next test, as iso-8859-15 covers that
-        expected = u'üäö€{0}'.format(os.linesep)
-        bytes = u'<p>üäö€</p>'.encode("iso-8859-15")
+        expected = u'äüäö{0}'.format(os.linesep)
+        bytes = u'<p>äüäö</p>'.encode("iso-8859-15")
 
         # Without encoding, this fails as we expect utf-8 per default
 
         def f():
-            pypandoc.convert_text(bytes, 'md', format='html')
+            written = pypandoc.convert_text(bytes, 'md', format='html')
 
-        self.assertRaises(RuntimeError, f)
+            assert expected != written
 
         def f():
             # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
-            pypandoc.convert_text(bytes, 'md', format='html', encoding="utf-16")
+            written = pypandoc.convert_text(bytes, 'md', format='html', encoding="utf-16")
 
-        self.assertRaises(RuntimeError, f)
+            assert expected != written
         # with the right encoding it should work...
         written = pypandoc.convert_text(bytes, 'md', format='html', encoding="iso-8859-15")
         self.assertEqualExceptForNewlineEnd(expected, written)
