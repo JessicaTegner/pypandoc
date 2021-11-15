@@ -321,13 +321,13 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
     try:
         stdout = stdout.decode('utf-8')
     except UnicodeDecodeError:
-        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
+        # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
         raise RuntimeError('Pandoc output was not utf-8.')
            
     try:
         stderr = stderr.decode('utf-8')
     except UnicodeDecodeError:
-        # this shouldn't happen: pandoc more or less garantees that the output is utf-8!
+        # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
         raise RuntimeError('Pandoc output was not utf-8.')
 
     # check that pandoc returned successfully
@@ -460,7 +460,7 @@ def get_pandoc_path():
 
     It will return a path to pandoc which is used by pypandoc.
 
-    This might be a full path or, if pandoc is on PATH, simple `pandoc`. It's garanteed
+    This might be a full path or, if pandoc is on PATH, simple `pandoc`. It's guaranteed
     to be callable (i.e. we could get version information from `pandoc --version`).
     If `PYPANDOC_PANDOC` is set and valid, it will return that value. If the environment
     variable is not set, either the full path to the included pandoc or the pandoc in
@@ -503,7 +503,7 @@ def _ensure_pandoc_path(quiet=False):
             if os.getenv('ProgramFiles(x86)', None):
                 search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\Pandoc"))
 
-        # bin can also be used on windows (conda at leats has it in path), so
+        # bin can also be used on windows (conda at least has it in path), so
         # include it unconditionally
         search_paths.append(os.path.join(sys.exec_prefix, "bin", "pandoc"))
         # If a user added the complete path to pandoc to an env, use that as the
