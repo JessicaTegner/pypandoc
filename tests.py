@@ -74,7 +74,7 @@ def assert_produces_warning(expected_warning=Warning, filter_level="always",
     with warnings.catch_warnings(record=True) as w:
 
         if clear is not None:
-            # make sure that we are clearning these warnings
+            # make sure that we are clearing these warnings
             # if they have happened before
             # to guarantee that we will catch them
             if not is_list_like(clear):
@@ -224,7 +224,7 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqualExceptForNewlineEnd(expected_without_extension, received_without_extension)
 
     def test_conversion_from_markdown_with_extensions(self):
-        # Aparently without the extension, ~~ gets turned into different code
+        # Apparently without the extension, ~~ gets turned into different code
         # depending on the pandoc version. So we do not test for that anymore...
         input = u'~~strike~~'
         expected_with_extension = u'<p><del>strike</del></p>'
@@ -278,7 +278,7 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(expected == written)
         self.assertTrue(isinstance(written, unicode_type))
 
-        # Only use german umlauts in th next test, as iso-8859-15 covers that
+        # Only use german umlauts in the next test, as iso-8859-15 covers that
         expected = u'äüäö{0}'.format(os.linesep)
         bytes = u'<p>äüäö</p>'.encode("iso-8859-15")
 
