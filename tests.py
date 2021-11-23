@@ -16,7 +16,7 @@ from pypandoc.py3compat import path2url, string_types, unicode_type
 
 
 @contextlib.contextmanager
-def closed_tempfile(suffix, text=None, dir_name=None, check_case=False):
+def closed_tempfile(suffix, text=None, dir_name=None):
     file_name = None
     try:
         if dir_name:
@@ -27,10 +27,6 @@ def closed_tempfile(suffix, text=None, dir_name=None, check_case=False):
             if text:
                 test_file.write(text)
                 test_file.flush()
-        if check_case and file_name != file_name.lower():
-            # there is a bug in pandoc which can't work with uppercase lua files
-            # https://github.com/jgm/pandoc/issues/4610
-            raise unittest.SkipTest("pandoc has problems with uppercase filenames, got %s" % file_name)
         yield file_name
     finally:
         if dir_name:
@@ -187,8 +183,7 @@ class TestPypandoc(unittest.TestCase):
     def test_convert_with_custom_writer(self):
         lua_file_content = self.create_sample_lua()
         with closed_tempfile('.md', text='# title\n') as file_name:
-            with closed_tempfile('.lua', text=lua_file_content, dir_name="foo-bar+baz",
-                                 check_case=True) as lua_file_name:
+            with closed_tempfile('.lua', text=lua_file_content, dir_name="foo-bar+baz") as lua_file_name:
                 expected = u'<h1 id="title">title</h1>{0}'.format(os.linesep)
                 received = pypandoc.convert_file(file_name, lua_file_name)
                 self.assertEqualExceptForNewlineEnd(expected, received)
