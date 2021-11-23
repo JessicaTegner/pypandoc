@@ -114,6 +114,10 @@ def assert_produces_warning(expected_warning=Warning, filter_level="always",
 
 class TestPypandoc(unittest.TestCase):
 
+    # Python 2 compatibility
+    if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
+        assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
     def setUp(self):
         if 'HOME' not in os.environ:
             # if this is used with older versions of pandoc-citeproc
@@ -148,13 +152,15 @@ class TestPypandoc(unittest.TestCase):
         def f():
             pypandoc.convert_text("ok", format='md', to='invalid')
 
-        self.assertRaises(RuntimeError, f)
+        with self.assertRaisesRegex(RuntimeError, "Invalid output format! Got invalid but "):
+            f()
 
     def test_does_not_convert_from_invalid_format(self):
         def f():
             pypandoc.convert_text("ok", format='invalid', to='rest')
 
-        self.assertRaises(RuntimeError, f)
+        with self.assertRaisesRegex(RuntimeError, 'Invalid input format! Got "invalid" but '):
+            f()
 
     def test_basic_conversion_from_file(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
@@ -240,7 +246,8 @@ class TestPypandoc(unittest.TestCase):
             pypandoc.convert_text('# some title\n', to='odf', format='md',
                              outputfile=None)
 
-        self.assertRaises(RuntimeError, f)
+        with self.assertRaisesRegex(RuntimeError, "Invalid output format! Got odf but "):
+            f()
 
     def test_conversion_with_empty_filter(self):
         # we just want to get a temp file name, where we can write to
@@ -260,7 +267,8 @@ class TestPypandoc(unittest.TestCase):
         def f():
             pypandoc.convert_text('<h1>Primary Heading</h1>', 'md', format='html', extra_args=["--blah"])
 
-        self.assertRaises(RuntimeError, f)
+        with self.assertRaisesRegex(RuntimeError, 'Pandoc died with exitcode "6" during conversion: Unknown option --blah'):
+            f()
 
     def test_unicode_input(self):
         # make sure that pandoc always returns unicode and does not mishandle it
@@ -317,21 +325,24 @@ class TestPypandoc(unittest.TestCase):
             # needs an outputfile
             pypandoc.convert_text('# some title\n', to='pdf', format='md')
 
-        self.assertRaises(RuntimeError, f)
+        with self.assertRaisesRegex(RuntimeError, "Output to pdf only works by using a outputfile"):
+            f()
 
         # outputfile needs to end in pdf
         with closed_tempfile('.WRONG') as file_name:
             def f():
                 pypandoc.convert_text('# some title\n', to='pdf', format='md', outputfile=file_name)
 
-            self.assertRaises(RuntimeError, f)
+            with self.assertRaisesRegex(RuntimeError, 'PDF output needs an outputfile with ".pdf" as a fileending'):
+                f()
 
         # no extensions allowed
         with closed_tempfile('.pdf') as file_name:
             def f():
                 pypandoc.convert_text('# some title\n', to='pdf+somethign', format='md', outputfile=file_name)
 
-            self.assertRaises(RuntimeError, f)
+            with self.assertRaisesRegex(RuntimeError, r"PDF output can't contain any extensions: pdf\+somethign"):
+                f()
 
     def test_get_pandoc_path(self):
         result = pypandoc.get_pandoc_path()
@@ -349,7 +360,8 @@ class TestPypandoc(unittest.TestCase):
             pypandoc.convert_file(filepath, 'rst')
 
         for filepath in files:
-            self.assertRaises(RuntimeError, f, filepath)
+            with self.assertRaisesRegex(RuntimeError, "source_file is not a valid path"):
+                f(filepath)
 
     def test_convert_text_with_existing_file(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
