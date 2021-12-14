@@ -145,6 +145,18 @@ class TestPypandoc(unittest.TestCase):
         # according to http://pandoc.org/releases.html there were only two versions 0.x ...
         self.assertTrue(major in [0, 1, 2])
 
+    def test_ensure_pandoc_minimal_version(self):
+        assert "HOME" in os.environ, "No HOME set, this will error..."
+        assert pypandoc.ensure_pandoc_minimal_version(1) == True
+        assert pypandoc.ensure_pandoc_minimal_version(1,1) == True
+        assert pypandoc.ensure_pandoc_minimal_version(999,999) == False
+
+    def test_ensure_pandoc_maximal_version(self):
+        assert "HOME" in os.environ, "No HOME set, this will error..."
+        assert pypandoc.ensure_pandoc_maximal_version(999) == True
+        assert pypandoc.ensure_pandoc_maximal_version(999,999) == True
+        assert pypandoc.ensure_pandoc_maximal_version(1,1) == False
+
     def test_converts_valid_format(self):
         self.assertEqualExceptForNewlineEnd(pypandoc.convert_text("ok", format='md', to='rest'), 'ok')
 

@@ -490,7 +490,38 @@ def get_pandoc_path():
     _ensure_pandoc_path()
     return __pandoc_path
 
+def ensure_pandoc_minimal_version(major, minor=0):
+    """Check if the used pandoc fulfill a minimal version requirement.
 
+    :param bool major: pandoc major version, such as 1 or 2.
+
+    :param bool minor: pandoc minor version, such as 10 or 11.
+
+    :returns: True if the installed pandoc is above the minimal version, False otherwise.
+    :rtype: bool
+    """
+    version = [int(x) for x in get_pandoc_version().split(".")]
+    if version[0] > int(major): # if we have pandoc2 but major is request to be 1
+        return True
+    return version[0] >= int(major) and version[1] >= int(minor)
+    
+
+
+def ensure_pandoc_maximal_version(major, minor=9999):
+    """Check if the used pandoc fulfill a maximal version requirement.
+
+    :param bool major: pandoc major version, such as 1 or 2.
+
+    :param bool minor: pandoc minor version, such as 10 or 11.
+
+    :returns: True if the installed pandoc is below the maximal version, False otherwise.
+    :rtype: bool
+    """
+    version = [int(x) for x in get_pandoc_version().split(".")]
+    if version[0] < int(major): # if we have pandoc1 but major is request to be 2
+        return True
+    return version[0] <= int(major) and version[1] <= int(minor)
+    
 def _ensure_pandoc_path(quiet=False):
     global __pandoc_path
 
