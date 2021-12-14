@@ -50,7 +50,7 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
-    msg = ("Due to possible ambiguity, 'convert()' is deprecated. "
+    msg = ("Due to possible ambiguity, 'convert()' is deprecated and will be removed in pypandoc 1.8. "
            "Use 'convert_file()'  or 'convert_text()'.")
     warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
@@ -69,7 +69,7 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
 
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True):
+                 outputfile=None, filters=None, verify_format=True, sandbox=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -99,11 +99,11 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     source = _as_unicode(source, encoding)
     return _convert_input(source, format, 'string', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format)
+                          verify_format=verify_format, sandbox=sandbox)
 
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True):
+                 outputfile=None, filters=None, verify_format=True, sandbox=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -137,7 +137,7 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     format = _identify_format_from_path(source_file, format)
     return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format)
+                          verify_format=verify_format, sandbox=sandbox)
 
 
 def _identify_path(source):
@@ -256,7 +256,7 @@ def _validate_formats(format, to, outputfile):
 
 
 def _convert_input(source, format, input_type, to, extra_args=(), outputfile=None,
-                   filters=None, verify_format=True):
+                   filters=None, verify_format=True, sandbox=True):
     _ensure_pandoc_path()
 
     if verify_format:
@@ -275,6 +275,9 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
 
     if outputfile:
         args.append("--output=" + outputfile)
+
+    if sandbox:
+        args.append("--sandbox")
 
     args.extend(extra_args)
 
