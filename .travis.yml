@@ -1,19 +1,13 @@
 language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "3.10.0"
+os: linux
+dist: bionic
 sudo: false
-matrix:
-  include:
-    - python: 3.8
-      env: TOXENV=py38
-    - python: 3.7
-      env: TOXENV=py37
-    - python: 3.6
-      env: TOXENV=py36
-    - python: 3.5
-      env: TOXENV=py35
-    - python: 3.4
-      env: TOXENV=py34
-  allow_failures:
-    - env: TOXENV=flake8
 addons:
   apt:
     packages:
@@ -26,14 +20,15 @@ addons:
       - texlive-latex-recommended
       - lmodern
 install:
-  - travis_retry python -m pip install tox
+  - travis_retry python -m pip install poetry
+  - travis_retry poetry install
   # only download pandoc, the tests should work without a install of pypandoc
-  - python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+  - poetry run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
   - export PATH=~/bin:$PATH
 
 script:
   - ~/bin/pandoc -v
-  - tox
+  - poetry run python tests.py
 
 deploy:
   provider: pypi
@@ -43,4 +38,3 @@ deploy:
   on:
     tags: true
     repo: NicklasTegner/pypandoc
-    condition: $TOXENV == py37
