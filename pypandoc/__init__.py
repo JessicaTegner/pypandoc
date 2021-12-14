@@ -92,7 +92,7 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     :param bool verify_format: Verify from and to format before converting. Should only be set False when confident of the formats and performance is an issue.
             (Default value = True)
 
-    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option.
+    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = True)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
@@ -134,7 +134,7 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     :param bool verify_format: Verify from and to format before converting. Should only be set False when confident of the formats and performance is an issue.
             (Default value = True)
 
-    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option.
+    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = True)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
@@ -289,7 +289,8 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
         args.append("--output=" + outputfile)
 
     if sandbox:
-        args.append("--sandbox")
+        if ensure_pandoc_minimal_version(2,15): # sandbox was introduced in pandoc 2.15, so only add if we are using 2.15 or above.
+            args.append("--sandbox")
 
     args.extend(extra_args)
 
