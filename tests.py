@@ -264,7 +264,7 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_with_empty_filter(self):
         # we just want to get a temp file name, where we can write to
         filters = ''
-        written = pypandoc.convert_file('./filter_test.md', to='html', format='md',
+        written = pypandoc.convert_file('./test_files/filter_test.md', to='html', format='md',
                                    outputfile=None, filters=filters)
         import re as re
         # This should not use the pandoc-citeproc module and will not find the

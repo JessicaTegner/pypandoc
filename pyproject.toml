@@ -42,6 +42,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^2.7 || ^3.6"
+wheel = "^0.25.0"
 
 [tool.poetry.dev-dependencies]
 
