@@ -3,9 +3,6 @@ environment:
   # /E:ON and /V:ON options are not enabled in the batch script intepreter
   # See: http://stackoverflow.com/a/13751649/163740
   CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
-  TWINE_PASSWORD:
-    secure: XofI4w4Vdjc9gc4j0gAa6keiUlj5Y7mLlg7Jd9fOyXlVyTxfMq+iFyIRsQAkYF3HK7TOsAOhuH8LVbIweGb7WsUA+n6HygDGyMABFN+ZB7vmS04FuzWc9KB+tnwBPFnkEZU+abrfSgyqu0Tdx5tAAH17BUTflR0im0LCvH42AaH7GJinxkrma7iL+F50NS+bwXsBUvSow34wdUJ0O0ARHKKyiQnRIrN7TBVK7G/hhMTWPQ12SSOq87uxGXVlhvKXL+Y3A0PTFmyaFawJ7FmvyA==
-  TWINE_USERNAME: __token__
 
   matrix:
 
@@ -89,22 +86,3 @@ test_script:
   # Run the project tests
   - "poetry run python --version"
   - "poetry run python tests.py"
-
-after_test:
-  # If tests are successful, create binary packages for the project.
-  - "python --version"
-  - "python setup.py bdist_wheel"
-  - ps: "ls dist"
-
-artifacts:
-  # Archive the generated packages in the ci.appveyor.com build report.
-  - path: dist\*
-
-on_success:
-  - ps: >-
-      if ($env:APPVEYOR_REPO_TAG -eq "true") {
-        # we produce version independent packages, so once per "big" version is enough
-        if ($env:PYTHON_VERSION -eq "3.7.x" -or $env:PYTHON_VERSION -eq "2.7.x") {
-          twine upload --verbose dist/*.whl
-        }
-      }

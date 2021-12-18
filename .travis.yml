@@ -29,12 +29,3 @@ install:
 script:
   - ~/bin/pandoc -v
   - poetry run python tests.py
-
-deploy:
-  provider: pypi
-  distributions: sdist
-  user: __token__
-  password: $PYPI_TOKEN
-  on:
-    tags: true
-    repo: NicklasTegner/pypandoc
