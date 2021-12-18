@@ -79,7 +79,7 @@ install:
 
 build_script:
   - "poetry run python --version"
-  - "poetry run python setup.py download_pandoc"
+  - "poetry run python -c \"from pypandoc import download_pandoc as dp; dp();\""
   - "poetry run pypandoc\\files\\pandoc --version"
 
 test_script:
