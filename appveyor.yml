@@ -75,12 +75,11 @@ install:
   - "python -m pip install --disable-pip-version-check --user --upgrade pip"
   - "python -m pip install twine wheel"
   - "python -m pip install poetry"
-  - "poetry install"
+  - "python -m poetry install"
 
 build_script:
   - "poetry run python --version"
   - "poetry run python -c \"from pypandoc import download_pandoc as dp; dp();\""
-  - "poetry run pypandoc\\files\\pandoc --version"
 
 test_script:
   # Run the project tests
