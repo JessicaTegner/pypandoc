@@ -295,11 +295,13 @@ class TestPypandoc(unittest.TestCase):
                          to='docx',
                          format='md',
                          outputfile=file_name) as output:
+                output = output.replace("'missing.png'",
+                                        "missing.png")
                 expected = (u'[WARNING] Could not fetch resource '
-                            u"'missing.png': PandocResourceNotFound "
+                            u'missing.png: PandocResourceNotFound '
                             u'"missing.png"\r\n'
                             u'[WARNING] Could not fetch resource '
-                            u"'missing.png': PandocResourceNotFound "
+                            u'missing.png: PandocResourceNotFound '
                             u'"missing.png"\r\n\n')
                 self.assertEquals(expected, output)
 
