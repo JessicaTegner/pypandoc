@@ -4,6 +4,7 @@
 import contextlib
 import io
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -295,14 +296,15 @@ class TestPypandoc(unittest.TestCase):
                          to='docx',
                          format='md',
                          outputfile=file_name) as output:
+                output = re.sub(r'\r', '', output)
                 output = output.replace("'missing.png'",
                                         "missing.png")
                 expected = (u'[WARNING] Could not fetch resource '
                             u'missing.png: PandocResourceNotFound '
-                            u'"missing.png"\r\n'
+                            u'"missing.png"\n'
                             u'[WARNING] Could not fetch resource '
                             u'missing.png: PandocResourceNotFound '
-                            u'"missing.png"\r\n\n')
+                            u'"missing.png"\n\n')
                 self.assertEquals(expected, output)
 
 
