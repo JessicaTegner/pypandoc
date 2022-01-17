@@ -16,6 +16,17 @@ from pypandoc.py3compat import path2url, string_types, unicode_type
 
 
 @contextlib.contextmanager
+def capture(command, *args, **kwargs):
+  err, sys.stderr = sys.stderr, io.StringIO()
+  try:
+    command(*args, **kwargs)
+    sys.stderr.seek(0)
+    yield sys.stderr.read()
+  finally:
+    sys.stderr = err
+
+
+@contextlib.contextmanager
 def closed_tempfile(suffix, text=None, dir_name=None):
     file_name = None
     try:
@@ -273,6 +284,38 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(found is None)
         found = re.search(r'10.1038', written)
         self.assertTrue(found is None)
+
+
+    def test_conversion_stderr(self):
+        with closed_tempfile('.docx') as file_name:
+            text = ('![Mock](missing.png)\n'
+                    '![Mock](missing.png)\n')
+            with capture(pypandoc.convert_text,
+                         text,
+                         to='docx',
+                         format='md',
+                         outputfile=file_name) as output:
+                expected = (u'[WARNING] Could not fetch resource '
+                            u"'missing.png': PandocResourceNotFound "
+                            u'"missing.png"\r\n'
+                            u'[WARNING] Could not fetch resource '
+                            u"'missing.png': PandocResourceNotFound "
+                            u'"missing.png"\r\n\n')
+                self.assertEquals(expected, output)
+
+
+    def test_conversion_stderr_quiet(self):
+        with closed_tempfile('.docx') as file_name:
+            text = ('![Mock](missing.png)\n'
+                    '![Mock](missing.png)\n')
+            with capture(pypandoc.convert_text,
+                         text,
+                         to='docx',
+                         format='md',
+                         outputfile=file_name,
+                         quiet=True) as output:
+                self.assertFalse(output)
+
 
     def test_conversion_error(self):
         # pandoc dies on wrong commandline arguments

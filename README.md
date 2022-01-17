@@ -191,6 +191,13 @@ output = pypandoc.convert_file('demo.md', 'pdf', outputfile='demo.pdf',
 it won't work. This gotcha has to do with the way
 [`subprocess.Popen`](https://docs.python.org/2/library/subprocess.html#subprocess.Popen) works.
 
+## Pandoc Logging Messages
+
+Pandoc may pass logging messages on the standard error (stderr) stream such
+as warnings or verbose output (see [pandoc issue #6628](https://github.com/jgm/pandoc/issues/6628)).
+To suppress these messages, pass the argument `quiet=True` to `convert_file` or
+`convert_text`.
+
 ## Getting Pandoc Version
 
 As it can be useful sometimes to check what pandoc version is available at your system or which

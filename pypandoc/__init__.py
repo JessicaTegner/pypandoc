@@ -21,7 +21,7 @@ __all__ = ['convert', 'convert_file', 'convert_text',
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
-            outputfile=None, filters=None):
+            outputfile=None, filters=None, quiet=False):
     """Converts given `source` from `format` to `to` (deprecated).
 
     :param str source: Unicode string or bytes or a file path (see encoding)
@@ -42,6 +42,8 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             returned if None (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
+
+    :param bool quiet: suppress pandoc output on stderr (Default value = False)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
@@ -65,11 +67,12 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             raise RuntimeError("Format missing, but need one (identified source as text as no "
                                "file with that name was found).")
     return _convert_input(source, format, input_type, to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters)
+                          outputfile=outputfile, filters=filters, quiet=quiet)
 
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True, sandbox=True):
+                 outputfile=None, filters=None, verify_format=True,
+                 sandbox=True, quiet=False):
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -95,6 +98,8 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = True)
 
+    :param bool quiet: suppress pandoc output on stderr (Default value = False)
+
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
@@ -105,11 +110,13 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     source = _as_unicode(source, encoding)
     return _convert_input(source, format, 'string', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox)
+                          verify_format=verify_format, sandbox=sandbox,
+                          quiet=quiet)
 
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True, sandbox=True):
+                 outputfile=None, filters=None, verify_format=True,
+                 sandbox=True, quiet=False):
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -137,6 +144,8 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = True)
 
+    :param bool quiet: suppress pandoc output on stderr (Default value = False)
+
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
@@ -149,7 +158,8 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     format = _identify_format_from_path(source_file, format)
     return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox)
+                          verify_format=verify_format, sandbox=sandbox,
+                          quiet=quiet)
 
 
 def _identify_path(source):
@@ -268,7 +278,8 @@ def _validate_formats(format, to, outputfile):
 
 
 def _convert_input(source, format, input_type, to, extra_args=(), outputfile=None,
-                   filters=None, verify_format=True, sandbox=True):
+                   filters=None, verify_format=True, sandbox=True,
+                   quiet=False):
     _ensure_pandoc_path()
 
     if verify_format:
@@ -351,6 +362,10 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
         raise RuntimeError(
             'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
+    
+    # if there is output on stderr print it unless in quiet mode
+    if stderr and not quiet:
+        print(stderr, file=sys.stderr)
 
     # if there is an outputfile, then stdout is likely empty!
     return stdout
@@ -573,7 +588,7 @@ def _ensure_pandoc_path(quiet=False):
                     # path exist but is not useable -> not executable?
                     if not quiet:
                         print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
-                        print(e, file=sys.stderr)
+                        
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
