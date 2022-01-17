@@ -588,7 +588,7 @@ def _ensure_pandoc_path(quiet=False):
                     # path exist but is not useable -> not executable?
                     if not quiet:
                         print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
-                        
+                        print(e, file=sys.stderr)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
