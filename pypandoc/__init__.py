@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, with_statement
 
+import logging
 import os
 import re
 import subprocess
@@ -19,9 +20,12 @@ __all__ = ['convert', 'convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
            'download_pandoc']
 
+# Set up the module level logger
+logger = logging.getLogger(__name__)
+
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
-            outputfile=None, filters=None, quiet=False):
+            outputfile=None, filters=None):
     """Converts given `source` from `format` to `to` (deprecated).
 
     :param str source: Unicode string or bytes or a file path (see encoding)
@@ -42,8 +46,6 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             returned if None (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
-
-    :param bool quiet: suppress pandoc output on stderr (Default value = False)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
@@ -67,12 +69,12 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             raise RuntimeError("Format missing, but need one (identified source as text as no "
                                "file with that name was found).")
     return _convert_input(source, format, input_type, to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters, quiet=quiet)
+                          outputfile=outputfile, filters=filters)
 
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None, verify_format=True,
-                 sandbox=True, quiet=False):
+                 sandbox=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -98,8 +100,6 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = True)
 
-    :param bool quiet: suppress pandoc output on stderr (Default value = False)
-
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
@@ -110,13 +110,12 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     source = _as_unicode(source, encoding)
     return _convert_input(source, format, 'string', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          quiet=quiet)
+                          verify_format=verify_format, sandbox=sandbox)
 
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None, verify_format=True,
-                 sandbox=True, quiet=False):
+                 sandbox=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -144,8 +143,6 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = True)
 
-    :param bool quiet: suppress pandoc output on stderr (Default value = False)
-
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
@@ -158,8 +155,7 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     format = _identify_format_from_path(source_file, format)
     return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          quiet=quiet)
+                          verify_format=verify_format, sandbox=sandbox)
 
 
 def _identify_path(source):
@@ -277,9 +273,11 @@ def _validate_formats(format, to, outputfile):
     return format, to
 
 
-def _convert_input(source, format, input_type, to, extra_args=(), outputfile=None,
-                   filters=None, verify_format=True, sandbox=True,
-                   quiet=False):
+def _convert_input(source, format, input_type, to, extra_args=(),
+                   outputfile=None, filters=None, verify_format=True,
+                   sandbox=True):
+    
+    _check_log_handler()
     _ensure_pandoc_path()
 
     if verify_format:
@@ -363,12 +361,47 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
             'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
     
-    # if there is output on stderr print it unless in quiet mode
-    if stderr and not quiet:
-        print(stderr, file=sys.stderr)
+    # if there is output on stderr, process it and send to logger
+    if stderr:
+        for level, msg in _classify_pandoc_logging(stderr):
+            logger.log(level, msg)
 
     # if there is an outputfile, then stdout is likely empty!
     return stdout
+
+
+def _classify_pandoc_logging(raw):
+    # Split the output from stderr and yeild the logging level and message
+    # Assumes that the first and each subsequent log message is formatted like
+    # "[LEVEL] message"
+    
+    level_map = {"CRITICAL": 50,
+                 "ERROR": 40,
+                 "WARNING": 30,
+                 "INFO": 20,
+                 "DEBUG": 10,
+                 "NOTSET": 0}
+    
+    msgs = raw.split("\n")
+    first = msgs.pop(0)
+    
+    search = re.search(r"\[(.*?)\]", first)
+    level = first[search.start(1):search.end(1)]
+    log_msgs = [first.replace(f'[{level}] ', '')]
+    
+    for msg in msgs:
+        
+        search = re.search(r"\[(.*?)\]", msg)
+        
+        if search is not None:
+            yield level_map[level], "\n".join(log_msgs)
+            level = msg[search.start(1):search.end(1)]
+            log_msgs = [msg.replace(f'[{level}] ', '')]
+            continue
+        
+        log_msgs.append(msg)
+    
+    yield level_map[level], "\n".join(log_msgs)
 
 
 def _get_base_format(format):
@@ -537,10 +570,13 @@ def ensure_pandoc_maximal_version(major, minor=9999):
     if version[0] < int(major): # if we have pandoc1 but major is request to be 2
         return True
     return version[0] <= int(major) and version[1] <= int(minor)
-    
+
+
 def _ensure_pandoc_path(quiet=False):
     global __pandoc_path
-
+    
+    _check_log_handler()
+    
     if __pandoc_path is None:
         included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
@@ -582,13 +618,14 @@ def _ensure_pandoc_path(quiet=False):
             # print("Trying: %s" % path)
             try:
                 version_string = _get_pandoc_version(path)
-            except Exception as e:
+            except Exception:
                 # we can't use that path...
                 if os.path.exists(path):
                     # path exist but is not useable -> not executable?
                     if not quiet:
-                        print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
-                        print(e, file=sys.stderr)
+                        log_msg = ("Found {}, but not using it because of an "
+                                   "error:".format(path))
+                        logging.exception(log_msg)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
@@ -604,34 +641,54 @@ def _ensure_pandoc_path(quiet=False):
             # Only print hints if requested
             if not quiet:
                 if os.path.exists('/usr/local/bin/brew'):
-                    sys.stderr.write(textwrap.dedent("""\
+                    logger.info(textwrap.dedent("""\
                         Maybe try:
 
                             brew install pandoc
                     """))
                 elif os.path.exists('/usr/bin/apt-get'):
-                    sys.stderr.write(textwrap.dedent("""\
+                    logger.info(textwrap.dedent("""\
                         Maybe try:
 
                             sudo apt-get install pandoc
                     """))
                 elif os.path.exists('/usr/bin/yum'):
-                    sys.stderr.write(textwrap.dedent("""\
+                    logger.info(textwrap.dedent("""\
                         Maybe try:
 
                         sudo yum install pandoc
                     """))
-                sys.stderr.write(textwrap.dedent("""\
+                logger.info(textwrap.dedent("""\
                     See http://johnmacfarlane.net/pandoc/installing.html
                     for installation options
                 """))
-                sys.stderr.write(textwrap.dedent("""\
+                logger.info(textwrap.dedent("""\
                     ---------------------------------------------------------------
 
                 """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
                           "to your PATH or or call pypandoc.download_pandoc(...) or\n"
                           "install pypandoc wheels with included pandoc.")
+
+
+def _check_log_handler():
+    
+    # If logger has a handler do nothing
+    if logger.handlers: return
+    
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    logging.root.setLevel(logging.DEBUG)
+    
+    # create formatter
+    formatter = logging.Formatter('[%(levelname)s] %(message)s')
+    
+    # add formatter to ch
+    ch.setFormatter(formatter)
+    
+    # add ch to logger
+    logger.addHandler(ch)
 
 
 def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):

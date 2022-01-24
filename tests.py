@@ -3,6 +3,7 @@
 
 import contextlib
 import io
+import logging
 import os
 import re
 import shutil
@@ -287,7 +288,26 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(found is None)
 
 
+    def test_classify_pandoc_logging(self):
+        
+        test = ("[WARNING] This is some message on\ntwo lines\n"
+                "[ERROR] This is a second message.")
+        
+        expected_levels = [30, 40]
+        expected_msgs = ["This is some message on\ntwo lines",
+                         "This is a second message."]
+        
+        for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
+            self.assertEqual(expected_levels[i], l)
+            self.assertEqual(expected_msgs[i], m)
+
+
     def test_conversion_stderr(self):
+        
+        # Clear logger handlers
+        logger = logging.getLogger("pypandoc")
+        logger.handlers = []
+        
         with closed_tempfile('.docx') as file_name:
             text = ('![Mock](missing.png)\n'
                     '![Mock](missing.png)\n')
@@ -305,10 +325,15 @@ class TestPypandoc(unittest.TestCase):
                             u'[WARNING] Could not fetch resource '
                             u'missing.png: PandocResourceNotFound '
                             u'"missing.png"\n\n')
-                self.assertEquals(expected, output)
+                self.assertEqual(expected, output)
 
 
-    def test_conversion_stderr_quiet(self):
+    def test_conversion_stderr_nullhandler(self):
+        
+        # Replace any logging handlers with a null handler
+        logger = logging.getLogger("pypandoc")
+        logger.handlers = [logging.NullHandler()]
+        
         with closed_tempfile('.docx') as file_name:
             text = ('![Mock](missing.png)\n'
                     '![Mock](missing.png)\n')
@@ -316,8 +341,7 @@ class TestPypandoc(unittest.TestCase):
                          text,
                          to='docx',
                          format='md',
-                         outputfile=file_name,
-                         quiet=True) as output:
+                         outputfile=file_name) as output:
                 self.assertFalse(output)
 
 
