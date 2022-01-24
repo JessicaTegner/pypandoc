@@ -387,7 +387,13 @@ def _classify_pandoc_logging(raw):
     first = msgs.pop(0)
     
     search = re.search(r"\[(.*?)\]", first)
-    level = first[search.start(1):search.end(1)]
+    
+    try:
+        level = first[search.start(1):search.end(1)]
+    except AttributeError:
+        msg = "Could not determine level from msg: {}".format(first)
+        raise RuntimeError(msg)
+    
     log_msgs = [first.replace(f'[{level}] ', '')]
     
     for msg in msgs:
