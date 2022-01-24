@@ -371,7 +371,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     return stdout
 
 
-def _classify_pandoc_logging(raw):
+def _classify_pandoc_logging(raw, default_level="WARNING"):
     # Split the output from stderr and yeild the logging level and message
     # Assumes that the first and each subsequent log message is formatted like
     # "[LEVEL] message"
@@ -388,11 +388,11 @@ def _classify_pandoc_logging(raw):
     
     search = re.search(r"\[(.*?)\]", first)
     
-    try:
+    # Use the default if the first message doesn't have a level
+    if search is None:
+        level = default_level
+    else:
         level = first[search.start(1):search.end(1)]
-    except AttributeError:
-        msg = "Could not determine level from msg: {}".format(first)
-        raise RuntimeError(msg)
     
     log_msgs = [first.replace(f'[{level}] ', '')]
     
