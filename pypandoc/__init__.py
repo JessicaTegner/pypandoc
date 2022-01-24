@@ -10,6 +10,7 @@ import tempfile
 import textwrap
 import warnings
 
+from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
@@ -572,7 +573,7 @@ def ensure_pandoc_maximal_version(major, minor=9999):
     return version[0] <= int(major) and version[1] <= int(minor)
 
 
-def _ensure_pandoc_path(quiet=False):
+def _ensure_pandoc_path():
     global __pandoc_path
     
     _check_log_handler()
@@ -622,10 +623,9 @@ def _ensure_pandoc_path(quiet=False):
                 # we can't use that path...
                 if os.path.exists(path):
                     # path exist but is not useable -> not executable?
-                    if not quiet:
-                        log_msg = ("Found {}, but not using it because of an "
-                                   "error:".format(path))
-                        logging.exception(log_msg)
+                    log_msg = ("Found {}, but not using it because of an "
+                               "error:".format(path))
+                    logging.exception(log_msg)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
@@ -639,59 +639,41 @@ def _ensure_pandoc_path(quiet=False):
 
         if __pandoc_path is None:
             # Only print hints if requested
-            if not quiet:
-                if os.path.exists('/usr/local/bin/brew'):
-                    logger.info(textwrap.dedent("""\
-                        Maybe try:
-
-                            brew install pandoc
-                    """))
-                elif os.path.exists('/usr/bin/apt-get'):
-                    logger.info(textwrap.dedent("""\
-                        Maybe try:
-
-                            sudo apt-get install pandoc
-                    """))
-                elif os.path.exists('/usr/bin/yum'):
-                    logger.info(textwrap.dedent("""\
-                        Maybe try:
-
-                        sudo yum install pandoc
-                    """))
+            if os.path.exists('/usr/local/bin/brew'):
                 logger.info(textwrap.dedent("""\
-                    See http://johnmacfarlane.net/pandoc/installing.html
-                    for installation options
-                """))
-                logger.info(textwrap.dedent("""\
-                    ---------------------------------------------------------------
+                    Maybe try:
 
+                        brew install pandoc
                 """))
+            elif os.path.exists('/usr/bin/apt-get'):
+                logger.info(textwrap.dedent("""\
+                    Maybe try:
+
+                        sudo apt-get install pandoc
+                """))
+            elif os.path.exists('/usr/bin/yum'):
+                logger.info(textwrap.dedent("""\
+                    Maybe try:
+
+                    sudo yum install pandoc
+                """))
+            logger.info(textwrap.dedent("""\
+                See http://johnmacfarlane.net/pandoc/installing.html
+                for installation options
+            """))
+            logger.info(textwrap.dedent("""\
+                ---------------------------------------------------------------
+
+            """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
                           "to your PATH or or call pypandoc.download_pandoc(...) or\n"
                           "install pypandoc wheels with included pandoc.")
 
 
-def _check_log_handler():
-    
-    # If logger has a handler do nothing
-    if logger.handlers: return
-    
-    # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    logging.root.setLevel(logging.DEBUG)
-    
-    # create formatter
-    formatter = logging.Formatter('[%(levelname)s] %(message)s')
-    
-    # add formatter to ch
-    ch.setFormatter(formatter)
-    
-    # add ch to logger
-    logger.addHandler(ch)
-
-
-def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
+def ensure_pandoc_installed(url=None, 
+                            targetfolder=None,
+                            version="latest",
+                            delete_installer=False):
     """Try to install pandoc if it isn't installed.
 
     Parameters are passed to download_pandoc()
@@ -703,14 +685,16 @@ def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet
         os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + os.path.abspath(os.path.expanduser(targetfolder))
 
     try:
-        # Perform the test quietly if asked
-        _ensure_pandoc_path(quiet=quiet)
+        _ensure_pandoc_path()
 
     except OSError:
-        download_pandoc(url=url, targetfolder=targetfolder, version=version, quiet=quiet, delete_installer=delete_installer)
+        download_pandoc(url=url,
+                        targetfolder=targetfolder,
+                        version=version,
+                        delete_installer=delete_installer)
 
         # Show errors in case of secondary failure
-        _ensure_pandoc_path(quiet=False)
+        _ensure_pandoc_path()
 
 
 # -----------------------------------------------------------------------------

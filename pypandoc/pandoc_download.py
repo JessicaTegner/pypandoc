@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 import os.path
 import platform
@@ -13,6 +14,10 @@ try:
     from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
+
+from .handler import _check_log_handler
+
+logger = logging.getLogger(__name__.split('.')[0])
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
@@ -64,12 +69,12 @@ def _get_pandoc_urls(version="latest"):
 def _make_executable(path):
     mode = os.stat(path).st_mode
     mode |= (mode & 0o444) >> 2  # copy R bits to X
-    print("* Making %s executeable..." % (path))
+    logger.info("Making %s executeable..." % (path))
     os.chmod(path, mode)
 
 
 def _handle_linux(filename, targetfolder):
-    print("* Unpacking %s to tempfolder..." % (filename))
+    logger.info("Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
     cur_wd = os.getcwd()
@@ -87,21 +92,21 @@ def _handle_linux(filename, targetfolder):
         exe = "pandoc"
         src = os.path.join(tempfolder, "usr", "bin", exe)
         dst = os.path.join(targetfolder, exe)
-        print("* Copying %s to %s ..." % (exe, targetfolder))
+        logger.info("Copying %s to %s ..." % (exe, targetfolder))
         shutil.copyfile(src, dst)
         _make_executable(dst)
         exe = "pandoc-citeproc"
         src = os.path.join(tempfolder, "usr", "bin", exe)
         dst = os.path.join(targetfolder, exe)
-        print("* Copying %s to %s ..." % (exe, targetfolder))
+        logger.info("Copying %s to %s ..." % (exe, targetfolder))
         try:
             shutil.copyfile(src, dst)
             _make_executable(dst)
         except FileNotFoundError:
-            print("Didn't copy pandoc-citeproc")
+            logger.exception("Didn't copy pandoc-citeproc")
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
         dst = os.path.join(targetfolder, "copyright.pandoc")
-        print("* Copying copyright to %s ..." % (targetfolder))
+        logger.info("Copying copyright to %s ..." % (targetfolder))
         shutil.copyfile(src, dst)
     finally:
         os.chdir(cur_wd)
@@ -109,7 +114,7 @@ def _handle_linux(filename, targetfolder):
 
 
 def _handle_darwin(filename, targetfolder):
-    print("* Unpacking %s to tempfolder..." % (filename))
+    logger.info("Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
 
@@ -128,27 +133,27 @@ def _handle_darwin(filename, targetfolder):
     exe = "pandoc"
     src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
     dst = os.path.join(targetfolder, exe)
-    print("* Copying %s to %s ..." % (exe, targetfolder))
+    logger.info("Copying %s to %s ..." % (exe, targetfolder))
     shutil.copyfile(src, dst)
     _make_executable(dst)
 
     exe = "pandoc-citeproc"
     src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
     dst = os.path.join(targetfolder, exe)
-    print("* Copying %s to %s ..." % (exe, targetfolder))
+    logger.info("Copying %s to %s ..." % (exe, targetfolder))
     try:
         shutil.copyfile(src, dst)
         _make_executable(dst)
     except FileNotFoundError:
-        print("Didn't copy pandoc-citeproc")
+        logger.exception("Didn't copy pandoc-citeproc")
 
     # remove temporary dir
     shutil.rmtree(tempfolder)
-    print("* Done.")
+    logger.info("Done.")
 
 
 def _handle_win32(filename, targetfolder):
-    print("* Unpacking %s to tempfolder..." % (filename))
+    logger.info("Unpacking %s to tempfolder..." % (filename))
 
     tempfolder = tempfile.mkdtemp()
 
@@ -161,30 +166,34 @@ def _handle_win32(filename, targetfolder):
     exe = "pandoc.exe"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    print("* Copying %s to %s ..." % (exe, targetfolder))
+    logger.info("Copying %s to %s ..." % (exe, targetfolder))
     shutil.copyfile(src, dst)
 
     exe = "pandoc-citeproc.exe"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    print("* Copying %s to %s ..." % (exe, targetfolder))
+    logger.info("Copying %s to %s ..." % (exe, targetfolder))
     try:
         shutil.copyfile(src, dst)
     except FileNotFoundError:
-        print("Didn't copy pandoc-citeproc.exe")
+        logger.exception("Didn't copy pandoc-citeproc.exe")
 
     exe = "COPYRIGHT.txt"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    print("* Copying %s to %s ..." % (exe, targetfolder))
+    logger.info("Copying %s to %s ..." % (exe, targetfolder))
     shutil.copyfile(src, dst)
 
     # remove temporary dir
     shutil.rmtree(tempfolder)
-    print("* Done.")
+    logger.info("Done.")
 
 
-def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False, download_folder=None):
+def download_pandoc(url=None,
+                    targetfolder=None,
+                    version="latest",
+                    delete_installer=False,
+                    download_folder=None):
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
@@ -202,8 +211,8 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
     :param str download_folder: Directory, where the installer should download files before unpacking
         to the target folder. If no `download_folder` is given, uses the current directory. example: `/tmp/`, `/tmp`
     """
-    if quiet:
-        sys.stdout = open(os.devnull, 'w')
+
+    _check_log_handler()
 
     pf = sys.platform
 
@@ -230,9 +239,9 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
         filename = os.path.join(os.path.expanduser(download_folder), filename)
 
     if os.path.isfile(filename):
-        print("* Using already downloaded file %s" % (filename))
+        logger.info("Using already downloaded file %s" % (filename))
     else:
-        print("* Downloading pandoc from %s ..." % url)
+        logger.info("Downloading pandoc from %s ..." % url)
         # https://stackoverflow.com/questions/30627937/tracebaclk-attributeerroraddinfourl-instance-has-no-attribute-exit
         response = urlopen(url)
         with open(filename, 'wb') as out_file:
@@ -254,5 +263,3 @@ def download_pandoc(url=None, targetfolder=None, version="latest", quiet=False, 
     unpack(filename, targetfolder)
     if delete_installer:
         os.remove(filename)
-    if quiet:
-        sys.stdout = sys.__stdout__
