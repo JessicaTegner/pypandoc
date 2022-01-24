@@ -394,7 +394,7 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     else:
         level = first[search.start(1):search.end(1)]
     
-    log_msgs = [first.replace(f'[{level}] ', '')]
+    log_msgs = [first.replace('[{}] '.format(level), '')]
     
     for msg in msgs:
         
@@ -403,7 +403,7 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
         if search is not None:
             yield level_map[level], "\n".join(log_msgs)
             level = msg[search.start(1):search.end(1)]
-            log_msgs = [msg.replace(f'[{level}] ', '')]
+            log_msgs = [msg.replace('[{}] '.format(level), '')]
             continue
         
         log_msgs.append(msg)
