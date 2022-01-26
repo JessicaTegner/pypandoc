@@ -372,9 +372,9 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
 
 def _classify_pandoc_logging(raw, default_level="WARNING"):
-    # Split the output from stderr and yeild the logging level and message
-    # Assumes that the first and each subsequent log message is formatted like
-    # "[LEVEL] message"
+    # Process raw and yeild the contained logging levels and messages.
+    # Assumes that the messages are formatted like "[LEVEL] message". If the 
+    # first message does not have a level, use the default_level value instead.
     
     level_map = {"CRITICAL": 50,
                  "ERROR": 40,
@@ -679,6 +679,7 @@ def _ensure_pandoc_path():
 def ensure_pandoc_installed(url=None, 
                             targetfolder=None,
                             version="latest",
+                            quiet=None,
                             delete_installer=False):
     """Try to install pandoc if it isn't installed.
 
@@ -686,6 +687,12 @@ def ensure_pandoc_installed(url=None,
 
     :raises OSError: if pandoc cannot be installed
     """
+
+    if quiet is not None:
+        msg = ("The quiet flag in PyPandoc has been deprecated in favour of "
+               "logging. See README.md for more information.")
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
     # Append targetfolder to the PATH environment variable so it is found by subprocesses
     if targetfolder is not None:
         os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + os.path.abspath(os.path.expanduser(targetfolder))

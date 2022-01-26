@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import warnings
 
 try:
     from urllib.request import urlopen
@@ -192,6 +193,7 @@ def _handle_win32(filename, targetfolder):
 def download_pandoc(url=None,
                     targetfolder=None,
                     version="latest",
+                    quiet=None,
                     delete_installer=False,
                     download_folder=None):
     """Download and unpack pandoc
@@ -211,6 +213,11 @@ def download_pandoc(url=None,
     :param str download_folder: Directory, where the installer should download files before unpacking
         to the target folder. If no `download_folder` is given, uses the current directory. example: `/tmp/`, `/tmp`
     """
+
+    if quiet is not None:
+        msg = ("The quiet flag in PyPandoc has been deprecated in favour of "
+               "logging. See README.md for more information.")
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
     _check_log_handler()
 
