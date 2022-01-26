@@ -3,7 +3,9 @@
 
 import contextlib
 import io
+import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -13,6 +15,17 @@ import warnings
 
 import pypandoc
 from pypandoc.py3compat import path2url, string_types, unicode_type
+
+
+@contextlib.contextmanager
+def capture(command, *args, **kwargs):
+  err, sys.stderr = sys.stderr, io.StringIO()
+  try:
+    command(*args, **kwargs)
+    sys.stderr.seek(0)
+    yield sys.stderr.read()
+  finally:
+    sys.stderr = err
 
 
 @contextlib.contextmanager
@@ -273,6 +286,77 @@ class TestPypandoc(unittest.TestCase):
         self.assertTrue(found is None)
         found = re.search(r'10.1038', written)
         self.assertTrue(found is None)
+
+
+    def test_classify_pandoc_logging(self):
+        
+        test = ("[WARNING] This is some message on\ntwo lines\n"
+                "[ERROR] This is a second message.")
+        
+        expected_levels = [30, 40]
+        expected_msgs = ["This is some message on\ntwo lines",
+                         "This is a second message."]
+        
+        for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
+            self.assertEqual(expected_levels[i], l)
+            self.assertEqual(expected_msgs[i], m)
+
+
+    def test_classify_pandoc_logging_default(self):
+        
+        test = ("This is some message on\ntwo lines\n"
+                "[ERROR] This is a second message.")
+        expected_levels = [30, 40]
+        expected_msgs = ["This is some message on\ntwo lines",
+                         "This is a second message."]
+        
+        for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
+            self.assertEqual(expected_levels[i], l)
+            self.assertEqual(expected_msgs[i], m)
+
+
+    def test_conversion_stderr(self):
+        
+        # Clear logger handlers
+        logger = logging.getLogger("pypandoc")
+        logger.handlers = []
+        
+        with closed_tempfile('.docx') as file_name:
+            text = ('![Mock](missing.png)\n'
+                    '![Mock](missing.png)\n')
+            with capture(pypandoc.convert_text,
+                         text,
+                         to='docx',
+                         format='md',
+                         outputfile=file_name) as output:
+                output = re.sub(r'\r', '', output)
+                output = output.replace("'missing.png'",
+                                        "missing.png")
+                expected = (u'[WARNING] Could not fetch resource '
+                            u'missing.png: PandocResourceNotFound '
+                            u'"missing.png"\n'
+                            u'[WARNING] Could not fetch resource '
+                            u'missing.png: PandocResourceNotFound '
+                            u'"missing.png"\n\n')
+                self.assertEqual(expected, output)
+
+
+    def test_conversion_stderr_nullhandler(self):
+        
+        # Replace any logging handlers with a null handler
+        logger = logging.getLogger("pypandoc")
+        logger.handlers = [logging.NullHandler()]
+        
+        with closed_tempfile('.docx') as file_name:
+            text = ('![Mock](missing.png)\n'
+                    '![Mock](missing.png)\n')
+            with capture(pypandoc.convert_text,
+                         text,
+                         to='docx',
+                         format='md',
+                         outputfile=file_name) as output:
+                self.assertFalse(output)
+
 
     def test_conversion_error(self):
         # pandoc dies on wrong commandline arguments

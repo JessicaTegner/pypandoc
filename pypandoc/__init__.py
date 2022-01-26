@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, with_statement
 
+import logging
 import os
 import re
 import subprocess
@@ -9,6 +10,7 @@ import tempfile
 import textwrap
 import warnings
 
+from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
@@ -18,6 +20,9 @@ __license__ = 'MIT'
 __all__ = ['convert', 'convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
            'download_pandoc']
+
+# Set up the module level logger
+logger = logging.getLogger(__name__)
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
@@ -69,7 +74,8 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
 
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True, sandbox=True):
+                 outputfile=None, filters=None, verify_format=True,
+                 sandbox=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -109,7 +115,8 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
 
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True, sandbox=True):
+                 outputfile=None, filters=None, verify_format=True,
+                 sandbox=True):
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -267,8 +274,11 @@ def _validate_formats(format, to, outputfile):
     return format, to
 
 
-def _convert_input(source, format, input_type, to, extra_args=(), outputfile=None,
-                   filters=None, verify_format=True, sandbox=True):
+def _convert_input(source, format, input_type, to, extra_args=(),
+                   outputfile=None, filters=None, verify_format=True,
+                   sandbox=True):
+    
+    _check_log_handler()
     _ensure_pandoc_path()
 
     if verify_format:
@@ -351,9 +361,54 @@ def _convert_input(source, format, input_type, to, extra_args=(), outputfile=Non
         raise RuntimeError(
             'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
+    
+    # if there is output on stderr, process it and send to logger
+    if stderr:
+        for level, msg in _classify_pandoc_logging(stderr):
+            logger.log(level, msg)
 
     # if there is an outputfile, then stdout is likely empty!
     return stdout
+
+
+def _classify_pandoc_logging(raw, default_level="WARNING"):
+    # Process raw and yeild the contained logging levels and messages.
+    # Assumes that the messages are formatted like "[LEVEL] message". If the 
+    # first message does not have a level, use the default_level value instead.
+    
+    level_map = {"CRITICAL": 50,
+                 "ERROR": 40,
+                 "WARNING": 30,
+                 "INFO": 20,
+                 "DEBUG": 10,
+                 "NOTSET": 0}
+    
+    msgs = raw.split("\n")
+    first = msgs.pop(0)
+    
+    search = re.search(r"\[(.*?)\]", first)
+    
+    # Use the default if the first message doesn't have a level
+    if search is None:
+        level = default_level
+    else:
+        level = first[search.start(1):search.end(1)]
+    
+    log_msgs = [first.replace('[{}] '.format(level), '')]
+    
+    for msg in msgs:
+        
+        search = re.search(r"\[(.*?)\]", msg)
+        
+        if search is not None:
+            yield level_map[level], "\n".join(log_msgs)
+            level = msg[search.start(1):search.end(1)]
+            log_msgs = [msg.replace('[{}] '.format(level), '')]
+            continue
+        
+        log_msgs.append(msg)
+    
+    yield level_map[level], "\n".join(log_msgs)
 
 
 def _get_base_format(format):
@@ -522,10 +577,13 @@ def ensure_pandoc_maximal_version(major, minor=9999):
     if version[0] < int(major): # if we have pandoc1 but major is request to be 2
         return True
     return version[0] <= int(major) and version[1] <= int(minor)
-    
-def _ensure_pandoc_path(quiet=False):
-    global __pandoc_path
 
+
+def _ensure_pandoc_path():
+    global __pandoc_path
+    
+    _check_log_handler()
+    
     if __pandoc_path is None:
         included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
@@ -567,13 +625,13 @@ def _ensure_pandoc_path(quiet=False):
             # print("Trying: %s" % path)
             try:
                 version_string = _get_pandoc_version(path)
-            except Exception as e:
+            except Exception:
                 # we can't use that path...
                 if os.path.exists(path):
                     # path exist but is not useable -> not executable?
-                    if not quiet:
-                        print("Found %s, but not using it because of an error:" % (path), file=sys.stderr)
-                        print(e, file=sys.stderr)
+                    log_msg = ("Found {}, but not using it because of an "
+                               "error:".format(path))
+                    logging.exception(log_msg)
                 continue
             version = [int(x) for x in version_string.split(".")]
             while len(version) < len(curr_version):
@@ -587,58 +645,69 @@ def _ensure_pandoc_path(quiet=False):
 
         if __pandoc_path is None:
             # Only print hints if requested
-            if not quiet:
-                if os.path.exists('/usr/local/bin/brew'):
-                    sys.stderr.write(textwrap.dedent("""\
-                        Maybe try:
+            if os.path.exists('/usr/local/bin/brew'):
+                logger.info(textwrap.dedent("""\
+                    Maybe try:
 
-                            brew install pandoc
-                    """))
-                elif os.path.exists('/usr/bin/apt-get'):
-                    sys.stderr.write(textwrap.dedent("""\
-                        Maybe try:
-
-                            sudo apt-get install pandoc
-                    """))
-                elif os.path.exists('/usr/bin/yum'):
-                    sys.stderr.write(textwrap.dedent("""\
-                        Maybe try:
-
-                        sudo yum install pandoc
-                    """))
-                sys.stderr.write(textwrap.dedent("""\
-                    See http://johnmacfarlane.net/pandoc/installing.html
-                    for installation options
+                        brew install pandoc
                 """))
-                sys.stderr.write(textwrap.dedent("""\
-                    ---------------------------------------------------------------
+            elif os.path.exists('/usr/bin/apt-get'):
+                logger.info(textwrap.dedent("""\
+                    Maybe try:
 
+                        sudo apt-get install pandoc
                 """))
+            elif os.path.exists('/usr/bin/yum'):
+                logger.info(textwrap.dedent("""\
+                    Maybe try:
+
+                    sudo yum install pandoc
+                """))
+            logger.info(textwrap.dedent("""\
+                See http://johnmacfarlane.net/pandoc/installing.html
+                for installation options
+            """))
+            logger.info(textwrap.dedent("""\
+                ---------------------------------------------------------------
+
+            """))
             raise OSError("No pandoc was found: either install pandoc and add it\n"
                           "to your PATH or or call pypandoc.download_pandoc(...) or\n"
                           "install pypandoc wheels with included pandoc.")
 
 
-def ensure_pandoc_installed(url=None, targetfolder=None, version="latest", quiet=False, delete_installer=False):
+def ensure_pandoc_installed(url=None, 
+                            targetfolder=None,
+                            version="latest",
+                            quiet=None,
+                            delete_installer=False):
     """Try to install pandoc if it isn't installed.
 
     Parameters are passed to download_pandoc()
 
     :raises OSError: if pandoc cannot be installed
     """
+
+    if quiet is not None:
+        msg = ("The quiet flag in PyPandoc has been deprecated in favour of "
+               "logging. See README.md for more information.")
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
     # Append targetfolder to the PATH environment variable so it is found by subprocesses
     if targetfolder is not None:
         os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + os.path.abspath(os.path.expanduser(targetfolder))
 
     try:
-        # Perform the test quietly if asked
-        _ensure_pandoc_path(quiet=quiet)
+        _ensure_pandoc_path()
 
     except OSError:
-        download_pandoc(url=url, targetfolder=targetfolder, version=version, quiet=quiet, delete_installer=delete_installer)
+        download_pandoc(url=url,
+                        targetfolder=targetfolder,
+                        version=version,
+                        delete_installer=delete_installer)
 
         # Show errors in case of secondary failure
-        _ensure_pandoc_path(quiet=False)
+        _ensure_pandoc_path()
 
 
 # -----------------------------------------------------------------------------
