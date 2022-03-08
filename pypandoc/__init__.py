@@ -320,14 +320,21 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
     new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
     creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
+
+    old_wd = os.getcwd()
+    if cworkdir and old_wd != cworkdir:
+        os.chdir(cworkdir)
+
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE if string_input else None,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        cwd=cworkdir,
         env=new_env,
         creationflags=creation_flag)
+
+    if cworkdir is not None:
+        os.chdir(old_wd)
 
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
