@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 def convert(source, to, format=None, extra_args=(), encoding='utf-8',
-            outputfile=None, filters=None):
+            outputfile=None, filters=None, cworkdir=None):
     """Converts given `source` from `format` to `to` (deprecated).
 
     :param str source: Unicode string or bytes or a file path (see encoding)
@@ -70,12 +70,13 @@ def convert(source, to, format=None, extra_args=(), encoding='utf-8',
             raise RuntimeError("Format missing, but need one (identified source as text as no "
                                "file with that name was found).")
     return _convert_input(source, format, input_type, to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters)
+                          outputfile=outputfile, filters=filters,
+                          cworkdir=cworkdir)
 
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None, verify_format=True,
-                 sandbox=True):
+                 sandbox=True, cworkdir=None):
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -111,12 +112,13 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
     source = _as_unicode(source, encoding)
     return _convert_input(source, format, 'string', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox)
+                          verify_format=verify_format, sandbox=sandbox,
+                          cworkdir=cworkdir)
 
 
 def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None, verify_format=True,
-                 sandbox=True):
+                 sandbox=True, cworkdir=None):
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -156,7 +158,8 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
     format = _identify_format_from_path(source_file, format)
     return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox)
+                          verify_format=verify_format, sandbox=sandbox,
+                          cworkdir=cworkdir)
 
 
 def _identify_path(source):
@@ -276,7 +279,7 @@ def _validate_formats(format, to, outputfile):
 
 def _convert_input(source, format, input_type, to, extra_args=(),
                    outputfile=None, filters=None, verify_format=True,
-                   sandbox=True):
+                   sandbox=True, cworkdir=None):
     
     _check_log_handler()
     _ensure_pandoc_path()
@@ -317,6 +320,11 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
     new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
     creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
+
+    old_wd = os.getcwd()
+    if cworkdir and old_wd != cworkdir:
+        os.chdir(cworkdir)
+
     p = subprocess.Popen(
         args,
         stdin=subprocess.PIPE if string_input else None,
@@ -324,6 +332,9 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         stderr=subprocess.PIPE,
         env=new_env,
         creationflags=creation_flag)
+
+    if cworkdir is not None:
+        os.chdir(old_wd)
 
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
