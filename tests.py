@@ -468,11 +468,6 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert_file(file_name, 'rst', format='md')
             self.assertTrue("title" in received)
 
-    def test_depreaction_warnings(self):
-        # convert itself is deprecated...
-        with assert_produces_warning(DeprecationWarning):
-            pypandoc.convert('# some title\n', to='rst', format='md')
-
     def create_sample_lua(self):
         args = [pypandoc.get_pandoc_path(), '--print-default-data-file', 'sample.lua']
         p = subprocess.Popen(args, stdout=subprocess.PIPE)
