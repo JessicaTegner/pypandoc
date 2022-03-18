@@ -43,7 +43,7 @@ class PandocPDFService(BasePandocService):
             '-o', self.file_object.name
         )
         # generate it using pandoc
-        self.service.convert(html, to_format, format=from_format, extra_args=extra_args)
+        self.service.convert_text(html, to_format, format=from_format, extra_args=extra_args)
         # return the file which is now populated with the docx forms
         return self.file_object
 
@@ -64,6 +64,6 @@ class PandocDocxService(BasePandocService):
             '-o', self.file_object.name
         )
         # generate it using pandoc
-        self.service.convert(html, to_format, format=from_format, extra_args=extra_args)
+        self.service.convert_text(html, to_format, format=from_format, extra_args=extra_args)
         # return the file which is now populated with the docx forms
         return self.file_object
