@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, with_statement
+from typing import Iterable
+from typing import Union
 
 import logging
 import os
@@ -8,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+from turtle import TurtleScreenBase
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
@@ -23,9 +26,9 @@ __all__ = ['convert', 'convert_file', 'convert_text',
 # Set up the module level logger
 logger = logging.getLogger(__name__)
 
-def convert_text(source, to, format, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True,
-                 sandbox=True, cworkdir=None):
+def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
+                 outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
+                 sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -65,9 +68,9 @@ def convert_text(source, to, format, extra_args=(), encoding='utf-8',
                           cworkdir=cworkdir)
 
 
-def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
-                 outputfile=None, filters=None, verify_format=True,
-                 sandbox=True, cworkdir=None):
+def convert_file(source_file:str, to:str, format:Union[str, None]=None, extra_args:Iterable=(), encoding:str='utf-8',
+                 outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
+                 sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param str source_file: file path (see encoding)
@@ -111,11 +114,7 @@ def convert_file(source_file, to, format=None, extra_args=(), encoding='utf-8',
                           cworkdir=cworkdir)
 
 
-def _identify_path(source):
-    # guard against problems
-    if source is None or not isinstance(source, string_types):
-        return False
-
+def _identify_path(source:str) -> bool:
     is_path = False
     try:
         is_path = os.path.exists(source)
@@ -126,24 +125,27 @@ def _identify_path(source):
         pass
 
     if not is_path:
-        # check if it's an URL
-        result = urlparse(source)
-        if result.scheme in ["http", "https"]:
-            is_path = True
-        elif result.scheme and result.netloc and result.path:
-            # complete uri including one with a network path
-            is_path = True
-        elif result.scheme == "file" and result.path:
-            is_path = os.path.exists(url2path(source))
+        try:
+            # check if it's an URL
+            result = urlparse(source)
+            if result.scheme in ["http", "https"]:
+                is_path = True
+            elif result.scheme and result.netloc and result.path:
+                # complete uri including one with a network path
+                is_path = True
+            elif result.scheme == "file" and result.path:
+                is_path = os.path.exists(url2path(source))
+        except AttributeError:
+            pass
 
     return is_path
 
 
-def _identify_format_from_path(sourcefile, format):
+def _identify_format_from_path(sourcefile:str, format:str) -> str:
     return format or os.path.splitext(sourcefile)[1].strip('.')
 
 
-def _as_unicode(source, encoding):
+def _as_unicode(source:any, encoding:str) -> any:
     if encoding != 'utf-8':
         # if a source and a different encoding is given, try to decode the the source into a
         # unicode string
@@ -154,7 +156,7 @@ def _as_unicode(source, encoding):
     return source
 
 
-def _identify_input_type(source, format, encoding='utf-8'):
+def _identify_input_type(source:any, format:str, encoding:str='utf-8'):
     path = _identify_path(source)
     if path:
         format = _identify_format_from_path(source, format)
@@ -381,7 +383,7 @@ def _get_base_format(format):
     return re.split(r'\+|-', format)[0]
 
 
-def get_pandoc_formats():
+def get_pandoc_formats() -> tuple[list, list]:
     '''
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
@@ -414,7 +416,7 @@ def get_pandoc_formats():
     return [f.strip() for f in in_], [f.strip() for f in out]
 
 
-def get_pandoc_formats_pre_1_18():
+def get_pandoc_formats_pre_1_18() -> tuple[list, list]:
     '''
     Dynamic preprocessor for Pandoc formats for version < 1.18.
     Return 2 lists. "from_formats" and "to_formats".
@@ -443,7 +445,7 @@ def get_pandoc_formats_pre_1_18():
 
 # copied and adapted from jupyter_nbconvert/utils/pandoc.py, Modified BSD License
 
-def _get_pandoc_version(pandoc_path):
+def _get_pandoc_version(pandoc_path:str) -> str:
     new_env = os.environ.copy()
     creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
     if 'HOME' not in os.environ:
@@ -468,7 +470,7 @@ def _get_pandoc_version(pandoc_path):
     return version
 
 
-def get_pandoc_version():
+def get_pandoc_version() -> str:
     """Gets the Pandoc version if Pandoc is installed.
 
     It will probe Pandoc for its version, cache it and return that value. If a cached version is
@@ -486,7 +488,7 @@ def get_pandoc_version():
     return __version
 
 
-def get_pandoc_path():
+def get_pandoc_path() -> str:
     """Gets the Pandoc path if Pandoc is installed.
 
     It will return a path to pandoc which is used by pypandoc.
@@ -506,12 +508,12 @@ def get_pandoc_path():
     _ensure_pandoc_path()
     return __pandoc_path
 
-def ensure_pandoc_minimal_version(major, minor=0):
+def ensure_pandoc_minimal_version(major:int, minor:int=0) -> bool:
     """Check if the used pandoc fulfill a minimal version requirement.
 
-    :param bool major: pandoc major version, such as 1 or 2.
+    :param int major: pandoc major version, such as 1 or 2.
 
-    :param bool minor: pandoc minor version, such as 10 or 11.
+    :param int minor: pandoc minor version, such as 10 or 11.
 
     :returns: True if the installed pandoc is above the minimal version, False otherwise.
     :rtype: bool
@@ -523,12 +525,12 @@ def ensure_pandoc_minimal_version(major, minor=0):
     
 
 
-def ensure_pandoc_maximal_version(major, minor=9999):
+def ensure_pandoc_maximal_version(major:int, minor:int=9999) -> bool:
     """Check if the used pandoc fulfill a maximal version requirement.
 
-    :param bool major: pandoc major version, such as 1 or 2.
+    :param int major: pandoc major version, such as 1 or 2.
 
-    :param bool minor: pandoc minor version, such as 10 or 11.
+    :param int minor: pandoc minor version, such as 10 or 11.
 
     :returns: True if the installed pandoc is below the maximal version, False otherwise.
     :rtype: bool
@@ -539,7 +541,7 @@ def ensure_pandoc_maximal_version(major, minor=9999):
     return version[0] <= int(major) and version[1] <= int(minor)
 
 
-def _ensure_pandoc_path():
+def _ensure_pandoc_path() -> None:
     global __pandoc_path
     
     _check_log_handler()
@@ -636,10 +638,10 @@ def _ensure_pandoc_path():
                           "install pypandoc wheels with included pandoc.")
 
 
-def ensure_pandoc_installed(url=None, 
-                            targetfolder=None,
-                            version="latest",
-                            delete_installer=False):
+def ensure_pandoc_installed(url:Union[str, None]=None, 
+                            targetfolder:Union[str, None]=None,
+                            version:str="latest",
+                            delete_installer:bool=False) -> None:
     """Try to install pandoc if it isn't installed.
 
     Parameters are passed to download_pandoc()
