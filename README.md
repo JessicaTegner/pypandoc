@@ -148,7 +148,7 @@ output = pypandoc.convert_text(
     'md', format='html',
     extra_args=['--atx-headers'])
 # output == '# Primary Heading\r\n'
-output = pypandoc.convert(
+output = pypandoc.convert_text(
     '# Primary Heading',
     'html', format='md',
     extra_args=['--base-header-level=2'])
@@ -173,9 +173,6 @@ Please pass any filters in as a list and not as a string.
 
 Please refer to `pandoc -h` and the
 [official documentation](https://pandoc.org/MANUAL.html) for further details.
-
-> Note: the old way of using `convert(input, output)` is deprecated as in some cases it wasn't
-possible to determine whether the input should be used as a filename or as text.
 
 ## Dealing with Formatting Arguments
 

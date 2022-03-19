@@ -8,7 +8,6 @@ import subprocess
 import sys
 import tempfile
 import textwrap
-import warnings
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
@@ -23,56 +22,6 @@ __all__ = ['convert', 'convert_file', 'convert_text',
 
 # Set up the module level logger
 logger = logging.getLogger(__name__)
-
-
-def convert(source, to, format=None, extra_args=(), encoding='utf-8',
-            outputfile=None, filters=None, cworkdir=None):
-    """Converts given `source` from `format` to `to` (deprecated).
-
-    :param str source: Unicode string or bytes or a file path (see encoding)
-
-    :param str to: format into which the input should be converted; can be one of
-            `pypandoc.get_pandoc_formats()[1]`
-
-    :param str format: the format of the inputs; will be inferred if input is a file with an
-            known filename extension; can be one of `pypandoc.get_pandoc_formats()[1]`
-            (Default value = None)
-
-    :param list extra_args: extra arguments (list of strings) to be passed to pandoc
-            (Default value = ())
-
-    :param str encoding: the encoding of the file or the input bytes (Default value = 'utf-8')
-
-    :param str outputfile: output will be written to outfilename or the converted content
-            returned if None (Default value = None)
-
-    :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
-
-    :returns: converted string (unicode) or an empty string if an outputfile was given
-    :rtype: unicode
-
-    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
-    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
-            path.
-    """
-    msg = ("Due to possible ambiguity, 'convert()' is deprecated and will be removed in pypandoc 1.8. "
-           "Use 'convert_file()'  or 'convert_text()'.")
-    warnings.warn(msg, DeprecationWarning, stacklevel=2)
-
-    path = _identify_path(source)
-    if path:
-        format = _identify_format_from_path(source, format)
-        input_type = 'path'
-    else:
-        source = _as_unicode(source, encoding)
-        input_type = 'string'
-        if not format:
-            raise RuntimeError("Format missing, but need one (identified source as text as no "
-                               "file with that name was found).")
-    return _convert_input(source, format, input_type, to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          cworkdir=cworkdir)
-
 
 def convert_text(source, to, format, extra_args=(), encoding='utf-8',
                  outputfile=None, filters=None, verify_format=True,
@@ -690,7 +639,6 @@ def _ensure_pandoc_path():
 def ensure_pandoc_installed(url=None, 
                             targetfolder=None,
                             version="latest",
-                            quiet=None,
                             delete_installer=False):
     """Try to install pandoc if it isn't installed.
 
@@ -698,11 +646,6 @@ def ensure_pandoc_installed(url=None,
 
     :raises OSError: if pandoc cannot be installed
     """
-
-    if quiet is not None:
-        msg = ("The quiet flag in PyPandoc has been deprecated in favour of "
-               "logging. See README.md for more information.")
-        warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
     # Append targetfolder to the PATH environment variable so it is found by subprocesses
     if targetfolder is not None:
