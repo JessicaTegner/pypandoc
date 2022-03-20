@@ -383,7 +383,7 @@ def _get_base_format(format):
     return re.split(r'\+|-', format)[0]
 
 
-def get_pandoc_formats() -> tuple[list, list]:
+def get_pandoc_formats() -> Iterable:
     '''
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
@@ -416,7 +416,7 @@ def get_pandoc_formats() -> tuple[list, list]:
     return [f.strip() for f in in_], [f.strip() for f in out]
 
 
-def get_pandoc_formats_pre_1_18() -> tuple[list, list]:
+def get_pandoc_formats_pre_1_18() -> Iterable:
     '''
     Dynamic preprocessor for Pandoc formats for version < 1.18.
     Return 2 lists. "from_formats" and "to_formats".
