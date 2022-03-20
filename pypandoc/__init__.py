@@ -679,5 +679,5 @@ def clean_pandocpath_cache():
     __pandoc_path = None
 
 
-__version : str = None
-__pandoc_path : str = None
+__version = None
+__pandoc_path = None
