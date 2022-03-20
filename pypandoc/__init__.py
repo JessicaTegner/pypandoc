@@ -19,7 +19,7 @@ from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlpars
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.7.4'
 __license__ = 'MIT'
-__all__ = ['convert', 'convert_file', 'convert_text',
+__all__ = ['convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
            'download_pandoc']
 
@@ -679,5 +679,5 @@ def clean_pandocpath_cache():
     __pandoc_path = None
 
 
-__version = None
-__pandoc_path = None
+__version : str = None
+__pandoc_path : str = None
