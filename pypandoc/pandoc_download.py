@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from typing import Union
 
 try:
     from urllib.request import urlopen
@@ -189,11 +190,11 @@ def _handle_win32(filename, targetfolder):
     logger.info("Done.")
 
 
-def download_pandoc(url=None,
-                    targetfolder=None,
-                    version="latest",
-                    delete_installer=False,
-                    download_folder=None):
+def download_pandoc(url:Union[str, None]=None,
+                    targetfolder:Union[str, None]=None,
+                    version:str="latest",
+                    delete_installer:bool=False,
+                    download_folder:Union[str, None]=None) -> None:
     """Download and unpack pandoc
 
     Downloads prebuild binaries for pandoc from `url` and unpacks it into
