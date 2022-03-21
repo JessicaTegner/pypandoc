@@ -193,6 +193,25 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert_file(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
+    def test_basic_conversion_from_multiple_files(self):
+        with closed_tempfile('.md', text='some title') as file_name1:
+            with closed_tempfile('.md', text='some title') as file_name2:
+                expected = '<p>some title</p>\n<p>some title</p>'
+                received = pypandoc.convert_file([file_name1,file_name2], 'html')
+                self.assertEqualExceptForNewlineEnd(expected, received)
+
+    def test_basic_conversion_from_file_pattern(self):
+        received = pypandoc.convert_file("./*.md", 'html')
+        received = received.lower()
+        assert "making a release" in received
+        assert "pypandoc provides a thin wrapper" in received
+
+    def test_basic_conversion_from_file_pattern_with_input_list(self):
+        received = pypandoc.convert_file(["./*.md", "./*.md"], 'html')
+        received = received.lower()
+        assert "making a release" in received
+        assert "pypandoc provides a thin wrapper" in received
+
     @unittest.skipIf(sys.platform.startswith("win"), "File based urls do not work on windows: "
                                                      "https://github.com/jgm/pandoc/issues/4613")
     def test_basic_conversion_from_file_url(self):
