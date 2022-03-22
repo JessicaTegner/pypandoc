@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
-from turtle import TurtleScreenBase
+import glob
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
@@ -68,12 +68,12 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
                           cworkdir=cworkdir)
 
 
-def convert_file(source_file:str, to:str, format:Union[str, None]=None, extra_args:Iterable=(), encoding:str='utf-8',
+def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=None, extra_args:Iterable=(), encoding:str='utf-8',
                  outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
                  sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
-    :param str source_file: file path (see encoding)
+    :param (str, list) source_file: Either a full file path, relative file path, a file patterh (like dir/*.md), or a list if file or file patterns.
 
     :param str to: format into which the input should be converted; can be one of
             `pypandoc.get_pandoc_formats()[1]`
@@ -107,14 +107,39 @@ def convert_file(source_file:str, to:str, format:Union[str, None]=None, extra_ar
     """
     if not _identify_path(source_file):
         raise RuntimeError("source_file is not a valid path")
-    format = _identify_format_from_path(source_file, format)
-    return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
+    if _is_network_path(source_file): # if the source_file is an url
+        format = _identify_format_from_path(source_file, format)
+        return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
+                          outputfile=outputfile, filters=filters,
+                          verify_format=verify_format, sandbox=sandbox,
+                          cworkdir=cworkdir)
+
+    discovered_source_files = []
+    if isinstance(source_file, str):
+        discovered_source_files += glob.glob(source_file)
+    if isinstance(source_file, list): # a list of possibly file or file patterns. Expand all with glob
+        for filepath in source_file:
+            discovered_source_files.extend(glob.glob(filepath))
+    if len(discovered_source_files) == 1: # behavior for a single file or a pattern
+        format = _identify_format_from_path(discovered_source_files[0], format)
+        return _convert_input(discovered_source_files[0], format, 'path', to, extra_args=extra_args,
+                          outputfile=outputfile, filters=filters,
+                          verify_format=verify_format, sandbox=sandbox,
+                          cworkdir=cworkdir)
+    else: # behavior for multiple  files or file patterns
+        format = _identify_format_from_path(discovered_source_files[0], format)
+        return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
                           outputfile=outputfile, filters=filters,
                           verify_format=verify_format, sandbox=sandbox,
                           cworkdir=cworkdir)
 
 
-def _identify_path(source:str) -> bool:
+def _identify_path(source) -> bool:
+    if isinstance(source, list):
+        for single_source in source:
+            if not _identify_path(single_source):
+                return False
+        return True
     is_path = False
     try:
         is_path = os.path.exists(source)
@@ -124,6 +149,15 @@ def _identify_path(source:str) -> bool:
         # still false
         pass
 
+    if not is_path:
+        try:
+            is_path = len(glob.glob(source)) >= 1
+        except UnicodeEncodeError:
+            is_path = len(glob.glob(source.encode('utf-8'))) >= 1
+        except:  # noqa
+            # still false
+            pass
+    
     if not is_path:
         try:
             # check if it's an URL
@@ -139,6 +173,21 @@ def _identify_path(source:str) -> bool:
             pass
 
     return is_path
+
+def _is_network_path(source):
+    try:
+        # check if it's an URL
+        result = urlparse(source)
+        if result.scheme in ["http", "https"]:
+            return True
+        elif result.scheme and result.netloc and result.path:
+            # complete uri including one with a network path
+            return True
+        elif result.scheme == "file" and result.path:
+            return os.path.exists(url2path(source))
+    except AttributeError:
+        pass
+    return False
 
 
 def _identify_format_from_path(sourcefile:str, format:str) -> str:
@@ -242,7 +291,13 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         to = normalize_format(to)
 
     string_input = input_type == 'string'
-    input_file = [source] if not string_input else []
+    if not string_input:
+        if isinstance(source, str):
+            input_file = [source]
+        else:
+            input_file = source
+    else:
+        input_file = []
     args = [__pandoc_path, '--from=' + format]
 
     args.append('--to=' + to)
@@ -294,11 +349,12 @@ def _convert_input(source, format, input_type, to, extra_args=(),
                                                                            p.stderr.read())
         )
 
-    try:
-        source = cast_bytes(source, encoding='utf-8')
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        # assume that it is already a utf-8 encoded string
-        pass
+    if string_input:
+        try:
+            source = cast_bytes(source, encoding='utf-8')
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            # assume that it is already a utf-8 encoded string
+            pass
     try:
         stdout, stderr = p.communicate(source if string_input else None)
     except OSError:

@@ -139,6 +139,23 @@ output = pypandoc.convert_file('somefile.md', 'docx', outputfile="somefile.docx"
 assert output == ""
 ```
 
+
+It's also possible to specify multiple input files to pandoc, either as absolute paths, relative paths or file patterns.
+
+```python
+import pypandoc
+
+# convert all markdown files in a chapters/ subdirectory.
+pypandoc.convert_file('chapters/*.md', 'docx', outputfile="somefile.docx")
+
+# convert all markdown files in the book1 and book2 directories.
+pypandoc.convert_file(['book1/*.md', 'book2/*.md'], 'docx', outputfile="somefile.docx")
+
+# convert the front from another drive, and all markdown files in the chapter directory.
+pypandoc.convert_file(['D:/book_front.md', 'book2/*.md'], 'docx', outputfile="somefile.docx")
+```
+
+
 In addition to `format`, it is possible to pass `extra_args`.
 That makes it possible to access various pandoc options easily.
 
