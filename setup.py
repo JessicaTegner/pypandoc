@@ -87,6 +87,7 @@ setup(
     author_email = 'bebraw@gmail.com',
     packages = ['pypandoc'],
     package_data={'pypandoc': ['files/*']},
+    python_requires=">=3.6",
     install_requires = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -98,8 +99,6 @@ setup(
         'Programming Language :: Python',
         'Topic :: Text Processing',
         'Topic :: Text Processing :: Filters',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
