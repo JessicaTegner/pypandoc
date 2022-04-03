@@ -18,12 +18,6 @@ except ImportError:
 
 from .handler import _check_log_handler
 
-try:
-    FileNotFoundError
-except NameError:
-    # Python <3.5
-    FileNotFoundError = IOError
-
 logger = logging.getLogger(__name__.split('.')[0])
 
 DEFAULT_TARGET_FOLDER = {
