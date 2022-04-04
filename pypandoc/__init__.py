@@ -11,10 +11,12 @@ import sys
 import tempfile
 import textwrap
 import glob
+from urllib.parse import urljoin, urlparse
+from urllib.request import pathname2url, url2pathname
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
+from .py3compat import cast_bytes, cast_unicode, string_types
 
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.7.4'
@@ -720,6 +722,12 @@ def ensure_pandoc_installed(url:Union[str, None]=None,
 
         # Show errors in case of secondary failure
         _ensure_pandoc_path()
+
+def path2url(path):  # noqa: E303
+    return urljoin('file:', pathname2url(path))
+
+def url2path(url):  # noqa: E303
+    return url2pathname(urlparse(url).path)
 
 
 # -----------------------------------------------------------------------------
