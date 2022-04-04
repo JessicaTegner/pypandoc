@@ -10,11 +10,7 @@ import subprocess
 import sys
 import tempfile
 from typing import Union
-
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
+from urllib.request import urlopen
 
 from .handler import _check_log_handler
 
