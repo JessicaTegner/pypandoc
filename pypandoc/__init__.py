@@ -16,7 +16,7 @@ from urllib.request import pathname2url, url2pathname
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, string_types
+from .py3compat import cast_bytes, cast_unicode
 
 __author__ = u'Juho Vepsäläinen'
 __version__ = '1.7.4'
@@ -25,6 +25,7 @@ __all__ = ['convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
            'download_pandoc']
 
+string_types = (str,)
 # Set up the module level logger
 logger = logging.getLogger(__name__)
 
