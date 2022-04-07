@@ -32,8 +32,11 @@ addons:
       - texlive-fonts-recommended
       - texlive-latex-recommended
       - lmodern
+
+before_install:
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python3 -m pip install poetry; fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then python -m pip install poetry;  fi
 install:
-  - travis_retry python -m pip install poetry
   - travis_retry poetry install
   # only download pandoc, the tests should work without a install of pypandoc
   - poetry run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
