@@ -36,7 +36,7 @@ addons:
 before_install:
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then python -m pip install poetry;  fi
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python3 -m pip install poetry; fi
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install mactex-no-gui;  fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install basictex;  fi
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then eval "$(/usr/libexec/path_helper)";  fi
 install:
   - travis_retry poetry install
