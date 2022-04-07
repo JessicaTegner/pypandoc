@@ -36,6 +36,7 @@ addons:
 before_install:
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python3 -m pip install poetry; fi
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then python -m pip install poetry;  fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then brew install basictex;  fi
 install:
   - travis_retry poetry install
   # only download pandoc, the tests should work without a install of pypandoc
