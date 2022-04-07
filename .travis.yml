@@ -5,8 +5,16 @@ python:
   - "3.8"
   - "3.9"
   - "3.10.0"
-os: linux
-dist: bionic
+  include:
+    - 
+      os: linux
+      dist: bionic
+    - 
+      os: osx
+      osx_image: xcode13.1
+    - 
+      os: osx
+      osx_image: xcode13.3
 sudo: false
 addons:
   apt:
