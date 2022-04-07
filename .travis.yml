@@ -5,15 +5,13 @@ python:
   - "3.8"
   - "3.9"
   - "3.10.0"
+jobs:
   include:
-    - 
-      os: linux
+    - os: linux
       dist: bionic
-    - 
-      os: osx
+    - os: osx
       osx_image: xcode13.1
-    - 
-      os: osx
+    - os: osx
       osx_image: xcode13.3
 sudo: false
 addons:
