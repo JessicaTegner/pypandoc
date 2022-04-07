@@ -1,4 +1,5 @@
-language: python: python
+language: python
+os: linux
 jobs:
   include:
     - os: linux
