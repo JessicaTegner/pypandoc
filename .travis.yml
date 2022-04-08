@@ -14,6 +14,9 @@ jobs:
     - os: linux
       dist: bionic
       python: 3.9
+    - os: linux
+      dist: bionic
+      python: 3.10
     - os: osx
       osx_image: xcode13.1
       language: generic
