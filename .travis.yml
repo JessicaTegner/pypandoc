@@ -23,6 +23,9 @@ jobs:
     - os: osx
       osx_image: xcode13.3
       language: generic
+    - os: osx
+      osx_image: xcode12.2
+      language: generic
 sudo: false
 addons:
   apt:
