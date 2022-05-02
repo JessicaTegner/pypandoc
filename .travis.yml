@@ -1,12 +1,31 @@
 language: python
-python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
-  - "3.9"
-  - "3.10.0"
 os: linux
-dist: bionic
+jobs:
+  include:
+    - os: linux
+      dist: bionic
+      python: 3.6
+    - os: linux
+      dist: bionic
+      python: 3.7
+    - os: linux
+      dist: bionic
+      python: 3.8
+    - os: linux
+      dist: bionic
+      python: 3.9
+    - os: linux
+      dist: bionic
+      python: 3.10
+    - os: osx
+      osx_image: xcode13.1
+      language: generic
+    - os: osx
+      osx_image: xcode13.3
+      language: generic
+    - os: osx
+      osx_image: xcode12.2
+      language: generic
 sudo: false
 addons:
   apt:
@@ -19,8 +38,14 @@ addons:
       - texlive-fonts-recommended
       - texlive-latex-recommended
       - lmodern
+
+before_install:
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then python -m pip install poetry;  fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sysctl -n machdep.cpu.brand_string; fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python3 -m pip install poetry; fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install basictex;  fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then eval "$(/usr/libexec/path_helper)";  fi
 install:
-  - travis_retry python -m pip install poetry
   - travis_retry poetry install
   # only download pandoc, the tests should work without a install of pypandoc
   - poetry run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
