@@ -414,6 +414,10 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     
     log_msgs = [first.replace('[{}] '.format(level), '')]
     
+    if level not in level_map:
+        level = default_level
+    
+    
     for msg in msgs:
         
         search = re.search(r"\[(.*?)\]", msg)

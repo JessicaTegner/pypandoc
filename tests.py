@@ -334,6 +334,19 @@ class TestPypandoc(unittest.TestCase):
             self.assertEqual(expected_msgs[i], m)
 
 
+    def test_classify_pandoc_logging_invalid_level(self):
+        
+        test = ("[WARN] This is some message on\ntwo lines\n"
+                "[ERROR] This is a second message.")
+        expected_levels = [30, 40]
+        expected_msgs = ["This is some message on\ntwo lines",
+                         "This is a second message."]
+        
+        for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
+            self.assertEqual(expected_levels[i], l)
+            self.assertEqual(expected_msgs[i], m)
+
+
     def test_conversion_stderr(self):
         
         # Clear logger handlers
