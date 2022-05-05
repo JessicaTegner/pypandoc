@@ -437,7 +437,7 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
         
         log_msgs.append(msg)
     
-    yield get_python_level(pandoc_level), "\n".join(log_msgs)
+    return get_python_level(pandoc_level), "\n".join(log_msgs)
 
 
 def _get_base_format(format):
