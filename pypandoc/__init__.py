@@ -392,14 +392,24 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 def _classify_pandoc_logging(raw, default_level="WARNING"):
     # Process raw and yeild the contained logging levels and messages.
     # Assumes that the messages are formatted like "[LEVEL] message". If the 
-    # first message does not have a level, use the default_level value instead.
+    # first message does not have a level or the level does not conform to the
+    # pandoc standard, use the default_level value instead.
     
-    level_map = {"CRITICAL": 50,
-                 "ERROR": 40,
-                 "WARNING": 30,
-                 "INFO": 20,
-                 "DEBUG": 10,
-                 "NOTSET": 0}
+    def get_python_level(pandoc_level):
+        
+        level_map = {"CRITICAL": 50,
+                     "ERROR": 40,
+                     "WARNING": 30,
+                     "INFO": 20,
+                     "DEBUG": 10,
+                     "NOTSET": 0}
+        
+        if pandoc_level not in level_map:
+            level = level_map[default_level]
+        else:
+            level = level_map[pandoc_level]
+        
+        return level
     
     msgs = raw.split("\n")
     first = msgs.pop(0)
@@ -408,29 +418,25 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     
     # Use the default if the first message doesn't have a level
     if search is None:
-        level = default_level
+        pandoc_level = default_level
     else:
-        level = first[search.start(1):search.end(1)]
+        pandoc_level = first[search.start(1):search.end(1)]
     
-    log_msgs = [first.replace('[{}] '.format(level), '')]
-    
-    if level not in level_map:
-        level = default_level
-    
+    log_msgs = [first.replace('[{}] '.format(pandoc_level), '')]
     
     for msg in msgs:
         
         search = re.search(r"\[(.*?)\]", msg)
         
         if search is not None:
-            yield level_map[level], "\n".join(log_msgs)
-            level = msg[search.start(1):search.end(1)]
-            log_msgs = [msg.replace('[{}] '.format(level), '')]
+            yield get_python_level(pandoc_level), "\n".join(log_msgs)
+            pandoc_level = msg[search.start(1):search.end(1)]
+            log_msgs = [msg.replace('[{}] '.format(pandoc_level), '')]
             continue
         
         log_msgs.append(msg)
     
-    yield level_map[level], "\n".join(log_msgs)
+    yield get_python_level(pandoc_level), "\n".join(log_msgs)
 
 
 def _get_base_format(format):
