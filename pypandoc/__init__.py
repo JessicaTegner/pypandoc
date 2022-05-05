@@ -390,10 +390,11 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
 
 def _classify_pandoc_logging(raw, default_level="WARNING"):
-    # Process raw and yeild the contained logging levels and messages.
+    # Process raw and yield the contained logging levels and messages.
     # Assumes that the messages are formatted like "[LEVEL] message". If the 
-    # first message does not have a level or the level does not conform to the
-    # pandoc standard, use the default_level value instead.
+    # first message does not have a level or any other message has a level 
+    # that does not conform to the pandoc standard, use the default_level 
+    # value instead.
     
     def get_python_level(pandoc_level):
         
