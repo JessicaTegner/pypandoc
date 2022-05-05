@@ -396,14 +396,14 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     # that does not conform to the pandoc standard, use the default_level 
     # value instead.
     
+    # Available pandoc logging levels adapted from:
+    # https://github.com/jgm/pandoc/blob/5e1249481b2e3fc27e845245a0c96c3687a23c3d/src/Text/Pandoc/Logging.hs#L44
     def get_python_level(pandoc_level):
         
-        level_map = {"CRITICAL": 50,
-                     "ERROR": 40,
+        level_map = {"ERROR": 40,
                      "WARNING": 30,
                      "INFO": 20,
-                     "DEBUG": 10,
-                     "NOTSET": 0}
+                     "DEBUG": 10}
         
         if pandoc_level not in level_map:
             level = level_map[default_level]
