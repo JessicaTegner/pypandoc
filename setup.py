@@ -88,7 +88,7 @@ setup(
     packages = ['pypandoc'],
     package_data={'pypandoc': ['files/*']},
     python_requires=">=3.6",
-    install_requires = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0'],
+    setup_requires = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
