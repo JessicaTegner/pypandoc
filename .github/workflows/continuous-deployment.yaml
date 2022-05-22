@@ -6,9 +6,6 @@ on:
     tags:
     - "v*"
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 defaults:
   run:
     shell: bash
@@ -22,8 +19,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-      - name: Set tag
-        run: echo "GIT_TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Discover python architecture
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
@@ -43,7 +38,9 @@ jobs:
         run: python setup.py sdist bdist_wheel
       - name: Build binary Archive
         run: python setup_binary.py download_pandoc bdist_wheel
-      - name: Publish a Python distribution to PyPI
+      - name: Make sure binary tarball doesn't exist
+        run: rm dist/*binary.tar.gz
+      - name: Publish  to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip_existing: true
