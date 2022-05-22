@@ -17,8 +17,33 @@ from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
+__author_email__ = "bebraw@gmail.com"
+__url__ = 'https://github.com/NicklasTegner/pypandoc'
 __version__ = '1.8'
 __license__ = 'MIT'
+__description__ = "Thin wrapper for pandoc."
+__python_requires__ = ">=3.6"
+__setup_requires__ = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0']
+__classifiers__ = [
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: POSIX',
+        'Programming Language :: Python',
+        'Topic :: Text Processing',
+        'Topic :: Text Processing :: Filters',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy'
+    ]
+
 __all__ = ['convert_file', 'convert_text',
            'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
            'download_pandoc']
