@@ -14,9 +14,8 @@ document converter.
 
 ## Installation
 
-Pypandoc uses pandoc, so it needs an available installation of pandoc. For some common cases
-(wheels, conda packages), pypandoc already includes pandoc (and pandoc-citeproc) in its
-prebuilt package.
+Pypandoc uses pandoc, so it needs an available installation of pandoc. Pypandoc provides 2 packages, "pypandoc" and "pypandoc_binary", with the second one including pandoc out of the box.
+The 2 packages are identical, with the only difference being that one includes pandoc, while the other don't.
 
 If pandoc is already installed (i.e. pandoc is in the `PATH`), pypandoc uses the version with the
 higher version number, and if both are the same, the already installed version. See [Specifying the location of pandoc binaries](#specifying-the-location-of-pandoc-binaries) for more.
@@ -25,15 +24,24 @@ To use pandoc filters, you must have the relevant filters installed on your mach
 
 ### Installing via pip
 
-Install via `pip install pypandoc`.
+If you [want to install pandoc yourself](#Installing-pandoc) or are on a unsupported platform, you'll need to install "pypandoc" and  [install pandoc manually](#Installing-pandoc)
 
-Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc/) include
-pandoc. If there is no prebuilt binary available, you have to
-[install pandoc yourself](#installing-pandoc-manually).
+```
+pip install pypandoc
+```
+
+
+If you want pandoc included out of the box, you can utilize our pypandoc_binary package, which are identical to the "pypandoc" package, but with pandoc included.
+
+```
+pip install pypandoc_binary
+```
+
+Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc_binary/)
 
 If you use Linux and have [your own wheelhouse](https://wheel.readthedocs.org/en/latest/#usage),
 you can build a wheel which include pandoc with
-`python setup.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
+`python setup_binary.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
 on 64bit intel systems, as we only download it from the
 [official releases](https://github.com/jgm/pandoc/releases).
 
@@ -50,15 +58,14 @@ use `conda install pypandoc` directly and also lets you update via `conda update
 
 ### Installing pandoc
 
-If you don't get pandoc installed via a prebuild wheel which includes pandoc or via the
-conda package dependencies, you need to install pandoc by yourself.
+If you don't already have pandoc on your system, or have installed the pypandoc_binary package, which includes pandoc, you need to install pandoc by yourself.
 
 #### Installing pandoc via pypandoc
 
 Installing via pypandoc is possible on Windows, Mac OS X or Linux (Intel-based, 64-bit):
 
 ```python
-# expects an installed pypandoc: pip install pypandoc
+pip install pypandoc
 from pypandoc.pandoc_download import download_pandoc
 # see the documentation how to customize the installation path
 # but be aware that you then need to include it in the `PATH`
