@@ -6,6 +6,10 @@ on:
     tags:
     - "v*"
 
+defaults:
+  run:
+    shell: bash
+ 
 jobs:
   builder:
     strategy:
