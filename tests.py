@@ -471,7 +471,7 @@ class TestPypandoc(unittest.TestCase):
             def f():
                 pypandoc.convert_text('# some title\n', to='pdf+somethign', format='md', outputfile=file_name)
 
-            with self.assertRaisesRegex(RuntimeError, r"PDF output can't contain any extensions: pdf\+somethign"):
+            with self.assertRaisesRegex(RuntimeError, r"PDF output can't contain any extensions: pdf\+something"):
                 f()
 
     def test_get_pandoc_path(self):

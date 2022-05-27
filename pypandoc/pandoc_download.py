@@ -40,7 +40,7 @@ def _get_pandoc_urls(version="latest"):
     :return: str pandoc_urls: a dictionary with keys as system platform
         and values as the url pointing to respective binaries
 
-    :return: str version: actual pandoc version. (e.g. "lastest" will be resolved to the actual one)
+    :return: str version: actual pandoc version. (e.g. "latest" will be resolved to the actual one)
     """
     # url to pandoc download page
     url = "https://github.com/jgm/pandoc/releases/" + \
@@ -70,7 +70,7 @@ def _get_pandoc_urls(version="latest"):
 def _make_executable(path):
     mode = os.stat(path).st_mode
     mode |= (mode & 0o444) >> 2  # copy R bits to X
-    logger.info("Making %s executeable..." % (path))
+    logger.info("Making %s executable..." % (path))
     os.chmod(path, mode)
 
 

@@ -682,7 +682,7 @@ def _ensure_pandoc_path() -> None:
             except Exception:
                 # we can't use that path...
                 if os.path.exists(path):
-                    # path exist but is not useable -> not executable?
+                    # path exist but is not usable -> not executable?
                     log_msg = ("Found {}, but not using it because of an "
                                "error:".format(path))
                     logging.exception(log_msg)
