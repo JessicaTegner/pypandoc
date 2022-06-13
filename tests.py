@@ -320,8 +320,8 @@ class TestPypandoc(unittest.TestCase):
             output = pypandoc.convert_text(
                 markdown_source, to='html', format='md', outputfile=None, filters=tempfile
             )
-        expected = '<p><span class="smallcaps">Here comes the content.</span></p>\n'
-        self.assertTrue(output == expected)
+            expected = '<p><span class="smallcaps">Here comes the content.</span></p>\n'
+            self.assertTrue(output == expected)
 
     def test_classify_pandoc_logging(self):
         
