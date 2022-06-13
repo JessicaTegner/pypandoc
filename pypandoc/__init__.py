@@ -342,7 +342,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     if filters is not None:
         if isinstance(filters, string_types):
             filters = filters.split()
-        f = ['--filter=' + x for x in filters]
+        f = ['--lua-filter=' + x if x.endswith(".lua") else '--filter=' + x for x in filters]
         args.extend(f)
 
     # To get access to pandoc-citeproc when we use a included copy of pandoc,

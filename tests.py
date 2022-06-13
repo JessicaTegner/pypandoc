@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 import warnings
 
@@ -306,6 +307,20 @@ class TestPypandoc(unittest.TestCase):
         found = re.search(r'10.1038', written)
         self.assertTrue(found is None)
 
+    def test_conversion_with_lua_filter(self):
+        markdown_source = "**Here comes the content.**"
+        lua_source = """\
+        -- taken from: https://pandoc.org/lua-filters.html
+        function Strong(elem)
+            return pandoc.SmallCaps(elem.c)
+        end
+        """
+        lua_source = textwrap.dedent(lua_source)
+        with closed_tempfile(".lua", lua_source) as tempfile:
+            output = pypandoc.convert_text(markdown_source, to='html', format='md',
+                                    outputfile=None, filters=tempfile)
+        expected = '<p><span class="smallcaps">Here comes the content.</span></p>\n'
+        self.assertTrue(output == expected)
 
     def test_classify_pandoc_logging(self):
         
