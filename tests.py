@@ -319,8 +319,8 @@ class TestPypandoc(unittest.TestCase):
         with closed_tempfile(".lua", lua_source) as tempfile:
             output = pypandoc.convert_text(
                 markdown_source, to='html', format='md', outputfile=None, filters=tempfile
-            )
-            expected = '<p><span class="smallcaps">Here comes the content.</span></p>\n'
+            ).strip()
+            expected = '<p><span class="smallcaps">Here comes the content.</span></p>'
             self.assertTrue(output == expected)
 
     def test_classify_pandoc_logging(self):
