@@ -287,6 +287,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Rebecca Heineman](https://github.com/burgerbecky) - Added scanning code for finding pandoc in Windows
 * [Andrew Barraford](https://github.com/abarrafo) - Download destination.
 * [Jesse Widner](https://github.com/jwidner) & [Dominic Thorn](https://github.com/domvwt) - Add support for lua filters
+
 ## License
 
 Pypandoc is available under MIT license. See LICENSE for more details. Pandoc itself is [available under the GPL2 license](https://github.com/jgm/pandoc/blob/master/COPYING.md).
