@@ -317,8 +317,9 @@ class TestPypandoc(unittest.TestCase):
         """
         lua_source = textwrap.dedent(lua_source)
         with closed_tempfile(".lua", lua_source) as tempfile:
-            output = pypandoc.convert_text(markdown_source, to='html', format='md',
-                                    outputfile=None, filters=tempfile)
+            output = pypandoc.convert_text(
+                markdown_source, to='html', format='md', outputfile=None, filters=tempfile
+            )
         expected = '<p><span class="smallcaps">Here comes the content.</span></p>\n'
         self.assertTrue(output == expected)
 
