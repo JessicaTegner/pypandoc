@@ -34,6 +34,7 @@ packages = [
 python = "^3.6"
 
 [tool.poetry.dev-dependencies]
+pandocfilters = "^1.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
