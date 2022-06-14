@@ -354,17 +354,13 @@ class TestPypandoc(unittest.TestCase):
         markdown_source = "1 2 3 {{four}}"
 
         lua_source = """\
-        return {
-            {
-                Str = function (elem)
-                    if elem.text == "{{four}}" then
-                        return pandoc.Str "4"
-                    else
-                        return elem
-                    end
-                end,
-            }
-        }
+        function Str(elem)
+            if elem.text == "{{four}}" then
+                return pandoc.Str "4"
+            else
+                return elem
+            end
+        end
         """
         lua_source = textwrap.dedent(lua_source)
 
