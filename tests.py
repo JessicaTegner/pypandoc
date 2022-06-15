@@ -351,44 +351,41 @@ class TestPypandoc(unittest.TestCase):
             self.assertTrue(output == expected)
 
     def test_conversion_with_mixed_filters(self):
-        markdown_source = "1 2 3 {{four}}"
+        markdown_source = "-0-"
 
-        lua_source = """\
-        function Str(elem)
-            if elem.text == "{{four}}" then
-                return pandoc.Str "4"
-            else
-                return elem
-            end
+        lua = """\
+        function Para(elem)
+            return pandoc.Para(elem.content .. {{"{0}-"}})
         end
         """
-        lua_source = textwrap.dedent(lua_source)
+        lua = textwrap.dedent(lua)
 
-        python_source = """\
+        python = """\
         #!/usr/bin/env python
 
-        from pandocfilters import toJSONFilter, Str, Strong
+        from pandocfilters import toJSONFilter, Str, Strong, Para
 
-        def caps(key, value, format, meta):
-            if key == 'Str':
-                return Str("".join([str(int(x) + 1) if x.isdigit() else x for x in value]))
+        def func(key, value, format, meta):
+            if key == 'Para':
+                return Para(value + [Str("{0}-")])
 
         if __name__ == "__main__":
-            toJSONFilter(caps)
+            toJSONFilter(func)
         """
-        python_source = textwrap.dedent(python_source)
-        with closed_tempfile(".lua", lua_source) as tempfile1:
-            with closed_tempfile(".py", python_source) as tempfile2:
+        python = textwrap.dedent(python)
+
+        with closed_tempfile(".lua", lua.format(1)) as temp1, closed_tempfile(".py", python.format(2)) as temp2:
+            with closed_tempfile(".lua", lua.format(3)) as temp3, closed_tempfile(".py", python.format(4)) as temp4:
                 output = pypandoc.convert_text(
-                    markdown_source, to='html', format='md', outputfile=None, filters=[tempfile1, tempfile2, tempfile1]
+                    markdown_source, to='html', format='md', outputfile=None, filters=[temp1, temp2, temp3, temp4]
                 ).strip()
-                expected = "<p>2 3 4 5</p>"
+                expected = "<p>-0-1-2-3-4-</p>"
                 self.assertTrue(output == expected)
 
                 output = pypandoc.convert_text(
-                    markdown_source, to='html', format='md', outputfile=None, filters=[tempfile2, tempfile1, tempfile2]
+                    markdown_source, to='html', format='md', outputfile=None, filters=[temp3, temp1, temp4, temp2]
                 ).strip()
-                expected = "<p>3 4 5 5</p>"
+                expected = "<p>-0-3-1-4-2-</p>"
                 self.assertTrue(output == expected)
 
     def test_classify_pandoc_logging(self):
