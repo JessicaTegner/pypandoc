@@ -363,27 +363,28 @@ class TestPypandoc(unittest.TestCase):
         python = """\
         #!/usr/bin/env python
 
-        from pandocfilters import toJSONFilter, Str, Strong, Para
+        from pandocfilters import toJSONFilter, Para, Str
 
         def func(key, value, format, meta):
-            if key == 'Para':
+            if key == "Para":
                 return Para(value + [Str("{0}-")])
 
         if __name__ == "__main__":
             toJSONFilter(func)
+        
         """
         python = textwrap.dedent(python)
 
         with closed_tempfile(".lua", lua.format(1)) as temp1, closed_tempfile(".py", python.format(2)) as temp2:
             with closed_tempfile(".lua", lua.format(3)) as temp3, closed_tempfile(".py", python.format(4)) as temp4:
                 output = pypandoc.convert_text(
-                    markdown_source, to='html', format='md', outputfile=None, filters=[temp1, temp2, temp3, temp4]
+                    markdown_source, to="html", format="md", outputfile=None, filters=[temp1, temp2, temp3, temp4]
                 ).strip()
                 expected = "<p>-0-1-2-3-4-</p>"
                 self.assertTrue(output == expected)
 
                 output = pypandoc.convert_text(
-                    markdown_source, to='html', format='md', outputfile=None, filters=[temp3, temp1, temp4, temp2]
+                    markdown_source, to="html", format="md", outputfile=None, filters=[temp3, temp1, temp4, temp2]
                 ).strip()
                 expected = "<p>-0-3-1-4-2-</p>"
                 self.assertTrue(output == expected)
