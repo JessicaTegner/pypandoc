@@ -163,6 +163,23 @@ pypandoc.convert_file(['D:/book_front.md', 'book2/*.md'], 'docx', outputfile="so
 ```
 
 
+pathlib is also supported.
+
+```python
+import pypandoc
+from pathlib import Path
+
+# single file
+output = pypandoc.convert_file(Path('somefile.md'), 'html')
+
+# convert all markdown files in a chapters/ subdirectory.
+pypandoc.convert_file(Path('chapters').glob('*.md'), 'docx', outputfile="somefile.docx")
+
+# convert all markdown files in the book1 and book2 directories.
+pypandoc.convert_file([*Path('book1').glob('*.md'), *Path('book2').glob('*.md')], 'docx', outputfile="somefile.docx")
+# pathlib globs must be unpacked if they are inside lists.
+```
+
 In addition to `format`, it is possible to pass `extra_args`.
 That makes it possible to access various pandoc options easily.
 
@@ -286,6 +303,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Kolen Cheung](https://github.com/ickc) - Implement `_get_pandoc_urls` for installing arbitrary version as well as the latest version of pandoc. Minor: README, Travis, setup.py.
 * [Rebecca Heineman](https://github.com/burgerbecky) - Added scanning code for finding pandoc in Windows
 * [Andrew Barraford](https://github.com/abarrafo) - Download destination.
+* [Alex Kneisel](https://github.com/hey-thanks/) - Added pathlib.Path support to convert_file.
  
 ## License
 

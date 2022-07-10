@@ -98,7 +98,11 @@ def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=N
                  sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
-    :param (str, list) source_file: Either a full file path, relative file path, a file patterh (like dir/*.md), or a list if file or file patterns.
+    :param (str, list, pathlib.Path) source_file: If a string, should be either
+            an absolute file path, relative file path, or a file pattern (like dir/*.md).
+            If a list, should be a list of file paths, file patterns, or pathlib.Path
+            objects. In addition, pathlib.Path objects as well as the generators produced by
+            pathlib.Path.glob may be specified.
 
     :param str to: format into which the input should be converted; can be one of
             `pypandoc.get_pandoc_formats()[1]`
@@ -130,6 +134,14 @@ def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=N
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
+    # This if block effectively adds support for pathlib.Path objects
+    # and generators produced by pathlib.Path().glob().
+    if not isinstance(source_file, str):
+        try:
+            source_file = list(map(str, source_file))
+        except TypeError:
+            source_file = str(source_file)
+
     if not _identify_path(source_file):
         raise RuntimeError("source_file is not a valid path")
     if _is_network_path(source_file): # if the source_file is an url
@@ -145,18 +157,15 @@ def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=N
     if isinstance(source_file, list): # a list of possibly file or file patterns. Expand all with glob
         for filepath in source_file:
             discovered_source_files.extend(glob.glob(filepath))
-    if len(discovered_source_files) == 1: # behavior for a single file or a pattern
-        format = _identify_format_from_path(discovered_source_files[0], format)
-        return _convert_input(discovered_source_files[0], format, 'path', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          cworkdir=cworkdir)
-    else: # behavior for multiple  files or file patterns
-        format = _identify_format_from_path(discovered_source_files[0], format)
-        return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          cworkdir=cworkdir)
+
+    format = _identify_format_from_path(discovered_source_files[0], format)
+    if len(discovered_source_files) == 1:
+        discovered_source_files = discovered_source_files[0]
+
+    return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
+                      outputfile=outputfile, filters=filters,
+                      verify_format=verify_format, sandbox=sandbox,
+                      cworkdir=cworkdir)
 
 
 def _identify_path(source) -> bool:
