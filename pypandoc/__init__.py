@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, with_statement
 from typing import Iterable
 from typing import Union
+from typing import Generator
 
 import logging
 import os
@@ -11,6 +12,7 @@ import sys
 import tempfile
 import textwrap
 import glob
+from pathlib import Path
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
@@ -93,9 +95,10 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
                           cworkdir=cworkdir)
 
 
-def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=None, extra_args:Iterable=(), encoding:str='utf-8',
-                 outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
-                 sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
+def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:Union[str, None]=None,
+                 extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str]=None,
+                 filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=True,
+                 cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param (str, list, pathlib.Path) source_file: If a string, should be either
