@@ -537,6 +537,15 @@ class TestPypandoc(unittest.TestCase):
                                                                   'html').lower()
         assert received_from_str_filename_input == received_from_path_filename_input
 
+    def test_basic_conversion_to_pathlib_file(self):
+        with closed_tempfile('.rst', ) as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received = pypandoc.convert_text('# some title\n', to='rst', format='md', outputfile=Path(file_name))
+            self.assertEqualExceptForNewlineEnd("", received)
+            with io.open(file_name) as f:
+                written = f.read()
+            self.assertEqualExceptForNewlineEnd(expected, written)
+
     def assertEqualExceptForNewlineEnd(self, expected, received):  # noqa
         # output written to a file does not seem to have os.linesep
         # handle everything here by replacing the os linesep by a simple \n

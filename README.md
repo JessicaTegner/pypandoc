@@ -170,7 +170,9 @@ import pypandoc
 from pathlib import Path
 
 # single file
-output = pypandoc.convert_file(Path('somefile.md'), 'html')
+input = Path('somefile.md')
+output = input.with_suffix('.docx')
+pypandoc.convert_file(input, 'docx', outputfile=output)
 
 # convert all markdown files in a chapters/ subdirectory.
 pypandoc.convert_file(Path('chapters').glob('*.md'), 'docx', outputfile="somefile.docx")

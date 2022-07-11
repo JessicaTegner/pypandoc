@@ -54,7 +54,7 @@ __all__ = ['convert_file', 'convert_text',
 logger = logging.getLogger(__name__)
 
 def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
-                 outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
+                 outputfile:Union[None, str, Path]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
                  sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
@@ -96,7 +96,7 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
 
 
 def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:Union[str, None]=None,
-                 extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str]=None,
+                 extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str, Path]=None,
                  filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=True,
                  cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
@@ -342,7 +342,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     args += input_file
 
     if outputfile:
-        args.append("--output=" + outputfile)
+        args.append("--output=" + str(outputfile))
 
     if sandbox:
         if ensure_pandoc_minimal_version(2,15): # sandbox was introduced in pandoc 2.15, so only add if we are using 2.15 or above.
