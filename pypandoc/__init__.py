@@ -70,8 +70,9 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
 
     :param str encoding: the encoding of the input bytes (Default value = 'utf-8')
 
-    :param str outputfile: output will be written to outfilename or the converted content
-            returned if None (Default value = None)
+    :param str outputfile: output will be written to outputfile or the converted content
+            returned if None. The output filename can be specified as a string
+            or pathlib.Path object. (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
@@ -119,8 +120,9 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
 
     :param str encoding: the encoding of the file or the input bytes (Default value = 'utf-8')
 
-    :param str outputfile: output will be written to outfilename or the converted content
-            returned if None (Default value = None)
+    :param str outputfile: output will be written to outputfile or the converted content
+            returned if None. The output filename can be specified as a string
+            or pathlib.Path object. (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
