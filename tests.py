@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 import warnings
+from pathlib import Path
 
 import pypandoc
 from pypandoc.py3compat import path2url, string_types, unicode_type
@@ -507,6 +508,43 @@ class TestPypandoc(unittest.TestCase):
         p = subprocess.Popen(args, stdout=subprocess.PIPE)
         out, err = p.communicate()
         return out.decode('utf-8')
+
+    def test_basic_conversion_from_file_pathlib(self):
+        with closed_tempfile('.md', text='# some title\n') as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received_from_str_filename_input = pypandoc.convert_file(file_name, 'rst')
+            received_from_path_filename_input = pypandoc.convert_file(Path(file_name), 'rst')
+            self.assertEqualExceptForNewlineEnd(expected, received_from_str_filename_input)
+            self.assertEqualExceptForNewlineEnd(expected, received_from_path_filename_input)
+
+    def test_basic_conversion_from_multiple_files_pathlib(self):
+        with closed_tempfile('.md', text='some title') as file_name1:
+            with closed_tempfile('.md', text='some title') as file_name2:
+                expected = '<p>some title</p>\n<p>some title</p>'
+                received_from_str_filename_input = pypandoc.convert_file([file_name1, file_name2], 'html')
+                received_from_path_filename_input = pypandoc.convert_file([Path(file_name1), Path(file_name2)], 'html')
+                self.assertEqualExceptForNewlineEnd(expected, received_from_str_filename_input)
+                self.assertEqualExceptForNewlineEnd(expected, received_from_path_filename_input)
+
+    def test_basic_conversion_from_file_pattern_pathlib_glob(self):
+        received_from_str_filename_input = pypandoc.convert_file("./*.md", 'html').lower()
+        received_from_path_filename_input = pypandoc.convert_file(Path(".").glob("*.md"), 'html').lower()
+        assert received_from_str_filename_input == received_from_path_filename_input
+
+    def test_basic_conversion_from_file_pattern_with_input_list_pathlib_glob(self):
+        received_from_str_filename_input = pypandoc.convert_file(["./*.md", "./*.md"], 'html').lower()
+        received_from_path_filename_input = pypandoc.convert_file([*Path(".").glob("*.md"), *Path(".").glob("*.md")],
+                                                                  'html').lower()
+        assert received_from_str_filename_input == received_from_path_filename_input
+
+    def test_basic_conversion_to_pathlib_file(self):
+        with closed_tempfile('.rst', ) as file_name:
+            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            received = pypandoc.convert_text('# some title\n', to='rst', format='md', outputfile=Path(file_name))
+            self.assertEqualExceptForNewlineEnd("", received)
+            with io.open(file_name) as f:
+                written = f.read()
+            self.assertEqualExceptForNewlineEnd(expected, written)
 
     def assertEqualExceptForNewlineEnd(self, expected, received):  # noqa
         # output written to a file does not seem to have os.linesep
