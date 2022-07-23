@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, with_statement
 from typing import Iterable
 from typing import Union
+from typing import Generator
 
 import logging
 import os
@@ -11,6 +12,7 @@ import sys
 import tempfile
 import textwrap
 import glob
+from pathlib import Path
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
@@ -52,7 +54,7 @@ __all__ = ['convert_file', 'convert_text',
 logger = logging.getLogger(__name__)
 
 def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
-                 outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
+                 outputfile:Union[None, str, Path]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
                  sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
@@ -68,8 +70,9 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
 
     :param str encoding: the encoding of the input bytes (Default value = 'utf-8')
 
-    :param str outputfile: output will be written to outfilename or the converted content
-            returned if None (Default value = None)
+    :param str outputfile: output will be written to outputfile or the converted content
+            returned if None. The output filename can be specified as a string
+            or pathlib.Path object. (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
@@ -93,12 +96,17 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
                           cworkdir=cworkdir)
 
 
-def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=None, extra_args:Iterable=(), encoding:str='utf-8',
-                 outputfile:Union[None, str]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
-                 sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
+def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:Union[str, None]=None,
+                 extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str, Path]=None,
+                 filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=True,
+                 cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
-    :param (str, list) source_file: Either a full file path, relative file path, a file patterh (like dir/*.md), or a list if file or file patterns.
+    :param (str, list, pathlib.Path) source_file: If a string, should be either
+            an absolute file path, relative file path, or a file pattern (like dir/*.md).
+            If a list, should be a list of file paths, file patterns, or pathlib.Path
+            objects. In addition, pathlib.Path objects as well as the generators produced by
+            pathlib.Path.glob may be specified.
 
     :param str to: format into which the input should be converted; can be one of
             `pypandoc.get_pandoc_formats()[1]`
@@ -112,8 +120,9 @@ def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=N
 
     :param str encoding: the encoding of the file or the input bytes (Default value = 'utf-8')
 
-    :param str outputfile: output will be written to outfilename or the converted content
-            returned if None (Default value = None)
+    :param str outputfile: output will be written to outputfile or the converted content
+            returned if None. The output filename can be specified as a string
+            or pathlib.Path object. (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
@@ -130,6 +139,14 @@ def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=N
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
+    # This if block effectively adds support for pathlib.Path objects
+    # and generators produced by pathlib.Path().glob().
+    if not isinstance(source_file, str):
+        try:
+            source_file = list(map(str, source_file))
+        except TypeError:
+            source_file = str(source_file)
+
     if not _identify_path(source_file):
         raise RuntimeError("source_file is not a valid path")
     if _is_network_path(source_file): # if the source_file is an url
@@ -145,18 +162,15 @@ def convert_file(source_file:Union[list, str], to:str, format:Union[str, None]=N
     if isinstance(source_file, list): # a list of possibly file or file patterns. Expand all with glob
         for filepath in source_file:
             discovered_source_files.extend(glob.glob(filepath))
-    if len(discovered_source_files) == 1: # behavior for a single file or a pattern
-        format = _identify_format_from_path(discovered_source_files[0], format)
-        return _convert_input(discovered_source_files[0], format, 'path', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          cworkdir=cworkdir)
-    else: # behavior for multiple  files or file patterns
-        format = _identify_format_from_path(discovered_source_files[0], format)
-        return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          cworkdir=cworkdir)
+
+    format = _identify_format_from_path(discovered_source_files[0], format)
+    if len(discovered_source_files) == 1:
+        discovered_source_files = discovered_source_files[0]
+
+    return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
+                      outputfile=outputfile, filters=filters,
+                      verify_format=verify_format, sandbox=sandbox,
+                      cworkdir=cworkdir)
 
 
 def _identify_path(source) -> bool:
@@ -330,7 +344,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     args += input_file
 
     if outputfile:
-        args.append("--output=" + outputfile)
+        args.append("--output=" + str(outputfile))
 
     if sandbox:
         if ensure_pandoc_minimal_version(2,15): # sandbox was introduced in pandoc 2.15, so only add if we are using 2.15 or above.
