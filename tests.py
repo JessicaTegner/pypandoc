@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 import warnings
 from pathlib import Path
@@ -307,6 +308,87 @@ class TestPypandoc(unittest.TestCase):
         found = re.search(r'10.1038', written)
         self.assertTrue(found is None)
 
+    def test_conversion_with_python_filter(self):
+        markdown_source = "**Here comes the content.**"
+        python_source = '''\
+        #!/usr/bin/env python
+
+        """
+        Pandoc filter to convert all regular text to uppercase.
+        Code, link URLs, etc. are not affected.
+        """
+
+        from pandocfilters import toJSONFilter, Str
+
+        def caps(key, value, format, meta):
+            if key == 'Str':
+                return Str(value.upper())
+
+        if __name__ == "__main__":
+            toJSONFilter(caps)
+        '''
+        python_source = textwrap.dedent(python_source)
+        with closed_tempfile(".py", python_source) as tempfile:
+            output = pypandoc.convert_text(
+                markdown_source, to='html', format='md', outputfile=None, filters=tempfile
+            ).strip()
+            expected = '<p><strong>HERE COMES THE CONTENT.</strong></p>'
+            self.assertTrue(output == expected)
+
+    def test_conversion_with_lua_filter(self):
+        markdown_source = "**Here comes the content.**"
+        lua_source = """\
+        -- taken from: https://pandoc.org/lua-filters.html
+        function Strong(elem)
+            return pandoc.SmallCaps(elem.c)
+        end
+        """
+        lua_source = textwrap.dedent(lua_source)
+        with closed_tempfile(".lua", lua_source) as tempfile:
+            output = pypandoc.convert_text(
+                markdown_source, to='html', format='md', outputfile=None, filters=tempfile
+            ).strip()
+            expected = '<p><span class="smallcaps">Here comes the content.</span></p>'
+            self.assertTrue(output == expected)
+
+    def test_conversion_with_mixed_filters(self):
+        markdown_source = "-0-"
+
+        lua = """\
+        function Para(elem)
+            return pandoc.Para(elem.content .. {{"{0}-"}})
+        end
+        """
+        lua = textwrap.dedent(lua)
+
+        python = """\
+        #!/usr/bin/env python
+
+        from pandocfilters import toJSONFilter, Para, Str
+
+        def func(key, value, format, meta):
+            if key == "Para":
+                return Para(value + [Str("{0}-")])
+
+        if __name__ == "__main__":
+            toJSONFilter(func)
+        
+        """
+        python = textwrap.dedent(python)
+
+        with closed_tempfile(".lua", lua.format(1)) as temp1, closed_tempfile(".py", python.format(2)) as temp2:
+            with closed_tempfile(".lua", lua.format(3)) as temp3, closed_tempfile(".py", python.format(4)) as temp4:
+                output = pypandoc.convert_text(
+                    markdown_source, to="html", format="md", outputfile=None, filters=[temp1, temp2, temp3, temp4]
+                ).strip()
+                expected = "<p>-0-1-2-3-4-</p>"
+                self.assertTrue(output == expected)
+
+                output = pypandoc.convert_text(
+                    markdown_source, to="html", format="md", outputfile=None, filters=[temp3, temp1, temp4, temp2]
+                ).strip()
+                expected = "<p>-0-3-1-4-2-</p>"
+                self.assertTrue(output == expected)
 
     def test_classify_pandoc_logging(self):
         
