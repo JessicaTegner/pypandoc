@@ -1,7 +1,7 @@
 # pypandoc
 
-[![Build Status](https://travis-ci.com/NicklasTegner/pypandoc.svg?branch=master)](https://travis-ci.com/NicklasTegner/pypandoc)
-[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/NicklasTegner/pypandoc?svg=true)](https://ci.appveyor.com/project/NicklasTegner/pypandoc)
+[![Build Status](https://travis-ci.com/JessicaTegner/pypandoc.svg?branch=master)](https://travis-ci.com/JessicaTegner/pypandoc)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/JessicaTegner/pypandoc?svg=true)](https://ci.appveyor.com/project/JessicaTegner/pypandoc)
 [![GitHub Releases](https://img.shields.io/github/tag/bebraw/pypandoc.svg?label=github+release)](https://github.com/bebraw/pypandoc/releases)
 [![PyPI version](https://badge.fury.io/py/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
 [![conda version](https://anaconda.org/conda-forge/pypandoc/badges/version.svg)](https://anaconda.org/conda-forge/pypandoc/)
@@ -278,7 +278,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 
 ## Contributors
 
-* [Nicklas Tegner](https://github.com/nicklastegner) - New maintainer as of 1. Juli 2021
+* [Jessica Tegner](https://github.com/JessicaTegner) - New maintainer as of 1. Juli 2021
 * [Valentin Haenel](https://github.com/esc) - String conversion fix
 * [Daniel Sanchez](https://github.com/ErunamoJAZZ) - Automatic parsing of input/output formats
 * [Thomas G.](https://github.com/coldfix) - Python 3 support

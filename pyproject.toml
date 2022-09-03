@@ -2,10 +2,10 @@
 name = "pypandoc"
 version = "1.8.1"
 description = "Thin wrapper for pandoc"
-authors = ["NicklasTegner <NicklasMCHD@live.dk>"]
+authors = ["JessicaTegner <jessica.tegneroutlook.com>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/NicklasTegner/pypandoc"
+repository = "https://github.com/JessicaTegner/pypandoc"
 
 classifiers = [
         'Development Status :: 4 - Beta',
@@ -41,5 +41,5 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]
-"Issue Tracker" = "https://github.com/NicklasTegner/pypandoc/issues"
+"Issue Tracker" = "https://github.com/JessicaTegner/pypandoc/issues"
 
