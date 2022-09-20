@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import logging
 import os
 import os.path
@@ -43,18 +44,23 @@ def _get_pandoc_urls(version="latest"):
     :return: str version: actual pandoc version. (e.g. "lastest" will be resolved to the actual one)
     """
     # url to pandoc download page
-    url = "https://github.com/jgm/pandoc/releases/" + \
-          ("tag/" if version != "latest" else "") + version
+    api_url = "https://api.github.com/repos/jgm/pandoc/releases/" + \
+          ("tags/" if version != "latest" else "") + version
     # read the HTML content
-    response = urlopen(url)
+    response = urlopen(api_url)
     content = response.read()
+    api_json = json.loads(content)
+    release_assets = {}
+    for asset in api_json["assets"]:
+        release_assets[asset["name"]] = asset["browser_download_url"]
     # regex for the binaries
     processor_architecture = "arm" if platform.uname()[4].startswith("arm") else "amd"
-    regex = re.compile(r"/jgm/pandoc/releases/download/.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
+    regex = re.compile(r"pandoc\-.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
+    matched_keys = {key for key, value in release_assets.items() if regex.match(key)}
     # a list of urls to the binaries
-    pandoc_urls_list = regex.findall(content.decode("utf-8"))
+    pandoc_urls_list = [release_assets[key] for key in matched_keys]
     # actual pandoc version
-    version = pandoc_urls_list[0].split('/')[5]
+    version = pandoc_urls_list[0].split('/')[7]
     # dict that lookup the platform from binary extension
     ext2platform = {
         'msi': 'win32',
@@ -63,7 +69,8 @@ def _get_pandoc_urls(version="latest"):
     }
     # parse pandoc_urls from list to dict
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
-    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
+    pandoc_urls = {ext2platform[url_frag[-3:]]: (url_frag) for url_frag in pandoc_urls_list}
+    
     return pandoc_urls, version
 
 
