@@ -1,0 +1,47 @@
+name: Continuous Integration
+
+on:
+  - push
+  - pull_request
+
+defaults:
+  run:
+    shell: bash
+ 
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [Ubuntu 22.04, Ubuntu 20.04, Ubuntu 18.04,  macOS 12, macOS 11, Windows Server 2022, windows-2019]
+        python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Print Python Information
+        run: python -VV
+      - name: Update dependencies
+        run: python -m pip install -U pip wheel setuptools twine
+-     - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: install TinyTeX
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            choco install tinytex -params "/AddToSystemPath" --no-progress -y
+          else
+          curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+          sudo chown -R $(whoami) /usr/local/bin
+          fi
+      - name: Install PyPandoc environment
+        run: poetry install
+      - name: Download pandoc
+        run: poetry run python setup_binary.py download_pandoc
+      - name: run tests
+        run: poetry run python tests.py
