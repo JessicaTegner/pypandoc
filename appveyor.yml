@@ -47,9 +47,6 @@ install:
   - ECHO "Installing TinyTeX (PDFLatex):"
   - ps: choco install tinytex -params "/AddToSystemPath"
   - refreshenv
-  # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
-  # this adds this to the registry!
-  - initexmf --admin --set-config-value "[MPM]AutoInstall=1"
 
   # Install Python (from the official .msi of http://python.org) and pip when
   # not already installed.
