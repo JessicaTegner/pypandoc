@@ -50,7 +50,7 @@ def _get_pandoc_urls(version="latest"):
     try:
         response = urlopen(url)
         version_url_frags = response.url.split("/")
-        version = version_url_frags[7]
+        version = version_url_frags[-1]
     except urllib.error.HTTPError as e:
         raise RuntimeError("Invalid pandoc version {}.".format(version))
         return
