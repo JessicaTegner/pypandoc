@@ -33,7 +33,9 @@ jobs:
           sudo chown -R $(whoami) /usr/local/bin
       - name: install TinyTeX on Windows
         if: runner.os == 'Windows'
-        run: choco install tinytex -params "/AddToSystemPath" --no-progress -y
+        run: |
+          choco install tinytex -params "/AddToSystemPath" --no-progress -y
+          refreshenv
       - name: Install PyPandoc environment
         run: poetry install
       - name: Download pandoc
