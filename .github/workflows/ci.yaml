@@ -23,16 +23,16 @@ jobs:
         run: python -VV
       - name: Updating dependencies
         run: python -m pip install -U pip wheel setuptools poetry
-      - name: install TinyTeX
+      - name: install TinyTeX on Linux
+        run: wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+        if: runner.os == 'Linux'
+      - name: install TinyTeX on MacOS
+      if: runner.os == 'macOS'
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            choco install tinytex -params "/AddToSystemPath" --no-progress -y
-          else
           curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
           sudo chown -R $(whoami) /usr/local/bin
-          fi
+      - name: install TinyTeX on Windows
+        run: choco install tinytex -params "/AddToSystemPath" --no-progress -y
       - name: Install PyPandoc environment
         run: poetry install
       - name: Download pandoc
