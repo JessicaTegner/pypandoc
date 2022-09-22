@@ -30,14 +30,18 @@ jobs:
     - detect/init
     - run: 'echo "The current operating system is ${OSD_ID}."'
     - run:
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
+    - run:
         command: |
           case $OSD_FAMILY in
             linux)
               osVersion=$(grep -e "^DISTRIB_RELEASE=" /etc/lsb-release | cut -c17-)
+              curl -sSL https://install.python-poetry.org | python3 -
               wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
               ;;
             darwin)
               osVersion=$(sw_vers -productVersion)
+              curl -sSL https://install.python-poetry.org | python -
               curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
               sudo chown -R $(whoami) /usr/local/bin
               ;;
@@ -47,11 +51,6 @@ jobs:
               ;;
           esac
     - checkout
-    - run:
-        name: Install the latest version of Poetry
-        command: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
-          curl -sSL https://install.python-poetry.org | python3 -
     - run: |
         poetry run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
         export PATH=~/bin:$PATH
