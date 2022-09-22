@@ -25,9 +25,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Print Python Information
         run: python -VV
-      - name: Update dependencies
+      - name: Updating dependencies
         run: python -m pip install -U pip wheel setuptools twine
--     - name: Install Poetry
+      - name: Install Poetry
         uses: snok/install-poetry@v1
       - name: install TinyTeX
         run: |
