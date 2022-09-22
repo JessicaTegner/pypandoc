@@ -44,9 +44,7 @@ install:
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
 
-  - ECHO "Installed SDKs:"
-  - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
-
+  - ECHO "Installing TinyTeX (PDFLatex):"
   - ps: choco install tinytex -params "/AddToSystemPath"
   - refreshenv
   # autoinstall latex packages (0=no, 1=autoinstall, 2=ask)
