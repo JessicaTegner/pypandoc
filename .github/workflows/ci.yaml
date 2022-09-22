@@ -1,8 +1,10 @@
 name: Continuous Integration
 
 on:
-  - push
-  - pull_request
+  pull_request:
+    paths:
+      - '**.py'
+      - '**.yaml'
 
 jobs:
   test:
