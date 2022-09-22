@@ -1,0 +1,65 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+  detect: circleci/os-detect@0.3.0
+
+
+executors:
+  docker: # Docker using the Base Convenience Image
+    docker:
+      - image: cimg/python:3.810
+      - image: cimg/python:3.89
+      - image: cimg/python:3.8
+      - image: cimg/python:3.7
+      - image: cimg/python:3.6
+  linux: # a Linux VM running Ubuntu 20.04
+    machine:
+      image: ubuntu-2004:202107-02
+  macos:
+    macos:
+      xcode: 14.1.0
+
+jobs:
+  test:
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    steps:
+    - detect/init
+    - run: 'echo "The current operating system is ${OSD_ID}."'
+    - run:
+        command: |
+          case $OSD_FAMILY in
+            linux)
+              osVersion=$(grep -e "^DISTRIB_RELEASE=" /etc/lsb-release | cut -c17-)
+              wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+              ;;
+            darwin)
+              osVersion=$(sw_vers -productVersion)
+              curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+              sudo chown -R $(whoami) /usr/local/bin
+              ;;
+            *)
+              echo "Unsupported Operating System."
+              exit 1
+              ;;
+          esac
+    - checkout
+    - python/install-packages:
+        pkg-manager: poetry
+    - run: |
+        poetry run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+        export PATH=~/bin:$PATH
+        ~/bin/pandoc -v
+        poetry run python tests.py
+
+workflows:
+  all-tests:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              os: [linux, docker, macos]
+
