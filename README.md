@@ -1,7 +1,6 @@
 # pypandoc
 
-[![Build Status](https://travis-ci.com/JessicaTegner/pypandoc.svg?branch=master)](https://travis-ci.com/JessicaTegner/pypandoc)
-[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/JessicaTegner/pypandoc?svg=true)](https://ci.appveyor.com/project/JessicaTegner/pypandoc)
+[![Build Status](https://github.com/JessicaTegner/pypandoc/actions/workflows/ci.yaml/badge.svg)](https://github.com/JessicaTegner/pypandoc/actions/workflows/ci.yaml)
 [![GitHub Releases](https://img.shields.io/github/tag/bebraw/pypandoc.svg?label=github+release)](https://github.com/bebraw/pypandoc/releases)
 [![PyPI version](https://badge.fury.io/py/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
 [![conda version](https://anaconda.org/conda-forge/pypandoc/badges/version.svg)](https://anaconda.org/conda-forge/pypandoc/)
