@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
 import logging
 import os
 import os.path
@@ -12,6 +11,7 @@ import sys
 import tempfile
 from typing import Union
 
+import urllib
 try:
     from urllib.request import urlopen
 except ImportError:
@@ -44,23 +44,27 @@ def _get_pandoc_urls(version="latest"):
     :return: str version: actual pandoc version. (e.g. "lastest" will be resolved to the actual one)
     """
     # url to pandoc download page
-    api_url = "https://api.github.com/repos/jgm/pandoc/releases/" + \
-          ("tags/" if version != "latest" else "") + version
+    url = "https://github.com/jgm/pandoc/releases/" + \
+          ("tag/" if version != "latest" else "") + version
+    # try to open the url
+    try:
+        response = urlopen(url)
+        content = response.read()
+        pattern = re.compile(r"pandoc\s*([\d.]+)")
+        version = re.search(pattern, content.decode("utf-8")).group(1)
+    except urllib.error.HTTPError as e:
+        raise RuntimeError("Invalid pandoc version {}.".format(version))
+        return
     # read the HTML content
-    response = urlopen(api_url)
+    response = urlopen("https://github.com/jgm/pandoc/releases/expanded_assets/"+version)
     content = response.read()
-    api_json = json.loads(content)
-    release_assets = {}
-    for asset in api_json["assets"]:
-        release_assets[asset["name"]] = asset["browser_download_url"]
     # regex for the binaries
     processor_architecture = "arm" if platform.uname()[4].startswith("arm") else "amd"
-    regex = re.compile(r"pandoc\-.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
-    matched_keys = {key for key, value in release_assets.items() if regex.match(key)}
+    regex = re.compile(r"/jgm/pandoc/releases/download/.*(?:"+processor_architecture+"|x86|mac).*\.(?:msi|deb|pkg)")
     # a list of urls to the binaries
-    pandoc_urls_list = [release_assets[key] for key in matched_keys]
+    pandoc_urls_list = regex.findall(content.decode("utf-8"))
     # actual pandoc version
-    version = pandoc_urls_list[0].split('/')[7]
+    version = pandoc_urls_list[0].split('/')[5]
     # dict that lookup the platform from binary extension
     ext2platform = {
         'msi': 'win32',
@@ -69,8 +73,7 @@ def _get_pandoc_urls(version="latest"):
     }
     # parse pandoc_urls from list to dict
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
-    pandoc_urls = {ext2platform[url_frag[-3:]]: (url_frag) for url_frag in pandoc_urls_list}
-    
+    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
     return pandoc_urls, version
 
 
