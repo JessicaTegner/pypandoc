@@ -45,7 +45,7 @@ install:
   - ps: "ls \"C:/\""
 
   - ECHO "Installing TinyTeX (PDFLatex):"
-  - ps: choco install tinytex -params "/AddToSystemPath"
+  - ps: choco install tinytex -params "/AddToSystemPath" --no-progress -y
   - refreshenv
 
   # Install Python (from the official .msi of http://python.org) and pip when
