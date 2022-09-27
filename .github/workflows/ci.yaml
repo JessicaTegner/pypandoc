@@ -21,7 +21,7 @@ jobs:
         run: |
           curl -O -sSL https://install.python-poetry.org/install-poetry.py
           python3 install-poetry.py -y
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+          export PATH="/Users/runner/.local/bin:$PATH"
           rm install-poetry.py
       - name: Set up python
         id: setup-python
