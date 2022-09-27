@@ -27,10 +27,9 @@ jobs:
       - name: install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
       - name: Install and configure Poetry
-        uses: snok/install-poetry@v1.3.1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+        run: |
+        pip3 install poetry
+        poetry config virtualenvs.in-project true
       - name: Set up cache
         uses: actions/cache@v3
         id: cached-poetry-dependencies
