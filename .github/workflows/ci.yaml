@@ -23,13 +23,12 @@ jobs:
           python install-poetry.py -y
           echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
           rm install-poetry.py
-          poetry config virtualenvs.create false
       - name: Set up python
         id: setup-python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: 'poetry'
       - name: Print Python Information
         run: python -VV
       - name: install TinyTeX
