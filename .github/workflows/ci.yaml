@@ -17,12 +17,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-      - name: Install poetry
-        run: |
-          curl -O -sSL https://install.python-poetry.org/install-poetry.py
-          python install-poetry.py -y
-          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
-          rm install-poetry.py
+      - name: Setup Poetry
+        uses: Gr1N/setup-poetry@v7
       - name: Set up python
         id: setup-python
         uses: actions/setup-python@v4
