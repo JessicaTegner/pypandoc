@@ -28,8 +28,8 @@ jobs:
         uses: r-lib/actions/setup-tinytex@v2
       - name: Install and configure Poetry
         run: |
-        pip3 install poetry
-        poetry config virtualenvs.in-project true
+          pip3 install poetry
+          poetry config virtualenvs.in-project true
       - name: Set up cache
         uses: actions/cache@v3
         id: cached-poetry-dependencies
