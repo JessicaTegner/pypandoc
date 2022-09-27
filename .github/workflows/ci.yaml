@@ -69,8 +69,7 @@ jobs:
 
   publisher_release:
     needs: [builder]
-    if: startsWith(github.event.ref, 'refs/tags/v')
-    if: github.ref == 'refs/heads/master'
+    if: startsWith(github.event.ref, 'refs/tags/v') && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
