@@ -16,9 +16,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Updating poetry
-        run: python -m pip install -U pip poetry
+        uses: actions/checkout@v3
+      - name: Install poetry
+        run: |
+          curl -O -sSL https://install.python-poetry.org/install-poetry.py
+          python install-poetry.py -y
+          echo "PATH=${HOME}/.poetry/bin:${PATH}" >> $GITHUB_ENV
+          rm install-poetry.py
       - name: Set up python
         id: setup-python
         uses: actions/setup-python@v4
@@ -30,7 +34,10 @@ jobs:
       - name: install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
       - name: Install PyPandoc environment
-        run: poetry install
+        run: |
+          # This is required to do as of @actions/checkout@v3 to prevent default action python (3.8) from being used
+          poetry env use ${{ matrix.python-version }}
+          poetry install
       - name: Download pandoc
         run: poetry run python setup_binary.py download_pandoc
       - name: run tests
