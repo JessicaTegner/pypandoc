@@ -2,6 +2,10 @@ name: Continuous Integration
 
 on: push
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     strategy:
