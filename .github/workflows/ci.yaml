@@ -1,12 +1,6 @@
 name: Continuous Integration
 
-on:
-  push:
-    branches: [ $default-branch ]
-  pull_request:
-    paths:
-      - '**.py'
-      - '**.yaml'
+on: push:
 
 jobs:
   test:
@@ -39,6 +33,7 @@ jobs:
 
   builder:
     needs: [test]
+    if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
         os: [macos-10.15, windows-2019]
@@ -75,6 +70,7 @@ jobs:
   publisher_release:
     needs: [builder]
     if: startsWith(github.event.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -93,6 +89,7 @@ jobs:
 
   publisher_latest:
     needs: [builder]
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
