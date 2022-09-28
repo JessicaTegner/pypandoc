@@ -1,22 +1,26 @@
 name: Continuous Integration
 
-on: push
+on: [push, pull_request]
 
 defaults:
   run:
     shell: bash
 
+concurrency:
+  group: ci-tests-${{ github.ref }}-1
+  cancel-in-progress: true
+  
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-12, macos-11, windows-2022, windows-2019]
+        os: [ubuntu-20.04, macos-11, windows-2019]
         python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10", "pypy3.7", "pypy3.8", "pypy3.9", ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up python
         id: setup-python
         uses: actions/setup-python@v4
@@ -24,12 +28,21 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Print Python Information
         run: python -VV
-      - name: Updating dependencies
-        run: python -m pip install -U pip poetry
       - name: install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
-      - name: Install PyPandoc environment
+      - name: Install and configure Poetry
+        run: |
+          pip3 install poetry
+          poetry config virtualenvs.in-project true
+      - name: Set up cache
+        uses: actions/cache@v3
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
         run: poetry install
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Download pandoc
         run: poetry run python setup_binary.py download_pandoc
       - name: run tests
@@ -40,7 +53,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
-        os: [macos-10.15, windows-2019]
+        os: [macos-11, windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
@@ -53,7 +66,7 @@ jobs:
             echo "PYTHON_ARCHITECTURE=x64" >> $GITHUB_ENV
           fi
       - name: Set up python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9.x"
           architecture: "${{ env.PYTHON_ARCHITECTURE }}"
