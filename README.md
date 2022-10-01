@@ -1,11 +1,15 @@
 # pypandoc
 
 [![Build Status](https://github.com/JessicaTegner/pypandoc/actions/workflows/ci.yaml/badge.svg)](https://github.com/JessicaTegner/pypandoc/actions/workflows/ci.yaml)
-[![GitHub Releases](https://img.shields.io/github/tag/bebraw/pypandoc.svg?label=github+release)](https://github.com/bebraw/pypandoc/releases)
-[![PyPI version](https://badge.fury.io/py/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
+[![GitHub Releases](https://img.shields.io/github/tag/JessicaTegner/pypandoc.svg)](https://github.com/JessicaTegner/pypandoc/releases)
+[![Pypandoc PyPI Version](https://img.shields.io/pypi/v/pypandoc?label=pypandoc+pypi+version)](https://pypi.org/project/pypandoc/)
+[![Pypandoc Binary PyPI Version](https://img.shields.io/pypi/v/pypandoc_binary?label=pypandoc+binary+pypi+version)](https://pypi.org/project/pypandoc_binary/)
+![PyPandoc PyPi Downloads](https://img.shields.io/pypi/dm/pypandoc)
+![PyPandoc Binary PyPI Downloads](https://img.shields.io/pypi/dm/pypandoc_binary)
 [![conda version](https://anaconda.org/conda-forge/pypandoc/badges/version.svg)](https://anaconda.org/conda-forge/pypandoc/)
 [![Development Status](https://img.shields.io/pypi/status/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
-[![Python version](https://img.shields.io/pypi/pyversions/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
+[![PyPandoc Python version](https://img.shields.io/pypi/pyversions/pypandoc.svg)](https://pypi.python.org/pypi/pypandoc/)
+[![PyPandoc Binary Python version](https://img.shields.io/pypi/pyversions/pypandoc_binary.svg)](https://pypi.python.org/pypi/pypandoc_binary/)
 ![License](https://img.shields.io/pypi/l/pypandoc.svg)
 
 Pypandoc provides a thin wrapper for [pandoc](https://pandoc.org), a universal
