@@ -311,7 +311,7 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_with_python_filter(self):
         markdown_source = "**Here comes the content.**"
         python_source = '''\
-        #!/usr/bin/env python
+        #!{0}
 
         """
         Pandoc filter to convert all regular text to uppercase.
@@ -326,7 +326,7 @@ class TestPypandoc(unittest.TestCase):
 
         if __name__ == "__main__":
             toJSONFilter(caps)
-        '''
+        '''.format(sys.executable)
         python_source = textwrap.dedent(python_source)
         with closed_tempfile(".py", python_source) as tempfile:
             output = pypandoc.convert_text(
@@ -362,7 +362,7 @@ class TestPypandoc(unittest.TestCase):
         lua = textwrap.dedent(lua)
 
         python = """\
-        #!/usr/bin/env python
+        #!{0}
 
         from pandocfilters import toJSONFilter, Para, Str
 
@@ -373,7 +373,7 @@ class TestPypandoc(unittest.TestCase):
         if __name__ == "__main__":
             toJSONFilter(func)
         
-        """
+        """.format(sys.executable)
         python = textwrap.dedent(python)
 
         with closed_tempfile(".lua", lua.format(1)) as temp1, closed_tempfile(".py", python.format(2)) as temp2:
