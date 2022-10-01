@@ -337,6 +337,8 @@ def _convert_input(source, format, input_type, to, extra_args=(),
             input_file = source
     else:
         input_file = []
+    
+    input_file = sorted(input_file)
     args = [__pandoc_path, '--from=' + format]
 
     args.append('--to=' + to)
