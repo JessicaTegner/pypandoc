@@ -55,7 +55,7 @@ def _get_pandoc_urls(version="latest"):
         raise RuntimeError("Invalid pandoc version {}.".format(version))
         return
     # read the HTML content
-    response = urlopen("https://github.com/jgm/pandoc/releases/expanded_assets/"+version)
+    response = urlopen(f"https://github.com/jgm/pandoc/releases/expanded_assets/{version}")
     content = response.read()
     # regex for the binaries
     uname = platform.uname()[4]
@@ -73,19 +73,19 @@ def _get_pandoc_urls(version="latest"):
     }
     # parse pandoc_urls from list to dict
     # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
-    pandoc_urls = {ext2platform[url_frag[-3:]]: ("https://github.com" + url_frag) for url_frag in pandoc_urls_list}
+    pandoc_urls = {ext2platform[url_frag[-3:]]: (f"https://github.com{url_frag}") for url_frag in pandoc_urls_list}
     return pandoc_urls, version
 
 
 def _make_executable(path):
     mode = os.stat(path).st_mode
     mode |= (mode & 0o444) >> 2  # copy R bits to X
-    logger.info("Making %s executeable..." % (path))
+    logger.info(f"Making {path} executeable...")
     os.chmod(path, mode)
 
 
 def _handle_linux(filename, targetfolder):
-    logger.info("Unpacking %s to tempfolder..." % (filename))
+    logger.info(f"Unpacking {filename} to tempfolder...")
 
     tempfolder = tempfile.mkdtemp()
     cur_wd = os.getcwd()
@@ -103,13 +103,13 @@ def _handle_linux(filename, targetfolder):
         exe = "pandoc"
         src = os.path.join(tempfolder, "usr", "bin", exe)
         dst = os.path.join(targetfolder, exe)
-        logger.info("Copying %s to %s ..." % (exe, targetfolder))
+        logger.info(f"Copying {exe} to {targetfolder} ...")
         shutil.copyfile(src, dst)
         _make_executable(dst)
         exe = "pandoc-citeproc"
         src = os.path.join(tempfolder, "usr", "bin", exe)
         dst = os.path.join(targetfolder, exe)
-        logger.info("Copying %s to %s ..." % (exe, targetfolder))
+        logger.info(f"Copying {exe} to {targetfolder} ...")
         try:
             shutil.copyfile(src, dst)
             _make_executable(dst)
@@ -117,7 +117,7 @@ def _handle_linux(filename, targetfolder):
             logger.exception("Didn't copy pandoc-citeproc")
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
         dst = os.path.join(targetfolder, "copyright.pandoc")
-        logger.info("Copying copyright to %s ..." % (targetfolder))
+        logger.info(f"Copying copyright to {targetfolder} ...")
         shutil.copyfile(src, dst)
     finally:
         os.chdir(cur_wd)
@@ -125,7 +125,7 @@ def _handle_linux(filename, targetfolder):
 
 
 def _handle_darwin(filename, targetfolder):
-    logger.info("Unpacking %s to tempfolder..." % (filename))
+    logger.info(f"Unpacking {filename} to tempfolder...")
 
     tempfolder = tempfile.mkdtemp()
 
@@ -144,14 +144,14 @@ def _handle_darwin(filename, targetfolder):
     exe = "pandoc"
     src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info("Copying %s to %s ..." % (exe, targetfolder))
+    logger.info(f"Copying {exe} to {targetfolder} ...")
     shutil.copyfile(src, dst)
     _make_executable(dst)
 
     exe = "pandoc-citeproc"
     src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info("Copying %s to %s ..." % (exe, targetfolder))
+    logger.info(f"Copying {exe} to {targetfolder} ...")
     try:
         shutil.copyfile(src, dst)
         _make_executable(dst)
@@ -164,7 +164,7 @@ def _handle_darwin(filename, targetfolder):
 
 
 def _handle_win32(filename, targetfolder):
-    logger.info("Unpacking %s to tempfolder..." % (filename))
+    logger.info(f"Unpacking {filename} to tempfolder...")
 
     tempfolder = tempfile.mkdtemp()
 
@@ -177,13 +177,13 @@ def _handle_win32(filename, targetfolder):
     exe = "pandoc.exe"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info("Copying %s to %s ..." % (exe, targetfolder))
+    logger.info(f"Copying {exe} to {targetfolder} ...")
     shutil.copyfile(src, dst)
 
     exe = "pandoc-citeproc.exe"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info("Copying %s to %s ..." % (exe, targetfolder))
+    logger.info(f"Copying {exe} to {targetfolder} ...")
     try:
         shutil.copyfile(src, dst)
     except FileNotFoundError:
@@ -192,7 +192,7 @@ def _handle_win32(filename, targetfolder):
     exe = "COPYRIGHT.txt"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info("Copying %s to %s ..." % (exe, targetfolder))
+    logger.info(f"Copying {exe} to {targetfolder} ...")
     shutil.copyfile(src, dst)
 
     # remove temporary dir
@@ -250,9 +250,9 @@ def download_pandoc(url:Union[str, None]=None,
         filename = os.path.join(os.path.expanduser(download_folder), filename)
 
     if os.path.isfile(filename):
-        logger.info("Using already downloaded file %s" % (filename))
+        logger.info(f"Using already downloaded file {filename}")
     else:
-        logger.info("Downloading pandoc from %s ..." % url)
+        logger.info(f"Downloading pandoc from {url} ...")
         # https://stackoverflow.com/questions/30627937/tracebaclk-attributeerroraddinfourl-instance-has-no-attribute-exit
         response = urlopen(url)
         with open(filename, 'wb') as out_file:
