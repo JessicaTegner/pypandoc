@@ -37,15 +37,3 @@ def cast_bytes(s, encoding=None):
     if not isinstance(s, bytes):
         return _encode(s, encoding)
     return s
-
-# from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
-from urllib.parse import urljoin, urlparse
-from urllib.request import pathname2url, url2pathname
-
-
-def path2url(path):  # noqa: E303
-    return urljoin('file:', pathname2url(path))
-
-
-def url2path(url):  # noqa: E303
-    return url2pathname(urlparse(url).path)

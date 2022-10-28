@@ -13,10 +13,11 @@ import textwrap
 import glob
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, url2path
+from .py3compat import cast_bytes, cast_unicode
 
 __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
@@ -52,6 +53,11 @@ __all__ = ['convert_file', 'convert_text',
 
 # Set up the module level logger
 logger = logging.getLogger(__name__)
+
+def url2path(url):  # noqa: E303
+    # from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
+    return url2pathname(urlparse(url).path)
+
 
 def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
                  outputfile:Union[None, str, Path]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,

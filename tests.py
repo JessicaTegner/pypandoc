@@ -14,6 +14,8 @@ import textwrap
 import unittest
 import warnings
 from pathlib import Path
+from urllib.parse import urljoin
+from urllib.request import pathname2url
 
 import pypandoc
 
@@ -220,7 +222,9 @@ class TestPypandoc(unittest.TestCase):
             expected = u'some title{0}=========={0}{0}'.format(os.linesep)
             # this keeps the : (which should be '|' on windows but pandoc
             # doesn't like it
-            file_url = path2url(file_name)
+
+            # from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
+            file_url = urljoin('file:', pathname2url(file_name))
             assert pypandoc._identify_path(file_url)
 
             received = pypandoc.convert_file(file_url, 'rst')
