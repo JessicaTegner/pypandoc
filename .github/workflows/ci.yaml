@@ -50,7 +50,7 @@ jobs:
 
   builder_pypandoc:
     needs: [test]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-20.04  # Any OS is fine as this wheel is not OS dependent
     steps:
       - name: Check out repository
