@@ -17,7 +17,7 @@ from urllib.request import url2pathname
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_unicode
+from .py3compat import _DEFAULT_ENCODING
 
 __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
@@ -244,7 +244,10 @@ def _as_unicode(source:any, encoding:str) -> any:
         # if a source and a different encoding is given, try to decode the the source into a
         # unicode string
         try:
-            source = cast_unicode(source, encoding=encoding)
+            if isinstance(source, bytes):
+                encoding = encoding or _DEFAULT_ENCODING
+                source = source.decode(encoding)
+            
         except (UnicodeDecodeError, UnicodeEncodeError):
             pass
     return source

@@ -14,13 +14,3 @@ except Exception:
     pass
 
 _DEFAULT_ENCODING = _DEFAULT_ENCODING or sys.getdefaultencoding()
-
-
-def _decode(s, encoding=None):
-    encoding = encoding or _DEFAULT_ENCODING
-    return s.decode(encoding)
-
-def cast_unicode(s, encoding=None):
-    if isinstance(s, bytes):
-        return _decode(s, encoding)
-    return s
