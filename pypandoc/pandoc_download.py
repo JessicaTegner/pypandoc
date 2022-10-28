@@ -109,12 +109,10 @@ def _handle_linux(filename, targetfolder):
         exe = "pandoc-citeproc"
         src = os.path.join(tempfolder, "usr", "bin", exe)
         dst = os.path.join(targetfolder, exe)
-        logger.info(f"Copying {exe} to {targetfolder} ...")
-        try:
+        if os.path.exists(src):
+            logger.info(f"Copying {exe} to {targetfolder} ...")
             shutil.copyfile(src, dst)
             _make_executable(dst)
-        except FileNotFoundError:
-            logger.exception("Didn't copy pandoc-citeproc")
         src = os.path.join(tempfolder, "usr", "share", "doc", "pandoc", "copyright")
         dst = os.path.join(targetfolder, "copyright.pandoc")
         logger.info(f"Copying copyright to {targetfolder} ...")
@@ -151,12 +149,10 @@ def _handle_darwin(filename, targetfolder):
     exe = "pandoc-citeproc"
     src = os.path.join(pkgutilfolder, "usr", "local", "bin", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info(f"Copying {exe} to {targetfolder} ...")
-    try:
+    if os.path.exists(src):
+        logger.info(f"Copying {exe} to {targetfolder} ...")
         shutil.copyfile(src, dst)
         _make_executable(dst)
-    except FileNotFoundError:
-        logger.exception("Didn't copy pandoc-citeproc")
 
     # remove temporary dir
     shutil.rmtree(tempfolder)
@@ -183,11 +179,9 @@ def _handle_win32(filename, targetfolder):
     exe = "pandoc-citeproc.exe"
     src = os.path.join(tempfolder, "Pandoc", exe)
     dst = os.path.join(targetfolder, exe)
-    logger.info(f"Copying {exe} to {targetfolder} ...")
-    try:
+    if os.path.exists(src):
+        logger.info(f"Copying {exe} to {targetfolder} ...")
         shutil.copyfile(src, dst)
-    except FileNotFoundError:
-        logger.exception("Didn't copy pandoc-citeproc.exe")
 
     exe = "COPYRIGHT.txt"
     src = os.path.join(tempfolder, "Pandoc", exe)
