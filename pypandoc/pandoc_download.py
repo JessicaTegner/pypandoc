@@ -231,8 +231,9 @@ def download_pandoc(url:Union[str, None]=None,
         # compatibility with py3
         if pf.startswith("linux"):
             pf = "linux"
-            if platform.architecture()[0] != "64bit":
-                raise RuntimeError("Linux pandoc is only compiled for 64bit.")
+            arch = platform.architecture()[0]
+            if arch != "64bit":
+                raise RuntimeError(f"Linux pandoc is only compiled for 64bit. Got arch={arch}.")
 
         # get pandoc_urls
         pandoc_urls, _ = _get_pandoc_urls(version)
