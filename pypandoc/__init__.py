@@ -21,7 +21,7 @@ from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlpars
 __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
 __url__ = 'https://github.com/JessicaTegner/pypandoc'
-__version__ = '1.9'
+__version__ = '1.10'
 __license__ = 'MIT'
 __description__ = "Thin wrapper for pandoc."
 __python_requires__ = ">=3.6"
