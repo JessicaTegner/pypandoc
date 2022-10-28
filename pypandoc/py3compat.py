@@ -38,11 +38,6 @@ def cast_bytes(s, encoding=None):
         return _encode(s, encoding)
     return s
 
-PY3 = True
-
-string_types = (str,)
-unicode_type = str
-
 # from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
 from urllib.parse import urljoin, urlparse
 from urllib.request import pathname2url, url2pathname

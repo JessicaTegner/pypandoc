@@ -16,7 +16,6 @@ import warnings
 from pathlib import Path
 
 import pypandoc
-from pypandoc.py3compat import path2url, string_types, unicode_type
 
 
 @contextlib.contextmanager
@@ -53,7 +52,7 @@ def closed_tempfile(suffix, text=None, dir_name=None):
 # Stolen from pandas
 def is_list_like(arg):
     return (hasattr(arg, '__iter__') and
-            not isinstance(arg, string_types))
+            not isinstance(arg, str))
 
 
 @contextlib.contextmanager
@@ -155,7 +154,7 @@ class TestPypandoc(unittest.TestCase):
     def test_get_pandoc_version(self):
         assert "HOME" in os.environ, "No HOME set, this will error..."
         version = pypandoc.get_pandoc_version()
-        self.assertTrue(isinstance(version, pypandoc.string_types))
+        self.assertTrue(isinstance(version, str))
         major = int(version.split(".")[0])
         # according to http://pandoc.org/releases.html there were only two versions 0.x ...
         self.assertTrue(major in [0, 1, 2])
@@ -490,12 +489,12 @@ class TestPypandoc(unittest.TestCase):
         # make sure that pandoc always returns unicode and does not mishandle it
         expected = u'üäöîôû{0}'.format(os.linesep)
         written = pypandoc.convert_text(u'<p>üäöîôû</p>', 'md', format='html')
-        self.assertTrue(isinstance(written, unicode_type))
+        self.assertTrue(isinstance(written, str))
         self.assertEqualExceptForNewlineEnd(expected, written)
         bytes = u'<p>üäöîôû</p>'.encode("utf-8")
         written = pypandoc.convert_text(bytes, 'md', format='html')
         self.assertTrue(expected == written)
-        self.assertTrue(isinstance(written, unicode_type))
+        self.assertTrue(isinstance(written, str))
 
         # Only use german umlauts in the next test, as iso-8859-15 covers that
         expected = u'äüäö{0}'.format(os.linesep)
@@ -516,7 +515,7 @@ class TestPypandoc(unittest.TestCase):
         # with the right encoding it should work...
         written = pypandoc.convert_text(bytes, 'md', format='html', encoding="iso-8859-15")
         self.assertEqualExceptForNewlineEnd(expected, written)
-        self.assertTrue(isinstance(written, unicode_type))
+        self.assertTrue(isinstance(written, str))
 
     def test_conversion_from_non_plain_text_file(self):
         with closed_tempfile('.docx') as file_name:
