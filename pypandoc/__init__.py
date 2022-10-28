@@ -17,7 +17,7 @@ from urllib.request import url2pathname
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode
+from .py3compat import cast_unicode
 
 __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
@@ -398,7 +398,8 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
     if string_input:
         try:
-            source = cast_bytes(source, encoding='utf-8')
+            if not isinstance(source, bytes):
+                source = source.encode('utf-8')
         except (UnicodeDecodeError, UnicodeEncodeError):
             # assume that it is already a utf-8 encoded string
             pass
