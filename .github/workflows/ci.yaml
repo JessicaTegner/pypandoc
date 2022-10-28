@@ -72,7 +72,7 @@ jobs:
 
   builder_pypandoc_binary:
     needs: [test]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     strategy:
       matrix:
         # Ref: https://cibuildwheel.readthedocs.io/en/stable/options/#archs
@@ -103,7 +103,7 @@ jobs:
 
   publisher_release:
     needs: [builder_pypandoc, builder_pypandoc_binary]
-    if: startsWith(github.event.ref, 'refs/tags/v') && github.ref == 'refs/heads/master'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
