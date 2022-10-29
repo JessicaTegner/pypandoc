@@ -9,13 +9,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Union
-
 import urllib
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
+from typing import Union
+from urllib.request import urlopen
 
 from .handler import _check_log_handler
 

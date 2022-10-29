@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, with_statement
 from typing import Iterable
 from typing import Union
 from typing import Generator
@@ -13,10 +12,12 @@ import tempfile
 import textwrap
 import glob
 from pathlib import Path
+from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 from .handler import _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
+from .py3compat import _DEFAULT_ENCODING
 
 __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
@@ -52,6 +53,11 @@ __all__ = ['convert_file', 'convert_text',
 
 # Set up the module level logger
 logger = logging.getLogger(__name__)
+
+def url2path(url):  # noqa: E303
+    # from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
+    return url2pathname(urlparse(url).path)
+
 
 def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
                  outputfile:Union[None, str, Path]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
@@ -238,7 +244,10 @@ def _as_unicode(source:any, encoding:str) -> any:
         # if a source and a different encoding is given, try to decode the the source into a
         # unicode string
         try:
-            source = cast_unicode(source, encoding=encoding)
+            if isinstance(source, bytes):
+                encoding = encoding or _DEFAULT_ENCODING
+                source = source.decode(encoding)
+            
         except (UnicodeDecodeError, UnicodeEncodeError):
             pass
     return source
@@ -356,7 +365,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
     # adds the proper filter syntax for each item in the filters list
     if filters is not None:
-        if isinstance(filters, string_types):
+        if isinstance(filters, str):
             filters = filters.split()
         f = ['--lua-filter=' + x if x.endswith(".lua") else '--filter=' + x for x in filters]
         args.extend(f)
@@ -392,7 +401,8 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
     if string_input:
         try:
-            source = cast_bytes(source, encoding='utf-8')
+            if not isinstance(source, bytes):
+                source = source.encode('utf-8')
         except (UnicodeDecodeError, UnicodeEncodeError):
             # assume that it is already a utf-8 encoded string
             pass
