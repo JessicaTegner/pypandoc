@@ -35,7 +35,7 @@ class DownloadPandocCommand(Command):
     def run(self):
         from pypandoc.pandoc_download import download_pandoc
         targetfolder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "pypandoc", "files")
-        download_pandoc(targetfolder=targetfolder)
+        download_pandoc(targetfolder=targetfolder, version="2.19.2")
 
 
 cmd_classes = {'download_pandoc': DownloadPandocCommand}
