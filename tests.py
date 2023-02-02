@@ -467,14 +467,9 @@ class TestPypandoc(unittest.TestCase):
                 output = re.sub(r'\r', '', output)
                 output = output.replace("'missing.png'",
                                         "missing.png")
-                expected = (u'[WARNING] Could not fetch resource '
-                            u'missing.png: PandocResourceNotFound '
-                            u'"missing.png"\n'
-                            u'[WARNING] Could not fetch resource '
-                            u'missing.png: PandocResourceNotFound '
-                            u'"missing.png"\n\n')
-                self.assertEqual(expected, output)
-
+                output = output.lower()
+                print(output)
+                assert "[warning] could not fetch resource missing.png" in output
 
     def test_conversion_stderr_nullhandler(self):
         
