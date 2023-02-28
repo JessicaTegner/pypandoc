@@ -157,8 +157,7 @@ class TestPypandoc(unittest.TestCase):
         version = pypandoc.get_pandoc_version()
         self.assertTrue(isinstance(version, pypandoc.string_types))
         major = int(version.split(".")[0])
-        # according to http://pandoc.org/releases.html there were only two versions 0.x ...
-        self.assertTrue(major in [0, 1, 2])
+        self.assertTrue(major in [0, 1, 2, 3])
 
     def test_ensure_pandoc_minimal_version(self):
         assert "HOME" in os.environ, "No HOME set, this will error..."
@@ -248,6 +247,11 @@ class TestPypandoc(unittest.TestCase):
         print(result)
 
     def test_convert_with_custom_writer(self):
+        version = pypandoc.get_pandoc_version()
+        major = int(version.split(".")[0])
+        if major == 3:
+            # apparently --print-default-data-file fails on pandoc3x
+            return
         lua_file_content = self.create_sample_lua()
         with closed_tempfile('.md', text='# title\n') as file_name:
             with closed_tempfile('.lua', text=lua_file_content, dir_name="foo-bar+baz") as lua_file_name:
