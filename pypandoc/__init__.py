@@ -18,6 +18,7 @@ from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
+__author_email__ = "bebraw@gmail.com"
 __maintainer__ = u'Jessica Tegner'
 __url__ = 'https://github.com/JessicaTegner/pypandoc'
 __version__ = '1.10'
