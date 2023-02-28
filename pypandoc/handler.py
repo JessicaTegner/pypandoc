@@ -12,7 +12,6 @@ def _check_log_handler():
     # create console handler and set level to debug
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
-    logging.root.setLevel(logging.DEBUG)
     
     # create formatter
     formatter = logging.Formatter('[%(levelname)s] %(message)s')
