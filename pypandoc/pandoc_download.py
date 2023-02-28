@@ -17,9 +17,7 @@ try:
 except ImportError:
     from urllib import urlopen
 
-from .handler import _check_log_handler
-
-logger = logging.getLogger(__name__.split('.')[0])
+from .handler import logger, _check_log_handler
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",
