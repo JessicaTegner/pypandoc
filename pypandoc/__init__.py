@@ -55,7 +55,7 @@ logger = logging.getLogger(__name__)
 
 def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
                  outputfile:Union[None, str, Path]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
-                 sandbox:bool=True, cworkdir:Union[str, None]=None) -> str:
+                 sandbox:bool=False, cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -80,7 +80,7 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
             (Default value = True)
 
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
-            (Default value = True)
+            (Default value = False)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
@@ -98,7 +98,7 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
 
 def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:Union[str, None]=None,
                  extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str, Path]=None,
-                 filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=True,
+                 filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=False,
                  cworkdir:Union[str, None]=None) -> str:
     """Converts given `source` from `format` to `to`.
 
@@ -130,7 +130,7 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
             (Default value = True)
 
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
-            (Default value = True)
+            (Default value = False)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
@@ -318,7 +318,7 @@ def _validate_formats(format, to, outputfile):
 
 def _convert_input(source, format, input_type, to, extra_args=(),
                    outputfile=None, filters=None, verify_format=True,
-                   sandbox=True, cworkdir=None):
+                   sandbox=False, cworkdir=None):
     
     _check_log_handler()
     _ensure_pandoc_path()

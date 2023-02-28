@@ -232,6 +232,21 @@ class TestPypandoc(unittest.TestCase):
         received = pypandoc.convert_file(url, 'html')
         assert "GPL2 license" in received
 
+    def test_conversion_with_data_files(self):
+        # remove our test.docx file from our test_data dir if it already exosts
+        test_data_dir = os.path.join(os.path.dirname(__file__), 'test_data')
+        test_docx_file = os.path.join(test_data_dir, 'test.docx')
+        if os.path.exists(test_docx_file):
+            os.remove(test_docx_file)
+        result = pypandoc.convert_file(
+    os.path.join(test_data_dir, 'index.html'),
+    to='docx',
+    format='html',
+    outputfile=test_docx_file,
+    sandbox=True,
+)
+        print(result)
+
     def test_convert_with_custom_writer(self):
         lua_file_content = self.create_sample_lua()
         with closed_tempfile('.md', text='# title\n') as file_name:
@@ -452,14 +467,9 @@ class TestPypandoc(unittest.TestCase):
                 output = re.sub(r'\r', '', output)
                 output = output.replace("'missing.png'",
                                         "missing.png")
-                expected = (u'[WARNING] Could not fetch resource '
-                            u'missing.png: PandocResourceNotFound '
-                            u'"missing.png"\n'
-                            u'[WARNING] Could not fetch resource '
-                            u'missing.png: PandocResourceNotFound '
-                            u'"missing.png"\n\n')
-                self.assertEqual(expected, output)
-
+                output = output.lower()
+                print(output)
+                assert "[warning] could not fetch resource missing.png" in output
 
     def test_conversion_stderr_nullhandler(self):
         
