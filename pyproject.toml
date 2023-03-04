@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pypandoc"
-version = "1.10"
+version = "1.11"
 description = "Thin wrapper for pandoc"
 authors = ["JessicaTegner <jessica.tegneroutlook.com>"]
 license = "MIT"
