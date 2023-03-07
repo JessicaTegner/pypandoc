@@ -238,12 +238,12 @@ class TestPypandoc(unittest.TestCase):
         if os.path.exists(test_docx_file):
             os.remove(test_docx_file)
         result = pypandoc.convert_file(
-    os.path.join(test_data_dir, 'index.html'),
-    to='docx',
-    format='html',
-    outputfile=test_docx_file,
-    sandbox=True,
-)
+          os.path.join(test_data_dir, 'index.html'),
+          to='docx',
+          format='html',
+          outputfile=test_docx_file,
+          sandbox=True,
+        )
         print(result)
 
     def test_convert_with_custom_writer(self):
