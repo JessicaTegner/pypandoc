@@ -238,12 +238,12 @@ class TestPypandoc(unittest.TestCase):
         if os.path.exists(test_docx_file):
             os.remove(test_docx_file)
         result = pypandoc.convert_file(
-    os.path.join(test_data_dir, 'index.html'),
-    to='docx',
-    format='html',
-    outputfile=test_docx_file,
-    sandbox=True,
-)
+          os.path.join(test_data_dir, 'index.html'),
+          to='docx',
+          format='html',
+          outputfile=test_docx_file,
+          sandbox=True,
+        )
         print(result)
 
     def test_convert_with_custom_writer(self):
@@ -347,9 +347,10 @@ class TestPypandoc(unittest.TestCase):
             toJSONFilter(caps)
         '''
         python_source = textwrap.dedent(python_source)
-        python_source.format(sys.executable)
+        python_source = python_source.format(sys.executable)
         
         with closed_tempfile(".py", python_source) as tempfile:
+            os.chmod(tempfile, 0o755)
             output = pypandoc.convert_text(
                 markdown_source, to='html', format='md', outputfile=None, filters=tempfile
             ).strip()
@@ -389,28 +390,32 @@ class TestPypandoc(unittest.TestCase):
 
         def func(key, value, format, meta):
             if key == "Para":
-                return Para(value + [Str("{0}-")])
+                return Para(value + [Str("{{0}}-")])
 
         if __name__ == "__main__":
             toJSONFilter(func)
         
         """
         python = textwrap.dedent(python)
-        python.format(sys.executable)
+        python = python.format(sys.executable)
 
         with closed_tempfile(".lua", lua.format(1)) as temp1, closed_tempfile(".py", python.format(2)) as temp2:
+            os.chmod(temp2, 0o755)
+
             with closed_tempfile(".lua", lua.format(3)) as temp3, closed_tempfile(".py", python.format(4)) as temp4:
+                os.chmod(temp4, 0o755)
+
                 output = pypandoc.convert_text(
                     markdown_source, to="html", format="md", outputfile=None, filters=[temp1, temp2, temp3, temp4]
                 ).strip()
                 expected = "<p>-0-1-2-3-4-</p>"
-                self.assertTrue(output == expected)
+                self.assertEquals(output, expected)
 
                 output = pypandoc.convert_text(
                     markdown_source, to="html", format="md", outputfile=None, filters=[temp3, temp1, temp4, temp2]
                 ).strip()
                 expected = "<p>-0-3-1-4-2-</p>"
-                self.assertTrue(output == expected)
+                self.assertEquals(output, expected)
 
     def test_classify_pandoc_logging(self):
         
