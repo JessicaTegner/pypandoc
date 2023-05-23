@@ -6,7 +6,7 @@
 #     docker build -t <user>/pypandoc .
 # --------------------------------------------------------------------------
 
-# Switch to a more recent version of Python
+# Use Python 3.9
 FROM  python:3.9
 # Not sure if this line needs updating, I think this person no longer works on the project?
 LABEL author  Marc Abramowitz <marc@marc-abramowitz.com>
