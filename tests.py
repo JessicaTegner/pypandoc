@@ -565,11 +565,15 @@ class TestPypandoc(unittest.TestCase):
 
         # outputfile needs to end in pdf
         with closed_tempfile('.WRONG') as file_name:
-            def f():
+            def str_filename():
                 pypandoc.convert_text('# some title\n', to='pdf', format='md', outputfile=file_name)
 
+            def path_filename():
+                pypandoc.convert_text('# some title\n', to='pdf', format='md', outputfile=Path(file_name))
+
             with self.assertRaisesRegex(RuntimeError, 'PDF output needs an outputfile with ".pdf" as a fileending'):
-                f()
+                str_filename()
+                path_filename()
 
         # no extensions allowed
         with closed_tempfile('.pdf') as file_name:
