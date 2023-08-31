@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "pypandoc"
-version = "1.11"
 description = "Thin wrapper for pandoc"
 authors = ["JessicaTegner <jessica.tegneroutlook.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/JessicaTegner/pypandoc"
+version = "1.12"
 
 classifiers = [
         'Development Status :: 4 - Beta',
@@ -37,8 +37,12 @@ python = "^3.6"
 [tool.poetry.dev-dependencies]
 pandocfilters = "^1.5.0"
 
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = false
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]

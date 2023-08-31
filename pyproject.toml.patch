@@ -1,0 +1,10 @@
+--- pyproject.toml	2023-08-31 17:54:06.196415200 +0200
++++ pyproject.binary.toml	2023-08-31 17:57:56.021476600 +0200
+@@ -1,5 +1,6 @@
+ [tool.poetry]
+-name = "pypandoc"
++name = "pypandoc_binary"
++include = ["pypandoc/files/*"]
+ description = "Thin wrapper for pandoc"
+ authors = ["JessicaTegner <jessica.tegneroutlook.com>"]
+ license = "MIT"

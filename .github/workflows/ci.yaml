@@ -44,13 +44,12 @@ jobs:
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Download pandoc
-        run: poetry run python setup_binary.py download_pandoc
+        run: poetry run python binary_build_prep.py
       - name: run tests
         run: poetry run python tests.py
 
   builder_pypandoc:
     needs: [test]
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-20.04  # Any OS is fine as this wheel is not OS dependent
     steps:
       - name: Check out repository
@@ -60,10 +59,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.9  # Build any 1 python version as this wheel is not version dependent
-      - name: Update dependencies
-        run: python -m pip install -U pip wheel setuptools
+      - name: Install and configure Poetry
+        run: |
+          pip3 install poetry
+          poetry config virtualenvs.in-project true
       - name: Build wheel
-        run: python setup.py sdist bdist_wheel
+        run: poetry build
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -72,7 +73,6 @@ jobs:
 
   builder_pypandoc_binary:
     needs: [test]
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     strategy:
       matrix:
         # Ref: https://cibuildwheel.readthedocs.io/en/stable/options/#archs
@@ -85,12 +85,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-      - name: Remove pyproject and use setuptools
-        run: rm pyproject.toml
       - name: Build binary Archive
-        uses: pypa/cibuildwheel@v2.9.0
+        uses: pypa/cibuildwheel@v2.15.0
         env:
-          CIBW_BEFORE_ALL: "mv setup_binary.py setup.py && python3 setup.py download_pandoc"
+          CIBW_BUILD_FRONTEND: "build"
+          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_BEFORE_ALL: "python3 binary_build_prep.py"
           CIBW_BUILD: cp39-*  # Build any 1 python version as this wheel is not version dependent
           # We skip some variants because:
           # - pandoc does not publish binaries for Linux 32bit
@@ -103,7 +103,7 @@ jobs:
 
   publisher_release:
     needs: [builder_pypandoc, builder_pypandoc_binary]
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/master' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
