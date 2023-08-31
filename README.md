@@ -311,7 +311,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Jesse Widner](https://github.com/jwidner) & [Dominic Thorn](https://github.com/domvwt) - Add support for lua filters
 * [Alex Kneisel](https://github.com/hey-thanks/) - Added pathlib.Path support to convert_file.
 * [Juho Vepsäläinen](https://github.com/bebraw/) - Creator and former maintainer of pypandoc
-
+* [Connor](https://github.com/DisSupEng/) - Updated Dockerfile to Python 3.9 image and added docker compose file
 
 ## License
 
