@@ -303,8 +303,16 @@ def _validate_formats(format, to, outputfile):
     if base_to_format == "pdf":
         # pdf formats needs to actually have a to format of latex and a
         # filename with an ending pf .pdf
-        if outputfile[-4:] != ".pdf":
-            raise RuntimeError('PDF output needs an outputfile with ".pdf" as a fileending.')
+        if isinstance(outputfile, str):
+            if outputfile[-4:] != ".pdf":
+                raise RuntimeError(
+                    'PDF output needs an outputfile with ".pdf" as a fileending.'
+                )
+        elif isinstance(outputfile, Path):
+            if outputfile.suffix != ".pdf":
+                raise RuntimeError(
+                    'PDF output needs an outputfile with ".pdf" as a fileending.'
+                )
         # to is not allowed to contain pdf, but must point to latex
         # it's also not allowed to contain extensions according to the docs
         if to != base_to_format:
