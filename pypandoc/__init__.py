@@ -303,8 +303,16 @@ def _validate_formats(format, to, outputfile):
     if base_to_format == "pdf":
         # pdf formats needs to actually have a to format of latex and a
         # filename with an ending pf .pdf
-        if outputfile[-4:] != ".pdf":
-            raise RuntimeError('PDF output needs an outputfile with ".pdf" as a fileending.')
+        if isinstance(outputfile, str):
+            if outputfile[-4:] != ".pdf":
+                raise RuntimeError(
+                    'PDF output needs an outputfile with ".pdf" as a fileending.'
+                )
+        elif isinstance(outputfile, Path):
+            if outputfile.suffix != ".pdf":
+                raise RuntimeError(
+                    'PDF output needs an outputfile with ".pdf" as a fileending.'
+                )
         # to is not allowed to contain pdf, but must point to latex
         # it's also not allowed to contain extensions according to the docs
         if to != base_to_format:
@@ -704,7 +712,7 @@ def _ensure_pandoc_path() -> None:
             except Exception:
                 # we can't use that path...
                 if os.path.exists(path):
-                    # path exist but is not useable -> not executable?
+                    # path exist but is not usable -> not executable?
                     log_msg = ("Found {}, but not using it because of an "
                                "error:".format(path))
                     logger.exception(log_msg)
