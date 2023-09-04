@@ -116,7 +116,7 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
     :param list extra_args: extra arguments (list of strings) to be passed to pandoc
             (Default value = ())
 
-    :param str encoding: the encoding of the file or the input bytes (Default value = 'utf-8')
+    :param str encoding (deprecated): the encoding of the input bytes (Default value = 'utf-8')
 
     :param str outputfile: output will be written to outputfile or the converted content
             returned if None. The output filename can be specified as a string
@@ -137,6 +137,10 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
     :raises OSError: if pandoc is not found; make sure it has been installed and is available at
             path.
     """
+    # TODO: remove 'encoding' parameter and warning
+    if encoding != "utf-8":
+        logger.warning("The 'encoding' parameter will be removed in version 1.13. Just remove the parameter, because currently the method does not use it.")
+
     # This if block effectively adds support for pathlib.Path objects
     # and generators produced by pathlib.Path().glob().
     if not isinstance(source_file, str):
