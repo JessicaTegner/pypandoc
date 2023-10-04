@@ -678,7 +678,10 @@ def _ensure_pandoc_path() -> None:
         search_paths = ["pandoc", included_pandoc]
         pf = "linux" if sys.platform.startswith("linux") else sys.platform
         try:
-            search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc"))
+            if pf == "win32":
+                search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc.exe"))
+            else:
+                search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc"))
         except:  # noqa
             # not one of the know platforms...
             pass
@@ -688,16 +691,19 @@ def _ensure_pandoc_path() -> None:
         # Also add the interpreter script path, as that's where pandoc could be
         # installed if it's an environment and the environment wasn't activated
         if pf == "win32":
-            search_paths.append(os.path.join(sys.exec_prefix, "Scripts", "pandoc"))
+            search_paths.append(os.path.join(sys.exec_prefix, "Scripts", "pandoc.exe"))
 
             # Since this only runs on Windows, use Windows slashes
             if os.getenv('ProgramFiles', None):
-                search_paths.append(os.path.expandvars("${ProgramFiles}\\Pandoc\\Pandoc"))
+                search_paths.append(os.path.expandvars("${ProgramFiles}\\Pandoc\\pandoc.exe"))
+                search_paths.append(os.path.expandvars("${ProgramFiles}\\Pandoc\\Pandoc.exe"))
             if os.getenv('ProgramFiles(x86)', None):
-                search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\Pandoc"))
+                search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\pandoc.exe"))
+                search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\Pandoc.exe"))
 
         # bin can also be used on windows (conda at least has it in path), so
         # include it unconditionally
+        search_paths.append(os.path.join(sys.exec_prefix, "bin", "pandoc.exe"))
         search_paths.append(os.path.join(sys.exec_prefix, "bin", "pandoc"))
         # If a user added the complete path to pandoc to an env, use that as the
         # only way to get pandoc so that a user can overwrite even a higher
