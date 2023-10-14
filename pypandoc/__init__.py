@@ -161,6 +161,7 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
 
     discovered_source_files = []
     if isinstance(source_file, str):
+        source_file = source_file.replace('[', '[[]')
         discovered_source_files += glob.glob(source_file)
     if isinstance(source_file, list): # a list of possibly file or file patterns. Expand all with glob
         for filepath in source_file:
