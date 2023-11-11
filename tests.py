@@ -409,13 +409,21 @@ class TestPypandoc(unittest.TestCase):
                     markdown_source, to="html", format="md", outputfile=None, filters=[temp1, temp2, temp3, temp4]
                 ).strip()
                 expected = "<p>-0-1-2-3-4-</p>"
-                self.assertEquals(output, expected)
+                try:
+                    self.assertEquals(output, expected)
+                except AttributeError:
+                    # python 3.12 doesn't have assertEqual
+                    self.assertEqual(output, expected)
 
                 output = pypandoc.convert_text(
                     markdown_source, to="html", format="md", outputfile=None, filters=[temp3, temp1, temp4, temp2]
                 ).strip()
                 expected = "<p>-0-3-1-4-2-</p>"
-                self.assertEquals(output, expected)
+                try:
+                    self.assertEquals(output, expected)
+                except AttributeError:
+                    # python 3.12 doesn't have assertEqual
+                    self.assertEqual(output, expected)
 
     def test_classify_pandoc_logging(self):
         
