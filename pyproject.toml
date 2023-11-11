@@ -33,10 +33,15 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.6,<=3.12"
 
 [tool.poetry.dev-dependencies]
-pandocfilters = "^1.5.0"
+pandocfilters = "^1.5"
+setuptools = "58"
+
+[tool.poetry.group.dev.dependencies]
+pandocfilters = "^1.5"
+setuptools = "58"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
