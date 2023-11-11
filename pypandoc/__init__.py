@@ -450,7 +450,8 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         raise RuntimeError('Pandoc died with exitcode "%s" during conversion.' % (p.returncode))
 
     try:
-        stdout = stdout.decode('utf-8')
+        if not (to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"):
+            stdout = stdout.decode('utf-8')
     except UnicodeDecodeError:
         # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
         raise RuntimeError('Pandoc output was not utf-8.')
