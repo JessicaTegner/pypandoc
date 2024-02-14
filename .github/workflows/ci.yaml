@@ -2,6 +2,7 @@ name: Continuous Integration
 
 on: [push, pull_request]
 
+
 defaults:
   run:
     shell: bash
@@ -15,15 +16,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-11, windows-2019]
-        python-version: [ "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0", "pypy3.8", "pypy3.9", "pypy3.10", ]
+        os: [ubuntu-20.04, ubuntu-22.04, macos-13, windows-2022]
+        python-version: [ "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "pypy3.8", "pypy3.9", "pypy3.10", ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Print Python Information
@@ -35,11 +36,11 @@ jobs:
           pip3 install -U poetry setuptools
           poetry config virtualenvs.in-project true
       - name: Set up cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -50,14 +51,13 @@ jobs:
 
   builder_pypandoc:
     needs: [test]
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-20.04  # Any OS is fine as this wheel is not OS dependent
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up python
         id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9  # Build any 1 python version as this wheel is not version dependent
       - name: Update dependencies
@@ -65,40 +65,41 @@ jobs:
       - name: Build wheel
         run: python setup.py sdist bdist_wheel
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: pypandoc-distributions
           path: dist/
 
   builder_pypandoc_binary:
     needs: [test]
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     strategy:
       matrix:
-        # Ref: https://cibuildwheel.readthedocs.io/en/stable/options/#archs
-        # macos-11     - Creates macosx_x86_64
-        # windows-2019 - Creates {win_amd64,win32}
-        # ubuntu-20.04 - Creates {manylinux,musllinux}_{x86_64,i686}
-        #                In CIBW_SKIP we skip 32bit linux
-        os: [macos-11, windows-2019, ubuntu-20.04]
+        os: [macos-14, windows-2022, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
       - name: Remove pyproject and use setuptools
         run: rm pyproject.toml
       - name: Build binary Archive
-        uses: pypa/cibuildwheel@v2.9.0
+        uses: pypa/cibuildwheel@v2.16.5
         env:
           CIBW_BEFORE_ALL: "python3 -m pip install setuptools && mv setup_binary.py setup.py && python3 setup.py download_pandoc"
           CIBW_BUILD: cp39-*  # Build any 1 python version as this wheel is not version dependent
           # We skip some variants because:
           # - pandoc does not publish binaries for Linux 32bit
-          CIBW_SKIP: "*-{manylinux_i686,musllinux_i686}"
+          CIBW_ARCHS_LINUX: "auto64 aarch64"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+          CIBW_ARCHS_WINDOWS: "AMD64" 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python-package-distributions
+          name: pypandoc-binary-${{ matrix.os }}-distributions
           path: wheelhouse/
 
   publisher_release:
@@ -107,11 +108,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python-package-distributions
           path: dist/
       - name: Publish  to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -126,11 +126,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python-package-distributions
           path: dist/
       - name: Make release
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
