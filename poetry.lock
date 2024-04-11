@@ -2,13 +2,13 @@
 
 [[package]]
 name = "pandocfilters"
-version = "1.5.0"
+version = "1.5.1"
 description = "Utilities for writing pandoc filters in python"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 files = [
-    {file = "pandocfilters-1.5.0-py2.py3-none-any.whl", hash = "sha256:33aae3f25fd1a026079f5d27bdd52496f0e0803b3469282162bafdcbdf6ef14f"},
-    {file = "pandocfilters-1.5.0.tar.gz", hash = "sha256:0b679503337d233b4339a817bfc8c50064e2eff681314376a47cb582305a7a38"},
+    {file = "pandocfilters-1.5.1-py2.py3-none-any.whl", hash = "sha256:93be382804a9cdb0a7267585f157e5d1731bbe5545a85b268d6f5fe6232de2bc"},
+    {file = "pandocfilters-1.5.1.tar.gz", hash = "sha256:002b4a555ee4ebc03f8b66307e287fa492e4a77b4ea14d3f934328297bb4939e"},
 ]
 
 [[package]]
@@ -29,5 +29,5 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.7,<3.13"
-content-hash = "91117101dea3dbd85e5bf7ea003e83307ede9f377e04931c1e4b7d071b2053f3"
+python-versions = ">=3.7,<=3.13"
+content-hash = "b797275fbca860dc5e8e50a9bfddcc7ab496553fa0073b6176388a9e49d41cf3"
