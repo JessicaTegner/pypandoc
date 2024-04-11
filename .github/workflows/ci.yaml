@@ -89,7 +89,7 @@ jobs:
       - name: Build binary Archive
         uses: pypa/cibuildwheel@v2.16.5
         env:
-          CIBW_BEFORE_ALL: "python3 -m pip install setuptools && mv setup_binary.py setup.py && python3 setup.py download_pandoc"
+          CIBW_BEFORE_ALL: "python3 -m pip install --break-system-packages setuptools && mv setup_binary.py setup.py && python3 setup.py download_pandoc"
           CIBW_BUILD: cp39-*  # Build any 1 python version as this wheel is not version dependent
           # We skip some variants because:
           # - pandoc does not publish binaries for Linux 32bit
