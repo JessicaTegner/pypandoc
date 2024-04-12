@@ -22,5 +22,9 @@ setup(
     python_requires=pypandoc.__python_requires__,
     setup_requires = pypandoc.__setup_requires__,
     classifiers=pypandoc.__classifiers__,
-    test_suite = 'tests'
+    test_suite = 'tests',
+    project_urls={
+        'Source': pypandoc.__url__,
+        'Tracker': pypandoc.__url__ + '/issues',
+    }
 )
