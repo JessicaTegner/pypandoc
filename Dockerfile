@@ -1,14 +1,11 @@
 # --------------------------------------------------------------------------
-# This is a Dockerfile to build an Debian 11 (bullseye) image with pypandoc
-# and pandoc, uses Python 3.9.
+# This is a Dockerfile to build a Debian image with pypandoc and pandoc.
 #
 # Use a command like:
 #     docker build -t <user>/pypandoc .
 # --------------------------------------------------------------------------
 
-# Use Python 3.9
 FROM  python:3.12
-# Not sure if this line needs updating, I think this person no longer works on the project?
 LABEL author  Jessica Tegner <jessica@jessicategner.com> and pypandoc contributors
 # Update apt packages and install pandoc
 RUN apt update && apt upgrade -y && apt install pandoc -y
