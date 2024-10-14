@@ -133,9 +133,9 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = False)
 
-    :param bool sort_files: causes the files to be sorted before being passed to pandoc (Default value = True)
-
     :param str cworkdir: set the current working directory (Default value = None)
+
+    :param bool sort_files: causes the files to be sorted before being passed to pandoc (Default value = True)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
