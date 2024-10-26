@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import logging
 import os
 import os.path
 import platform
@@ -13,10 +12,10 @@ from typing import Union
 
 import urllib
 try:
-    from urllib.request import urlopen
+    from urllib.request import urlopen, Request
     from urllib.parse import urlparse
 except ImportError:
-    from urllib import urlopen
+    from urllib2 import urlopen, Request
     from urlparse import urlparse
 
 from .handler import logger, _check_log_handler
@@ -46,9 +45,17 @@ def _get_pandoc_urls(version="latest"):
     # url to pandoc download page
     url = "https://api.github.com/repos/jgm/pandoc/releases/" + \
           ("tags/" if version != "latest" else "") + version
+    github_token = os.getenv("GITHUB_TOKEN")
+    if github_token:
+        headers = {
+            "Authorization": f"Bearer {github_token}"
+        }
+        src = Request(url, headers=headers)
+    else:
+        src = url
     # try to open the url
     try:
-        response = urlopen(url)
+        response = urlopen(src)
     except urllib.error.HTTPError as e:
         raise RuntimeError("Invalid pandoc version {}.".format(version))
     # read json response

@@ -45,7 +45,7 @@ jobs:
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       - name: Download pandoc
-        run: poetry run python setup_binary.py download_pandoc
+        run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} poetry run python setup_binary.py download_pandoc
       - name: run tests
         run: poetry run python tests.py
 
