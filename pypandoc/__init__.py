@@ -24,7 +24,7 @@ __url__ = 'https://github.com/JessicaTegner/pypandoc'
 __version__ = '1.14'
 __license__ = 'MIT'
 __description__ = "Thin wrapper for pandoc."
-__python_requires__ = ">=3.6"
+__python_requires__ = ">=3.7"
 __setup_requires__ = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0']
 __classifiers__ = [
         'Development Status :: 4 - Beta',
