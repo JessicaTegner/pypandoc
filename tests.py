@@ -31,13 +31,13 @@ def capture(command, *args, **kwargs):
 
 
 @contextlib.contextmanager
-def closed_tempfile(suffix, text=None, dir_name=None):
+def closed_tempfile(suffix, text=None, dir_name=None, prefix=None):
     file_name = None
     try:
         if dir_name:
             dir_name = tempfile.mkdtemp(suffix=dir_name)
 
-        with tempfile.NamedTemporaryFile('w+t', suffix=suffix, delete=False, dir=dir_name) as test_file:
+        with tempfile.NamedTemporaryFile('w+t', suffix=suffix, prefix=prefix, delete=False, dir=dir_name) as test_file:
             file_name = test_file.name
             if text:
                 test_file.write(text)
@@ -199,6 +199,13 @@ class TestPypandoc(unittest.TestCase):
             with closed_tempfile('.md', text='some title') as file_name2:
                 expected = '<p>some title</p>\n<p>some title</p>'
                 received = pypandoc.convert_file([file_name1,file_name2], 'html')
+                self.assertEqualExceptForNewlineEnd(expected, received)
+
+    def test_sorting_rules_applied_for_multiple_files(self):
+        with closed_tempfile('.md', prefix='1_', text='some title 1') as file_name1:
+            with closed_tempfile('.md', prefix='2_', text='some title 2') as file_name2:
+                expected = '<p>some title 2</p>\n<p>some title 1</p>'
+                received = pypandoc.convert_file([file_name2,file_name1], 'html', sort_files=False)
                 self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_file_pattern(self):

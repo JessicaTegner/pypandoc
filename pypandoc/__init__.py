@@ -81,6 +81,8 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = False)
 
+    :param str cworkdir: set the current working directory (Default value = None)
+
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
 
@@ -98,7 +100,7 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
 def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:Union[str, None]=None,
                  extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str, Path]=None,
                  filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=False,
-                 cworkdir:Union[str, None]=None) -> str:
+                 cworkdir:Union[str, None]=None, sort_files=True) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param (str, list, pathlib.Path) source_file: If a string, should be either
@@ -130,6 +132,10 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
 
     :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
             (Default value = False)
+
+    :param str cworkdir: set the current working directory (Default value = None)
+
+    :param bool sort_files: causes the files to be sorted before being passed to pandoc (Default value = True)
 
     :returns: converted string (unicode) or an empty string if an outputfile was given
     :rtype: unicode
@@ -200,7 +206,7 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
     return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
                       outputfile=outputfile, filters=filters,
                       verify_format=verify_format, sandbox=sandbox,
-                      cworkdir=cworkdir)
+                      cworkdir=cworkdir, sort_files=sort_files)
 
 
 def _identify_path(source) -> bool:
@@ -356,7 +362,7 @@ def _validate_formats(format, to, outputfile):
 
 def _convert_input(source, format, input_type, to, extra_args=(),
                    outputfile=None, filters=None, verify_format=True,
-                   sandbox=False, cworkdir=None):
+                   sandbox=False, cworkdir=None, sort_files=True):
     
     _check_log_handler()
 
@@ -379,8 +385,10 @@ def _convert_input(source, format, input_type, to, extra_args=(),
             input_file = source
     else:
         input_file = []
-    
-    input_file = sorted(input_file)
+
+    if sort_files:
+        input_file = sorted(input_file)
+
     args = [__pandoc_path, '--from=' + format]
 
     args.append('--to=' + to)
