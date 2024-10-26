@@ -21,7 +21,7 @@ __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
 __maintainer__ = u'Jessica Tegner'
 __url__ = 'https://github.com/JessicaTegner/pypandoc'
-__version__ = '1.14'
+__version__ = '1.15'
 __license__ = 'MIT'
 __description__ = "Thin wrapper for pandoc."
 __python_requires__ = ">=3.7"
