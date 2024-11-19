@@ -209,45 +209,42 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
                       cworkdir=cworkdir, sort_files=sort_files)
 
 
-def _identify_path(source) -> bool:
-    if isinstance(source, list):
-        for single_source in source:
-            if not _identify_path(single_source):
-                return False
-        return True
-    is_path = False
+def resolve_path(source) -> bool:
+    # Check if a file path is valid, handling unicode and wildcards
     try:
-        is_path = os.path.exists(source)
+        if os.path.exists(source):
+            return True
     except UnicodeEncodeError:
-        is_path = os.path.exists(source.encode('utf-8'))
-    except:  # noqa
-        # still false
-        pass
+        if os.path.exists(source.encode('utf-8')):
+            return True
 
-    if not is_path:
-        try:
-            is_path = len(glob.glob(source)) >= 1
-        except UnicodeEncodeError:
-            is_path = len(glob.glob(source.encode('utf-8'))) >= 1
-        except:  # noqa
-            # still false
-            pass
-    
-    if not is_path:
-        try:
-            # check if it's an URL
-            result = urlparse(source)
-            if result.scheme in ["http", "https"]:
-                is_path = True
-            elif result.scheme and result.netloc and result.path:
-                # complete uri including one with a network path
-                is_path = True
-            elif result.scheme == "file" and result.path:
-                is_path = os.path.exists(url2path(source))
-        except AttributeError:
-            pass
+    # Handle wildcards
+    try:
+        matches = glob.glob(source)
+        if matches:
+            return True
+    except UnicodeEncodeError:
+        matches = glob.glob(source.encode('utf-8'))
+        if matches:
+            return True
 
-    return is_path
+    # If no valid path is found
+    return False
+
+
+def _identify_path(source) -> bool:
+    # Determine if the source is a valid file path or a network path (URL).
+    if isinstance(source, list):
+        return all(_identify_path(item) for item in source)
+
+    if resolve_path(source):
+        return True
+
+    if _is_network_path(source):
+        return True
+
+    return False
+
 
 def _is_network_path(source):
     try:
