@@ -6,7 +6,8 @@ authors = [
   {name = "Jessica Tegner", email = "jessica@jessicategner.com"},
 ]
 readme = "README.md"
-license = "MIT"
+license = {file = "LICENSE"}
+
 keywords = ["pandoc", "markdown", "rst", "restructuredtext", "docx", "pdf", "html", "latex", "epub", "odt", "docbook", "mediawiki", "textile", "org", "asciidoc", "t2t" ]
 requires-python = ">=3.8"
 dependencies = []
@@ -31,10 +32,6 @@ classifiers = [
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy'
     ]
-
-packages = [
-    { include = "pypandoc" },
-]
 
 [project.urls]
 Homepage = "https://github.com/JessicaTegner/pypandoc"
