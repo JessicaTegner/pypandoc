@@ -32,13 +32,13 @@ jobs:
       - name: install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
       - name: Install and configure UV
-        run: pip3 install --upgrade uv setuptools
+        run: pip3 install --upgrade pip setuptools wheel
       - name: Install dependencies
-        run: uv sync --dev
+        run: pip3 install -e .[dev]
       - name: Download pandoc
-        run: ./.venv/scripts/python setup_binary.py download_pandoc
+        run: python setup_binary.py download_pandoc
       - name: run tests
-        run: ./.venv/scripts/python tests.py
+        run: python tests.py
 
   builder_pypandoc:
     needs: [test]
