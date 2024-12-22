@@ -1,11 +1,15 @@
-[tool.poetry]
+[project]
 name = "pypandoc"
 version = "1.14"
 description = "Thin wrapper for pandoc"
-authors = ["JessicaTegner <jessica.tegneroutlook.com>"]
-license = "MIT"
+authors = [
+  {name = "Jessica Tegner", email = "jessica@jessicategner.com"},
+]
 readme = "README.md"
-repository = "https://github.com/JessicaTegner/pypandoc"
+license = "MIT"
+keywords = ["pandoc", "markdown", "rst", "restructuredtext", "docx", "pdf", "html", "latex", "epub", "odt", "docbook", "mediawiki", "textile", "org", "asciidoc", "t2t" ]
+requires-python = ">=3.8"
+dependencies = []
 
 classifiers = [
         'Development Status :: 4 - Beta',
@@ -32,21 +36,13 @@ packages = [
     { include = "pypandoc" },
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.7"
+[project.urls]
+Homepage = "https://github.com/JessicaTegner/pypandoc"
+Repository = "https://github.com/JessicaTegner/pypandoc.git"
+Issues = "https://github.com/JessicaTegner/pypandoc/issues"
 
-[tool.poetry.dev-dependencies]
-pandocfilters = "^1.5"
-setuptools = "68"
-
-[tool.poetry.group.dev.dependencies]
-pandocfilters = "^1.5"
-setuptools = "68"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.urls]
-"Issue Tracker" = "https://github.com/JessicaTegner/pypandoc/issues"
-
+[dependency-groups]
+dev = [
+    "pandocfilters>=1.5.1",
+    "setuptools>=75.3.0",
+]

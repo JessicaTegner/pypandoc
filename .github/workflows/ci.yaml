@@ -31,23 +31,22 @@ jobs:
         run: python -VV
       - name: install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
-      - name: Install and configure Poetry
-        run: |
-          pip3 install -U poetry setuptools
-          poetry config virtualenvs.in-project true
+      - name: Install and configure UV
+        run: pip3 install --upgrade uv setuptools
       - name: Set up cache
         uses: actions/cache@v4
-        id: cached-poetry-dependencies
+        id: cached-uv-dependencies
         with:
+          # Adjust these paths/keys if your UV tooling places caches in a different directory
           path: .venv
-          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/uv.lock') }}
       - name: Install dependencies
-        run: poetry install
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: uv install
+        if: steps.cached-uv-dependencies.outputs.cache-hit != 'true'
       - name: Download pandoc
-        run: poetry run python setup_binary.py download_pandoc
+        run: uv run python setup_binary.py download_pandoc
       - name: run tests
-        run: poetry run python tests.py
+        run: uv run python tests.py
 
   builder_pypandoc:
     needs: [test]
