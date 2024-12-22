@@ -34,13 +34,11 @@ jobs:
       - name: Install and configure UV
         run: pip3 install --upgrade uv setuptools
       - name: Install dependencies
-        run: |
-          uv sync --dev
-          source .venv/bin/activate
+        run: uv sync --dev
       - name: Download pandoc
-        run: python setup_binary.py download_pandoc
+        run: ./.venv/scripts/python setup_binary.py download_pandoc
       - name: run tests
-        run: python tests.py
+        run: ./.venv/scripts/python tests.py
 
   builder_pypandoc:
     needs: [test]
