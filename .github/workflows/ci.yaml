@@ -33,20 +33,12 @@ jobs:
         uses: r-lib/actions/setup-tinytex@v2
       - name: Install and configure UV
         run: pip3 install --upgrade uv setuptools
-      - name: Set up cache
-        uses: actions/cache@v4
-        id: cached-uv-dependencies
-        with:
-          # Adjust these paths/keys if your UV tooling places caches in a different directory
-          path: .venv
-          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/uv.lock') }}
       - name: Install dependencies
-        run: uv sync --dev
-        if: steps.cached-uv-dependencies.outputs.cache-hit != 'true'
+        run: uv pip install --system --no-cache-dir .[all]
       - name: Download pandoc
-        run: uv run python setup_binary.py download_pandoc
+        run: python setup_binary.py download_pandoc
       - name: run tests
-        run: uv run python tests.py
+        run: python tests.py
 
   builder_pypandoc:
     needs: [test]
