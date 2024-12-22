@@ -34,7 +34,9 @@ jobs:
       - name: Install and configure UV
         run: pip3 install --upgrade uv setuptools
       - name: Install dependencies
-        run: uv pip install --system --no-cache-dir .[all]
+        run: |
+          uv sync --dev
+          source .venv/bin/activate
       - name: Download pandoc
         run: python setup_binary.py download_pandoc
       - name: run tests
