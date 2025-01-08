@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, with_statement
 from typing import Iterable
+from typing import Iterator
 from typing import Union
-from typing import Generator
 
 import os
 import re
@@ -97,7 +97,7 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
                           cworkdir=cworkdir)
 
 
-def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:Union[str, None]=None,
+def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Union[str, None]=None,
                  extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str, Path]=None,
                  filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=False,
                  cworkdir:Union[str, None]=None, sort_files=True) -> str:
@@ -165,7 +165,7 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
         source_file = Path(source_file)
     elif isinstance(source_file, list):
         source_file = [Path(x) for x in source_file]
-    elif isinstance(source_file, Generator):
+    elif isinstance(source_file, Iterator):
         source_file = [Path(x) for x in source_file]
 
 
@@ -175,7 +175,7 @@ def convert_file(source_file:Union[list, str, Path, Generator], to:str, format:U
     # if it is, just use the absolute path
     if isinstance(source_file, list):
         source_file = [x if x.is_absolute() else Path(cworkdir, x) for x in source_file]
-    elif isinstance(source_file, Generator):
+    elif isinstance(source_file, Iterator):
         source_file = (x if x.is_absolute() else Path(cworkdir, x) for x in source_file)
     # check ifjust a single path was given
     elif isinstance(source_file, Path):
