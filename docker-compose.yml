@@ -6,7 +6,7 @@ services:
     restart: always
     volumes:
     # Create a binding mount between the source directory on the host and the container's source code directory.
-    # This means that any updated code will be transfered to the running container
+    # This means that any updated code will be transferred to the running container
     - .:/pypandoc/
     # This is just to keep the container running. It will allow us to use docker compose exec to go inside the container.
     command: tail -F ./anything
