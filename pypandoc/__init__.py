@@ -280,17 +280,6 @@ def _as_unicode(source:any, encoding:str) -> any:
     return source
 
 
-def _identify_input_type(source:any, format:str, encoding:str='utf-8'):
-    path = _identify_path(source)
-    if path:
-        format = _identify_format_from_path(source, format)
-        input_type = 'path'
-    else:
-        source = _as_unicode(source, encoding)
-        input_type = 'string'
-    return source, format, input_type
-
-
 def normalize_format(fmt):
     formats = {
         'dbk': 'docbook',

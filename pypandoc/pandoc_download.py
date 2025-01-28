@@ -51,7 +51,6 @@ def _get_pandoc_urls(version="latest"):
         version = version_url_frags[-1]
     except urllib.error.HTTPError as e:
         raise RuntimeError("Invalid pandoc version {}.".format(version))
-        return
     # read the HTML content
     response = urlopen(f"https://github.com/jgm/pandoc/releases/expanded_assets/{version}")
     content = response.read()
