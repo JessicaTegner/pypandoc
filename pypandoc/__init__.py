@@ -15,7 +15,7 @@ from pathlib import Path
 
 from .handler import logger, _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, string_types, url2path, urlparse
+from .py3compat import cast_bytes, cast_unicode, url2path, urlparse
 
 __author__ = u'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
@@ -395,7 +395,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
     # adds the proper filter syntax for each item in the filters list
     if filters is not None:
-        if isinstance(filters, string_types):
+        if isinstance(filters, str):
             filters = filters.split()
         f = ['--lua-filter=' + x if x.endswith(".lua") else '--filter=' + x for x in filters]
         args.extend(f)
