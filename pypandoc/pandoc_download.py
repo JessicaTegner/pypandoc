@@ -51,7 +51,6 @@ def _get_pandoc_urls(version="latest"):
         version = version_url_frags[-1]
     except urllib.error.HTTPError as e:
         raise RuntimeError("Invalid pandoc version {}.".format(version))
-        return
     # read the HTML content
     response = urlopen(f"https://github.com/jgm/pandoc/releases/expanded_assets/{version}")
     content = response.read()
@@ -70,8 +69,7 @@ def _get_pandoc_urls(version="latest"):
         'pkg': 'darwin'
     }
     # parse pandoc_urls from list to dict
-    # py26 don't like dict comprehension. Use this one instead when py26 support is dropped
-    pandoc_urls = {ext2platform[url_frag[-3:]]: (f"https://github.com{url_frag}") for url_frag in pandoc_urls_list}
+    pandoc_urls = {ext2platform[url_frag[-3:]]: f"https://github.com{url_frag}" for url_frag in pandoc_urls_list}
     return pandoc_urls, version
 
 
