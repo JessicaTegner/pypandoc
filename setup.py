@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import pypandoc
 import io
 from setuptools import setup
 
-with io.open('README.md', encoding="utf-8") as f:
+with open('README.md', encoding="utf-8") as f:
     long_description = f.read()
 
 module = pypandoc

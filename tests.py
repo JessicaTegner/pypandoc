@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import contextlib
 import io
@@ -186,7 +185,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_basic_conversion_from_file(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert_file(file_name, 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
@@ -220,7 +219,7 @@ class TestPypandoc(unittest.TestCase):
                                                      "https://github.com/jgm/pandoc/issues/4613")
     def test_basic_conversion_from_file_url(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             # this keeps the : (which should be '|' on windows but pandoc
             # doesn't like it
             file_url = path2url(file_name)
@@ -258,13 +257,13 @@ class TestPypandoc(unittest.TestCase):
         lua_file_content = self.create_sample_lua()
         with closed_tempfile('.md', text='# title\n') as file_name:
             with closed_tempfile('.lua', text=lua_file_content, dir_name="foo-bar+baz") as lua_file_name:
-                expected = u'<h1 id="title">title</h1>{0}'.format(os.linesep)
+                expected = f'<h1 id="title">title</h1>{os.linesep}'
                 received = pypandoc.convert_file(file_name, lua_file_name)
                 self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_file_with_format(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert_file(file_name, 'rst', format='md')
             self.assertEqualExceptForNewlineEnd(expected, received)
 
@@ -272,18 +271,18 @@ class TestPypandoc(unittest.TestCase):
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_basic_conversion_from_string(self):
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+        expected = 'some title{0}=========={0}{0}'.format(os.linesep)
         received = pypandoc.convert_text('# some title', 'rst', format='md')
         self.assertEqualExceptForNewlineEnd(expected, received)
 
-        expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+        expected = 'some title{0}=========={0}{0}'.format(os.linesep)
         received = pypandoc.convert_text('# some title', 'rst', format='md')
         self.assertEqualExceptForNewlineEnd(expected, received)
 
     def test_conversion_with_markdown_extensions(self):
         input = '<s>strike</s>'
-        expected_with_extension = u'~~strike~~'
-        expected_without_extension = u'<s>strike</s>'
+        expected_with_extension = '~~strike~~'
+        expected_without_extension = '<s>strike</s>'
         received_with_extension = pypandoc.convert_text(input, 'markdown+strikeout',
                                                    format='html')
         received_without_extension = pypandoc.convert_text(input,
@@ -295,17 +294,17 @@ class TestPypandoc(unittest.TestCase):
     def test_conversion_from_markdown_with_extensions(self):
         # Apparently without the extension, ~~ gets turned into different code
         # depending on the pandoc version. So we do not test for that anymore...
-        input = u'~~strike~~'
-        expected_with_extension = u'<p><del>strike</del></p>'
-        received_with_extension = pypandoc.convert_text(input, 'html', format=u'markdown+strikeout')
+        input = '~~strike~~'
+        expected_with_extension = '<p><del>strike</del></p>'
+        received_with_extension = pypandoc.convert_text(input, 'html', format='markdown+strikeout')
         self.assertEqualExceptForNewlineEnd(expected_with_extension, received_with_extension)
 
     def test_basic_conversion_to_file(self):
         with closed_tempfile('.rst', ) as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert_text('# some title\n', to='rst', format='md', outputfile=file_name)
             self.assertEqualExceptForNewlineEnd("", received)
-            with io.open(file_name) as f:
+            with open(file_name) as f:
                 written = f.read()
             self.assertEqualExceptForNewlineEnd(expected, written)
 
@@ -413,7 +412,7 @@ class TestPypandoc(unittest.TestCase):
                 ).strip()
                 expected = "<p>-0-1-2-3-4-</p>"
                 try:
-                    self.assertEquals(output, expected)
+                    self.assertEqual(output, expected)
                 except AttributeError:
                     # python 3.12 doesn't have assertEqual
                     self.assertEqual(output, expected)
@@ -423,7 +422,7 @@ class TestPypandoc(unittest.TestCase):
                 ).strip()
                 expected = "<p>-0-3-1-4-2-</p>"
                 try:
-                    self.assertEquals(output, expected)
+                    self.assertEqual(output, expected)
                 except AttributeError:
                     # python 3.12 doesn't have assertEqual
                     self.assertEqual(output, expected)
@@ -518,18 +517,18 @@ class TestPypandoc(unittest.TestCase):
 
     def test_unicode_input(self):
         # make sure that pandoc always returns unicode and does not mishandle it
-        expected = u'üäöîôû{0}'.format(os.linesep)
-        written = pypandoc.convert_text(u'<p>üäöîôû</p>', 'md', format='html')
+        expected = f'üäöîôû{os.linesep}'
+        written = pypandoc.convert_text('<p>üäöîôû</p>', 'md', format='html')
         self.assertTrue(isinstance(written, str))
         self.assertEqualExceptForNewlineEnd(expected, written)
-        bytes = u'<p>üäöîôû</p>'.encode("utf-8")
+        bytes = '<p>üäöîôû</p>'.encode()
         written = pypandoc.convert_text(bytes, 'md', format='html')
         self.assertTrue(expected == written)
         self.assertTrue(isinstance(written, str))
 
         # Only use german umlauts in the next test, as iso-8859-15 covers that
-        expected = u'äüäö{0}'.format(os.linesep)
-        bytes = u'<p>äüäö</p>'.encode("iso-8859-15")
+        expected = f'äüäö{os.linesep}'
+        bytes = '<p>äüäö</p>'.encode("iso-8859-15")
 
         # Without encoding, this fails as we expect utf-8 per default
 
@@ -550,7 +549,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_conversion_from_non_plain_text_file(self):
         with closed_tempfile('.docx') as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             # let's just test conversion (to and) from docx, testing e.g. odt
             # as well would really be testing pandoc rather than pypandoc
             received = pypandoc.convert_text('# some title\n', to='docx', format='md', outputfile=file_name)
@@ -562,7 +561,7 @@ class TestPypandoc(unittest.TestCase):
         with closed_tempfile('.pdf') as file_name:
             ret = pypandoc.convert_text('# some title\n', to='pdf', format='md', outputfile=file_name)
             assert ret == ""
-            with io.open(file_name, mode='rb') as f:
+            with open(file_name, mode='rb') as f:
                 written = f.read()
             assert written[:4] == b"%PDF"
             # TODO: find a test for the content?
@@ -630,7 +629,7 @@ class TestPypandoc(unittest.TestCase):
 
     def test_basic_conversion_from_file_pathlib(self):
         with closed_tempfile('.md', text='# some title\n') as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             received_from_str_filename_input = pypandoc.convert_file(file_name, 'rst')
             received_from_path_filename_input = pypandoc.convert_file(Path(file_name), 'rst')
             self.assertEqualExceptForNewlineEnd(expected, received_from_str_filename_input)
@@ -658,10 +657,10 @@ class TestPypandoc(unittest.TestCase):
 
     def test_basic_conversion_to_pathlib_file(self):
         with closed_tempfile('.rst', ) as file_name:
-            expected = u'some title{0}=========={0}{0}'.format(os.linesep)
+            expected = 'some title{0}=========={0}{0}'.format(os.linesep)
             received = pypandoc.convert_text('# some title\n', to='rst', format='md', outputfile=Path(file_name))
             self.assertEqualExceptForNewlineEnd("", received)
-            with io.open(file_name) as f:
+            with open(file_name) as f:
                 written = f.read()
             self.assertEqualExceptForNewlineEnd(expected, written)
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, with_statement
 from typing import Iterable
 from typing import Iterator
 from typing import Union
@@ -17,9 +15,9 @@ from .handler import logger, _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, url2path, urlparse
 
-__author__ = u'Juho Vepsäläinen'
+__author__ = 'Juho Vepsäläinen'
 __author_email__ = "bebraw@gmail.com"
-__maintainer__ = u'Jessica Tegner'
+__maintainer__ = 'Jessica Tegner'
 __url__ = 'https://github.com/JessicaTegner/pypandoc'
 __version__ = '1.15'
 __license__ = 'MIT'
@@ -298,7 +296,7 @@ def _validate_formats(format, to, outputfile):
 
     if _get_base_format(format) not in from_formats:
         raise RuntimeError(
-            'Invalid input format! Got "%s" but expected one of these: %s' % (
+            'Invalid input format! Got "{}" but expected one of these: {}'.format(
                 _get_base_format(format), ', '.join(from_formats)))
 
     base_to_format = _get_base_format(to)
@@ -309,7 +307,7 @@ def _validate_formats(format, to, outputfile):
             base_to_format != "pdf" and  # pdf is handled later # noqa: E127
             file_extension != '.lua'):
         raise RuntimeError(
-            'Invalid output format! Got %s but expected one of these: %s' % (
+            'Invalid output format! Got {} but expected one of these: {}'.format(
                 base_to_format, ', '.join(to_formats)))
 
     # list from https://github.com/jgm/pandoc/blob/master/pandoc.hs
@@ -419,7 +417,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
         raise RuntimeError(
-            'Pandoc died with exitcode "%s" before receiving input: %s' % (p.returncode,
+            'Pandoc died with exitcode "{}" before receiving input: {}'.format(p.returncode,
                                                                            p.stderr.read())
         )
 
@@ -452,7 +450,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     # check that pandoc returned successfully
     if p.returncode != 0:
         raise RuntimeError(
-            'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
+            f'Pandoc died with exitcode "{p.returncode}" during conversion: {stderr}'
         )
 
     # if there is output on stderr, process it and send to logger
@@ -498,7 +496,7 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     else:
         pandoc_level = first[search.start(1):search.end(1)]
 
-    log_msgs = [first.replace('[{}] '.format(pandoc_level), '')]
+    log_msgs = [first.replace(f'[{pandoc_level}] ', '')]
 
     for msg in msgs:
 
@@ -507,7 +505,7 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
         if search is not None:
             yield get_python_level(pandoc_level), "\n".join(log_msgs)
             pandoc_level = msg[search.start(1):search.end(1)]
-            log_msgs = [msg.replace('[{}] '.format(pandoc_level), '')]
+            log_msgs = [msg.replace(f'[{pandoc_level}] ', '')]
             continue
 
         log_msgs.append(msg)

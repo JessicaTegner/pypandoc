@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Example Services for using pypandoc
 """
@@ -7,7 +6,7 @@ from tempfile import NamedTemporaryFile
 import pypandoc
 
 
-class BasePandocService(object):
+class BasePandocService:
     """
     Base class for converting provided HTML to a doc or docx
     """

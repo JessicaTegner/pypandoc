@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import pypandoc
 from setuptools import setup, Command
 
@@ -14,7 +13,7 @@ except ImportError:
     from urllib import urlopen
 
 
-with io.open('README.md', encoding="utf-8") as f:
+with open('README.md', encoding="utf-8") as f:
     long_description = f.read()
 
 
