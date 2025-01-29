@@ -44,4 +44,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]
 "Issue Tracker" = "https://github.com/JessicaTegner/pypandoc/issues"
-

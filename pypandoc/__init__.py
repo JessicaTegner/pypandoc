@@ -225,7 +225,7 @@ def _identify_path(source) -> bool:
         except:  # noqa
             # still false
             pass
-    
+
     if not is_path:
         try:
             # check if it's an URL
@@ -342,7 +342,7 @@ def _validate_formats(format, to, outputfile):
 def _convert_input(source, format, input_type, to, extra_args=(),
                    outputfile=None, filters=None, verify_format=True,
                    sandbox=False, cworkdir=None, sort_files=True):
-    
+
     _check_log_handler()
 
     logger.debug("Ensuring pandoc path...")
@@ -442,7 +442,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     except UnicodeDecodeError:
         # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
         raise RuntimeError('Pandoc output was not utf-8.')
-           
+
     try:
         stderr = stderr.decode('utf-8')
     except UnicodeDecodeError:
@@ -454,7 +454,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         raise RuntimeError(
             'Pandoc died with exitcode "%s" during conversion: %s' % (p.returncode, stderr)
         )
-    
+
     # if there is output on stderr, process it and send to logger
     if stderr:
         for level, msg in _classify_pandoc_logging(stderr):
@@ -466,52 +466,52 @@ def _convert_input(source, format, input_type, to, extra_args=(),
 
 def _classify_pandoc_logging(raw, default_level="WARNING"):
     # Process raw and yield the contained logging levels and messages.
-    # Assumes that the messages are formatted like "[LEVEL] message". If the 
-    # first message does not have a level or any other message has a level 
-    # that does not conform to the pandoc standard, use the default_level 
+    # Assumes that the messages are formatted like "[LEVEL] message". If the
+    # first message does not have a level or any other message has a level
+    # that does not conform to the pandoc standard, use the default_level
     # value instead.
-    
+
     # Available pandoc logging levels adapted from:
     # https://github.com/jgm/pandoc/blob/5e1249481b2e3fc27e845245a0c96c3687a23c3d/src/Text/Pandoc/Logging.hs#L44
     def get_python_level(pandoc_level):
-        
+
         level_map = {"ERROR": 40,
                      "WARNING": 30,
                      "INFO": 20,
                      "DEBUG": 10}
-        
+
         if pandoc_level not in level_map:
             level = level_map[default_level]
         else:
             level = level_map[pandoc_level]
-        
+
         return level
-    
+
     msgs = raw.split("\n")
     first = msgs.pop(0)
-    
+
     search = re.search(r"\[(.*?)\]", first)
-    
+
     # Use the default if the first message doesn't have a level
     if search is None:
         pandoc_level = default_level
     else:
         pandoc_level = first[search.start(1):search.end(1)]
-    
+
     log_msgs = [first.replace('[{}] '.format(pandoc_level), '')]
-    
+
     for msg in msgs:
-        
+
         search = re.search(r"\[(.*?)\]", msg)
-        
+
         if search is not None:
             yield get_python_level(pandoc_level), "\n".join(log_msgs)
             pandoc_level = msg[search.start(1):search.end(1)]
             log_msgs = [msg.replace('[{}] '.format(pandoc_level), '')]
             continue
-        
+
         log_msgs.append(msg)
-    
+
     yield get_python_level(pandoc_level), "\n".join(log_msgs)
 
 
@@ -664,7 +664,7 @@ def ensure_pandoc_minimal_version(major:int, minor:int=0) -> bool:
     if version[0] > int(major): # if we have pandoc2 but major is request to be 1
         return True
     return version[0] >= int(major) and version[1] >= int(minor)
-    
+
 
 
 def ensure_pandoc_maximal_version(major:int, minor:int=9999) -> bool:
@@ -685,9 +685,9 @@ def ensure_pandoc_maximal_version(major:int, minor:int=9999) -> bool:
 
 def _ensure_pandoc_path() -> None:
     global __pandoc_path
-    
+
     _check_log_handler()
-    
+
     if __pandoc_path is None:
         included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                        "files", "pandoc")
@@ -786,7 +786,7 @@ def _ensure_pandoc_path() -> None:
                           "install pypandoc wheels with included pandoc.")
 
 
-def ensure_pandoc_installed(url:Union[str, None]=None, 
+def ensure_pandoc_installed(url:Union[str, None]=None,
                             targetfolder:Union[str, None]=None,
                             version:str="latest",
                             delete_installer:bool=False) -> None:

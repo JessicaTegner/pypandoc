@@ -351,7 +351,7 @@ class TestPypandoc(unittest.TestCase):
         '''
         python_source = textwrap.dedent(python_source)
         python_source = python_source.format(sys.executable)
-        
+
         with closed_tempfile(".py", python_source) as tempfile:
             os.chmod(tempfile, 0o755)
             output = pypandoc.convert_text(
@@ -397,7 +397,7 @@ class TestPypandoc(unittest.TestCase):
 
         if __name__ == "__main__":
             toJSONFilter(func)
-        
+
         """
         python = textwrap.dedent(python)
         python = python.format(sys.executable)
@@ -429,34 +429,34 @@ class TestPypandoc(unittest.TestCase):
                     self.assertEqual(output, expected)
 
     def test_classify_pandoc_logging(self):
-        
+
         test = ("[WARNING] This is some message on\ntwo lines\n"
                 "[ERROR] This is a second message.")
-        
+
         expected_levels = [30, 40]
         expected_msgs = ["This is some message on\ntwo lines",
                          "This is a second message."]
-        
+
         for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
             self.assertEqual(expected_levels[i], l)
             self.assertEqual(expected_msgs[i], m)
 
 
     def test_classify_pandoc_logging_default(self):
-        
+
         test = ("This is some message on\ntwo lines\n"
                 "[ERROR] This is a second message.")
         expected_levels = [30, 40]
         expected_msgs = ["This is some message on\ntwo lines",
                          "This is a second message."]
-        
+
         for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
             self.assertEqual(expected_levels[i], l)
             self.assertEqual(expected_msgs[i], m)
 
 
     def test_classify_pandoc_logging_invalid_level(self):
-        
+
         test = ("[WARN] This is some message on\ntwo lines\n"
                 "[ERR] This is a second message.\n"
                 "[ERROR] This is a third message.")
@@ -464,18 +464,18 @@ class TestPypandoc(unittest.TestCase):
         expected_msgs = ["This is some message on\ntwo lines",
                          "This is a second message.",
                          "This is a third message."]
-        
+
         for i, (l, m) in enumerate(pypandoc._classify_pandoc_logging(test)):
             self.assertEqual(expected_levels[i], l)
             self.assertEqual(expected_msgs[i], m)
 
 
     def test_conversion_stderr(self):
-        
+
         # Clear logger handlers
         logger = logging.getLogger("pypandoc")
         logger.handlers = []
-        
+
         with closed_tempfile('.docx') as file_name:
             text = ('![Mock](missing.png)\n'
                     '![Mock](missing.png)\n')
@@ -492,11 +492,11 @@ class TestPypandoc(unittest.TestCase):
                 assert "[warning] could not fetch resource missing.png" in output
 
     def test_conversion_stderr_nullhandler(self):
-        
+
         # Replace any logging handlers with a null handler
         logger = logging.getLogger("pypandoc")
         logger.handlers = [logging.NullHandler()]
-        
+
         with closed_tempfile('.docx') as file_name:
             text = ('![Mock](missing.png)\n'
                     '![Mock](missing.png)\n')
