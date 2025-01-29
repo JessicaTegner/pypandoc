@@ -313,6 +313,7 @@ Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https
 * [Juho Vepsäläinen](https://github.com/bebraw/) - Creator and former maintainer of pypandoc
 * [Connor](https://github.com/DisSupEng/) - Updated Dockerfile to Python 3.9 image and added docker compose file
 * [Colin Bull](https://github.com/colinbull) - Added ability to control whether files are sorted before being passed to pandoc process.
+* [Kurt McKee](https://github.com/kurtmckee) - Project infrastructure improvements
 
 ## License
 
