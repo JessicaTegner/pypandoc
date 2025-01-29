@@ -29,3 +29,8 @@ repos:
         name: "Enforce Python 3.7+ idioms"
         args:
           - "--py37-plus"
+
+  - repo: "https://github.com/psf/black-pre-commit-mirror"
+    rev: "25.1.0"
+    hooks:
+      - id: "black"
