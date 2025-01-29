@@ -15,43 +15,58 @@ from .handler import logger, _check_log_handler
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, url2path, urlparse
 
-__author__ = 'Juho Vepsäläinen'
+__author__ = "Juho Vepsäläinen"
 __author_email__ = "bebraw@gmail.com"
-__maintainer__ = 'Jessica Tegner'
-__url__ = 'https://github.com/JessicaTegner/pypandoc'
-__version__ = '1.15'
-__license__ = 'MIT'
+__maintainer__ = "Jessica Tegner"
+__url__ = "https://github.com/JessicaTegner/pypandoc"
+__version__ = "1.15"
+__license__ = "MIT"
 __description__ = "Thin wrapper for pandoc."
 __python_requires__ = ">=3.7"
-__setup_requires__ = ['setuptools', 'pip>=8.1.0', 'wheel>=0.25.0']
+__setup_requires__ = ["setuptools", "pip>=8.1.0", "wheel>=0.25.0"]
 __classifiers__ = [
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: POSIX',
-        'Programming Language :: Python',
-        'Topic :: Text Processing',
-        'Topic :: Text Processing :: Filters',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
-    ]
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX",
+    "Programming Language :: Python",
+    "Topic :: Text Processing",
+    "Topic :: Text Processing :: Filters",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
 
-__all__ = ['convert_file', 'convert_text',
-           'get_pandoc_formats', 'get_pandoc_version', 'get_pandoc_path',
-           'download_pandoc']
+__all__ = [
+    "convert_file",
+    "convert_text",
+    "get_pandoc_formats",
+    "get_pandoc_version",
+    "get_pandoc_path",
+    "download_pandoc",
+]
 
-def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encoding:str='utf-8',
-                 outputfile:Union[None, str, Path]=None, filters:Union[Iterable, None]=None, verify_format:bool=True,
-                 sandbox:bool=False, cworkdir:Union[str, None]=None) -> str:
+
+def convert_text(
+    source: str,
+    to: str,
+    format: str,
+    extra_args: Iterable = (),
+    encoding: str = "utf-8",
+    outputfile: Union[None, str, Path] = None,
+    filters: Union[Iterable, None] = None,
+    verify_format: bool = True,
+    sandbox: bool = False,
+    cworkdir: Union[str, None] = None,
+) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param str source: Unicode string or bytes (see encoding)
@@ -88,16 +103,32 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
             path.
     """
     source = _as_unicode(source, encoding)
-    return _convert_input(source, format, 'string', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          cworkdir=cworkdir)
+    return _convert_input(
+        source,
+        format,
+        "string",
+        to,
+        extra_args=extra_args,
+        outputfile=outputfile,
+        filters=filters,
+        verify_format=verify_format,
+        sandbox=sandbox,
+        cworkdir=cworkdir,
+    )
 
 
-def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Union[str, None]=None,
-                 extra_args:Iterable=(), outputfile:Union[None, str, Path]=None,
-                 filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=False,
-                 cworkdir:Union[str, None]=None, sort_files=True) -> str:
+def convert_file(
+    source_file: Union[list, str, Path, Iterator],
+    to: str,
+    format: Union[str, None] = None,
+    extra_args: Iterable = (),
+    outputfile: Union[None, str, Path] = None,
+    filters: Union[Iterable, None] = None,
+    verify_format: bool = True,
+    sandbox: bool = False,
+    cworkdir: Union[str, None] = None,
+    sort_files=True,
+) -> str:
     """Converts given `source` from `format` to `to`.
 
     :param (str, list, pathlib.Path) source_file: If a string, should be either
@@ -144,12 +175,20 @@ def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Un
     if cworkdir is None:
         cworkdir = os.getcwd()
 
-    if _is_network_path(source_file): # if the source_file is an url
+    if _is_network_path(source_file):  # if the source_file is an url
         format = _identify_format_from_path(source_file, format)
-        return _convert_input(source_file, format, 'path', to, extra_args=extra_args,
-                          outputfile=outputfile, filters=filters,
-                          verify_format=verify_format, sandbox=sandbox,
-                          cworkdir=cworkdir)
+        return _convert_input(
+            source_file,
+            format,
+            "path",
+            to,
+            extra_args=extra_args,
+            outputfile=outputfile,
+            filters=filters,
+            verify_format=verify_format,
+            sandbox=sandbox,
+            cworkdir=cworkdir,
+        )
 
     # convert the source file to a path object internally
     if isinstance(source_file, str):
@@ -158,7 +197,6 @@ def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Un
         source_file = [Path(x) for x in source_file]
     elif isinstance(source_file, Iterator):
         source_file = [Path(x) for x in source_file]
-
 
     # we are basically interested to figure out if its an absolute path or not
     # if it's not, we want to prefix the working directory
@@ -170,8 +208,9 @@ def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Un
         source_file = (x if x.is_absolute() else Path(cworkdir, x) for x in source_file)
     # check ifjust a single path was given
     elif isinstance(source_file, Path):
-        source_file = source_file if source_file.is_absolute() else Path(cworkdir, source_file)
-
+        source_file = (
+            source_file if source_file.is_absolute() else Path(cworkdir, source_file)
+        )
 
     discovered_source_files = []
     # if we have a list of files, we need to glob them
@@ -194,10 +233,19 @@ def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Un
     if len(discovered_source_files) == 1:
         discovered_source_files = discovered_source_files[0]
 
-    return _convert_input(discovered_source_files, format, 'path', to, extra_args=extra_args,
-                      outputfile=outputfile, filters=filters,
-                      verify_format=verify_format, sandbox=sandbox,
-                      cworkdir=cworkdir, sort_files=sort_files)
+    return _convert_input(
+        discovered_source_files,
+        format,
+        "path",
+        to,
+        extra_args=extra_args,
+        outputfile=outputfile,
+        filters=filters,
+        verify_format=verify_format,
+        sandbox=sandbox,
+        cworkdir=cworkdir,
+        sort_files=sort_files,
+    )
 
 
 def _identify_path(source) -> bool:
@@ -210,7 +258,7 @@ def _identify_path(source) -> bool:
     try:
         is_path = os.path.exists(source)
     except UnicodeEncodeError:
-        is_path = os.path.exists(source.encode('utf-8'))
+        is_path = os.path.exists(source.encode("utf-8"))
     except:  # noqa
         # still false
         pass
@@ -219,7 +267,7 @@ def _identify_path(source) -> bool:
         try:
             is_path = len(glob.glob(source)) >= 1
         except UnicodeEncodeError:
-            is_path = len(glob.glob(source.encode('utf-8'))) >= 1
+            is_path = len(glob.glob(source.encode("utf-8"))) >= 1
         except:  # noqa
             # still false
             pass
@@ -240,6 +288,7 @@ def _identify_path(source) -> bool:
 
     return is_path
 
+
 def _is_network_path(source):
     try:
         # check if it's an URL
@@ -256,12 +305,12 @@ def _is_network_path(source):
     return False
 
 
-def _identify_format_from_path(sourcefile:str, format:str) -> str:
-    return format or os.path.splitext(sourcefile)[1].strip('.')
+def _identify_format_from_path(sourcefile: str, format: str) -> str:
+    return format or os.path.splitext(sourcefile)[1].strip(".")
 
 
-def _as_unicode(source:any, encoding:str) -> any:
-    if encoding != 'utf-8':
+def _as_unicode(source: any, encoding: str) -> any:
+    if encoding != "utf-8":
         # if a source and a different encoding is given, try to decode the the source into a
         # unicode string
         try:
@@ -273,9 +322,9 @@ def _as_unicode(source:any, encoding:str) -> any:
 
 def normalize_format(fmt):
     formats = {
-        'dbk': 'docbook',
-        'md': 'markdown',
-        'tex': 'latex',
+        "dbk": "docbook",
+        "md": "markdown",
+        "tex": "latex",
     }
     fmt = formats.get(fmt, fmt)
     # rst format can have extensions
@@ -290,32 +339,38 @@ def _validate_formats(format, to, outputfile):
     to = normalize_format(to)
 
     if not format:
-        raise RuntimeError('Missing format!')
+        raise RuntimeError("Missing format!")
 
     from_formats, to_formats = get_pandoc_formats()
 
     if _get_base_format(format) not in from_formats:
         raise RuntimeError(
             'Invalid input format! Got "{}" but expected one of these: {}'.format(
-                _get_base_format(format), ', '.join(from_formats)))
+                _get_base_format(format), ", ".join(from_formats)
+            )
+        )
 
     base_to_format = _get_base_format(to)
 
     file_extension = os.path.splitext(to)[1]
 
-    if (base_to_format not in to_formats and
-            base_to_format != "pdf" and  # pdf is handled later # noqa: E127
-            file_extension != '.lua'):
+    if (
+        base_to_format not in to_formats
+        and base_to_format != "pdf"  # pdf is handled later # noqa: E127
+        and file_extension != ".lua"
+    ):
         raise RuntimeError(
-            'Invalid output format! Got {} but expected one of these: {}'.format(
-                base_to_format, ', '.join(to_formats)))
+            "Invalid output format! Got {} but expected one of these: {}".format(
+                base_to_format, ", ".join(to_formats)
+            )
+        )
 
     # list from https://github.com/jgm/pandoc/blob/master/pandoc.hs
     # `[...] where binaries = ["odt","docx","epub","epub3"] [...]`
     # pdf has the same restriction
     if base_to_format in ["odt", "docx", "epub", "epub3", "pdf"] and not outputfile:
         raise RuntimeError(
-            'Output to %s only works by using a outputfile.' % base_to_format
+            "Output to %s only works by using a outputfile." % base_to_format
         )
 
     if base_to_format == "pdf":
@@ -337,9 +392,19 @@ def _validate_formats(format, to, outputfile):
     return format, to
 
 
-def _convert_input(source, format, input_type, to, extra_args=(),
-                   outputfile=None, filters=None, verify_format=True,
-                   sandbox=False, cworkdir=None, sort_files=True):
+def _convert_input(
+    source,
+    format,
+    input_type,
+    to,
+    extra_args=(),
+    outputfile=None,
+    filters=None,
+    verify_format=True,
+    sandbox=False,
+    cworkdir=None,
+    sort_files=True,
+):
 
     _check_log_handler()
 
@@ -354,7 +419,7 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         to = normalize_format(to)
 
     logger.debug("Identifying input type...")
-    string_input = input_type == 'string'
+    string_input = input_type == "string"
     if not string_input:
         if isinstance(source, str):
             input_file = [source]
@@ -366,9 +431,9 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     if sort_files:
         input_file = sorted(input_file)
 
-    args = [__pandoc_path, '--from=' + format]
+    args = [__pandoc_path, "--from=" + format]
 
-    args.append('--to=' + to)
+    args.append("--to=" + to)
 
     args += input_file
 
@@ -376,11 +441,15 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         args.append("--output=" + str(outputfile))
 
     if sandbox:
-        if ensure_pandoc_minimal_version(2,15): # sandbox was introduced in pandoc 2.15, so only add if we are using 2.15 or above.
+        if ensure_pandoc_minimal_version(
+            2, 15
+        ):  # sandbox was introduced in pandoc 2.15, so only add if we are using 2.15 or above.
             logger.debug("Adding sandbox argument...")
             args.append("--sandbox")
         else:
-            logger.warning("Sandbox argument was used, but pandoc version is too low. Ignoring argument.")
+            logger.warning(
+                "Sandbox argument was used, but pandoc version is too low. Ignoring argument."
+            )
 
     args.extend(extra_args)
 
@@ -388,7 +457,10 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     if filters is not None:
         if isinstance(filters, str):
             filters = filters.split()
-        f = ['--lua-filter=' + x if x.endswith(".lua") else '--filter=' + x for x in filters]
+        f = [
+            "--lua-filter=" + x if x.endswith(".lua") else "--filter=" + x
+            for x in filters
+        ]
         args.extend(f)
 
     # To get access to pandoc-citeproc when we use a included copy of pandoc,
@@ -396,7 +468,9 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     new_env = os.environ.copy()
     files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
     new_env["PATH"] = new_env.get("PATH", "") + os.pathsep + files_path
-    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
+    creation_flag = (
+        0x08000000 if sys.platform == "win32" else 0
+    )  # set creation flag to not open pandoc in new console on windows
 
     old_wd = os.getcwd()
     if cworkdir and old_wd != cworkdir:
@@ -409,7 +483,8 @@ def _convert_input(source, format, input_type, to, extra_args=(),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=new_env,
-        creationflags=creation_flag)
+        creationflags=creation_flag,
+    )
 
     if cworkdir is not None:
         os.chdir(old_wd)
@@ -417,13 +492,14 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     # something else than 'None' indicates that the process already terminated
     if not (p.returncode is None):
         raise RuntimeError(
-            'Pandoc died with exitcode "{}" before receiving input: {}'.format(p.returncode,
-                                                                           p.stderr.read())
+            'Pandoc died with exitcode "{}" before receiving input: {}'.format(
+                p.returncode, p.stderr.read()
+            )
         )
 
     if string_input:
         try:
-            source = cast_bytes(source, encoding='utf-8')
+            source = cast_bytes(source, encoding="utf-8")
         except (UnicodeDecodeError, UnicodeEncodeError):
             # assume that it is already a utf-8 encoded string
             pass
@@ -432,20 +508,22 @@ def _convert_input(source, format, input_type, to, extra_args=(),
     except OSError:
         # this is happening only on Py2.6 when pandoc dies before reading all
         # the input. We treat that the same as when we exit with an error...
-        raise RuntimeError('Pandoc died with exitcode "%s" during conversion.' % (p.returncode))
+        raise RuntimeError(
+            'Pandoc died with exitcode "%s" during conversion.' % (p.returncode)
+        )
 
     try:
         if not (to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"):
-            stdout = stdout.decode('utf-8')
+            stdout = stdout.decode("utf-8")
     except UnicodeDecodeError:
         # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
-        raise RuntimeError('Pandoc output was not utf-8.')
+        raise RuntimeError("Pandoc output was not utf-8.")
 
     try:
-        stderr = stderr.decode('utf-8')
+        stderr = stderr.decode("utf-8")
     except UnicodeDecodeError:
         # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
-        raise RuntimeError('Pandoc output was not utf-8.')
+        raise RuntimeError("Pandoc output was not utf-8.")
 
     # check that pandoc returned successfully
     if p.returncode != 0:
@@ -473,10 +551,7 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     # https://github.com/jgm/pandoc/blob/5e1249481b2e3fc27e845245a0c96c3687a23c3d/src/Text/Pandoc/Logging.hs#L44
     def get_python_level(pandoc_level):
 
-        level_map = {"ERROR": 40,
-                     "WARNING": 30,
-                     "INFO": 20,
-                     "DEBUG": 10}
+        level_map = {"ERROR": 40, "WARNING": 30, "INFO": 20, "DEBUG": 10}
 
         if pandoc_level not in level_map:
             level = level_map[default_level]
@@ -494,9 +569,9 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
     if search is None:
         pandoc_level = default_level
     else:
-        pandoc_level = first[search.start(1):search.end(1)]
+        pandoc_level = first[search.start(1) : search.end(1)]
 
-    log_msgs = [first.replace(f'[{pandoc_level}] ', '')]
+    log_msgs = [first.replace(f"[{pandoc_level}] ", "")]
 
     for msg in msgs:
 
@@ -504,8 +579,8 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
 
         if search is not None:
             yield get_python_level(pandoc_level), "\n".join(log_msgs)
-            pandoc_level = msg[search.start(1):search.end(1)]
-            log_msgs = [msg.replace(f'[{pandoc_level}] ', '')]
+            pandoc_level = msg[search.start(1) : search.end(1)]
+            log_msgs = [msg.replace(f"[{pandoc_level}] ", "")]
             continue
 
         log_msgs.append(msg)
@@ -514,28 +589,31 @@ def _classify_pandoc_logging(raw, default_level="WARNING"):
 
 
 def _get_base_format(format):
-    '''
+    """
     According to http://johnmacfarlane.net/pandoc/README.html#general-options,
     syntax extensions for markdown can be individually enabled or disabled by
     appending +EXTENSION or -EXTENSION to the format name.
     Return the base format without any extensions.
-    '''
-    return re.split(r'\+|-', format)[0]
+    """
+    return re.split(r"\+|-", format)[0]
 
 
 def get_pandoc_formats() -> Iterable:
-    '''
+    """
     Dynamic preprocessor for Pandoc formats.
     Return 2 lists. "from_formats" and "to_formats".
-    '''
+    """
     _ensure_pandoc_path()
-    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
+    creation_flag = (
+        0x08000000 if sys.platform == "win32" else 0
+    )  # set creation flag to not open pandoc in new console on windows
     p = subprocess.Popen(
-        [__pandoc_path, '--list-output-formats'],
+        [__pandoc_path, "--list-output-formats"],
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        creationflags=creation_flag)
+        creationflags=creation_flag,
+    )
 
     comm = p.communicate()
     out = comm[0].decode().splitlines(False)
@@ -544,11 +622,12 @@ def get_pandoc_formats() -> Iterable:
         return get_pandoc_formats_pre_1_18()
 
     p = subprocess.Popen(
-        [__pandoc_path, '--list-input-formats'],
+        [__pandoc_path, "--list-input-formats"],
         stdin=subprocess.PIPE,
         stderr=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        creationflags=creation_flag)
+        creationflags=creation_flag,
+    )
 
     comm = p.communicate()
     in_ = comm[0].decode().splitlines(False)
@@ -557,50 +636,61 @@ def get_pandoc_formats() -> Iterable:
 
 
 def get_pandoc_formats_pre_1_18() -> Iterable:
-    '''
+    """
     Dynamic preprocessor for Pandoc formats for version < 1.18.
     Return 2 lists. "from_formats" and "to_formats".
-    '''
+    """
     _ensure_pandoc_path()
-    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
+    creation_flag = (
+        0x08000000 if sys.platform == "win32" else 0
+    )  # set creation flag to not open pandoc in new console on windows
     p = subprocess.Popen(
-        [__pandoc_path, '-h'],
+        [__pandoc_path, "-h"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
-        creationflags=creation_flag)
+        creationflags=creation_flag,
+    )
 
     comm = p.communicate()
     help_text = comm[0].decode().splitlines(False)
-    if p.returncode != 0 or 'Options:' not in help_text:
-        raise RuntimeError("Couldn't call pandoc to get output formats. Output from pandoc:\n%s" %
-                           str(comm))
-    txt = ' '.join(help_text[1:help_text.index('Options:')])
+    if p.returncode != 0 or "Options:" not in help_text:
+        raise RuntimeError(
+            "Couldn't call pandoc to get output formats. Output from pandoc:\n%s"
+            % str(comm)
+        )
+    txt = " ".join(help_text[1 : help_text.index("Options:")])
 
-    aux = txt.split('Output formats: ')
-    in_ = re.sub(r'Input\sformats:\s|\*|\[.*?\]', '', aux[0]).split(',')
-    out = re.sub(r'\*|\[.*?\]', '', aux[1]).split(',')
+    aux = txt.split("Output formats: ")
+    in_ = re.sub(r"Input\sformats:\s|\*|\[.*?\]", "", aux[0]).split(",")
+    out = re.sub(r"\*|\[.*?\]", "", aux[1]).split(",")
 
     return [f.strip() for f in in_], [f.strip() for f in out]
 
 
 # copied and adapted from jupyter_nbconvert/utils/pandoc.py, Modified BSD License
 
-def _get_pandoc_version(pandoc_path:str) -> str:
+
+def _get_pandoc_version(pandoc_path: str) -> str:
     new_env = os.environ.copy()
-    creation_flag = 0x08000000 if sys.platform == "win32" else 0 # set creation flag to not open pandoc in new console on windows
-    if 'HOME' not in os.environ:
-        new_env['HOME'] = tempfile.gettempdir()
+    creation_flag = (
+        0x08000000 if sys.platform == "win32" else 0
+    )  # set creation flag to not open pandoc in new console on windows
+    if "HOME" not in os.environ:
+        new_env["HOME"] = tempfile.gettempdir()
     p = subprocess.Popen(
-        [pandoc_path, '--version'],
+        [pandoc_path, "--version"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         env=new_env,
-        creationflags=creation_flag)
+        creationflags=creation_flag,
+    )
     comm = p.communicate()
     out_lines = comm[0].decode().splitlines(False)
     if p.returncode != 0 or len(out_lines) == 0:
-        raise RuntimeError("Couldn't call pandoc to get version information. Output from "
-                           "pandoc:\n%s" % str(comm))
+        raise RuntimeError(
+            "Couldn't call pandoc to get version information. Output from "
+            "pandoc:\n%s" % str(comm)
+        )
 
     version_pattern = re.compile(r"^\d+(\.\d+){1,}$")
     for tok in out_lines[0].split():
@@ -648,7 +738,8 @@ def get_pandoc_path() -> str:
     _ensure_pandoc_path()
     return __pandoc_path
 
-def ensure_pandoc_minimal_version(major:int, minor:int=0) -> bool:
+
+def ensure_pandoc_minimal_version(major: int, minor: int = 0) -> bool:
     """Check if the used pandoc fulfill a minimal version requirement.
 
     :param int major: pandoc major version, such as 1 or 2.
@@ -659,13 +750,12 @@ def ensure_pandoc_minimal_version(major:int, minor:int=0) -> bool:
     :rtype: bool
     """
     version = [int(x) for x in get_pandoc_version().split(".")]
-    if version[0] > int(major): # if we have pandoc2 but major is request to be 1
+    if version[0] > int(major):  # if we have pandoc2 but major is request to be 1
         return True
     return version[0] >= int(major) and version[1] >= int(minor)
 
 
-
-def ensure_pandoc_maximal_version(major:int, minor:int=9999) -> bool:
+def ensure_pandoc_maximal_version(major: int, minor: int = 9999) -> bool:
     """Check if the used pandoc fulfill a maximal version requirement.
 
     :param int major: pandoc major version, such as 1 or 2.
@@ -676,7 +766,7 @@ def ensure_pandoc_maximal_version(major:int, minor:int=9999) -> bool:
     :rtype: bool
     """
     version = [int(x) for x in get_pandoc_version().split(".")]
-    if version[0] < int(major): # if we have pandoc1 but major is request to be 2
+    if version[0] < int(major):  # if we have pandoc1 but major is request to be 2
         return True
     return version[0] <= int(major) and version[1] <= int(minor)
 
@@ -687,13 +777,16 @@ def _ensure_pandoc_path() -> None:
     _check_log_handler()
 
     if __pandoc_path is None:
-        included_pandoc = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                       "files", "pandoc")
+        included_pandoc = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "files", "pandoc"
+        )
         search_paths = ["pandoc", included_pandoc]
         pf = "linux" if sys.platform.startswith("linux") else sys.platform
         try:
             if pf == "win32":
-                search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc.exe"))
+                search_paths.append(
+                    os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc.exe")
+                )
             else:
                 search_paths.append(os.path.join(DEFAULT_TARGET_FOLDER[pf], "pandoc"))
         except:  # noqa
@@ -708,12 +801,20 @@ def _ensure_pandoc_path() -> None:
             search_paths.append(os.path.join(sys.exec_prefix, "Scripts", "pandoc.exe"))
 
             # Since this only runs on Windows, use Windows slashes
-            if os.getenv('ProgramFiles', None):
-                search_paths.append(os.path.expandvars("${ProgramFiles}\\Pandoc\\pandoc.exe"))
-                search_paths.append(os.path.expandvars("${ProgramFiles}\\Pandoc\\Pandoc.exe"))
-            if os.getenv('ProgramFiles(x86)', None):
-                search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\pandoc.exe"))
-                search_paths.append(os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\Pandoc.exe"))
+            if os.getenv("ProgramFiles", None):
+                search_paths.append(
+                    os.path.expandvars("${ProgramFiles}\\Pandoc\\pandoc.exe")
+                )
+                search_paths.append(
+                    os.path.expandvars("${ProgramFiles}\\Pandoc\\Pandoc.exe")
+                )
+            if os.getenv("ProgramFiles(x86)", None):
+                search_paths.append(
+                    os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\pandoc.exe")
+                )
+                search_paths.append(
+                    os.path.expandvars("${ProgramFiles(x86)}\\Pandoc\\Pandoc.exe")
+                )
 
         # bin can also be used on windows (conda at least has it in path), so
         # include it unconditionally
@@ -722,8 +823,8 @@ def _ensure_pandoc_path() -> None:
         # If a user added the complete path to pandoc to an env, use that as the
         # only way to get pandoc so that a user can overwrite even a higher
         # version in some other places.
-        if os.getenv('PYPANDOC_PANDOC', None):
-            search_paths = [os.getenv('PYPANDOC_PANDOC')]
+        if os.getenv("PYPANDOC_PANDOC", None):
+            search_paths = [os.getenv("PYPANDOC_PANDOC")]
         curr_version = [0, 0, 0]
         for path in search_paths:
             # Needed for windows and subprocess which can't expand it on it's
@@ -737,8 +838,10 @@ def _ensure_pandoc_path() -> None:
                 # we can't use that path...
                 if os.path.exists(path):
                     # path exist but is not usable -> not executable?
-                    log_msg = ("Found {}, but not using it because of an "
-                               "error:".format(path))
+                    log_msg = (
+                        "Found {}, but not using it because of an "
+                        "error:".format(path)
+                    )
                     logger.exception(log_msg)
                 continue
             version = [int(x) for x in version_string.split(".")]
@@ -753,41 +856,65 @@ def _ensure_pandoc_path() -> None:
 
         if __pandoc_path is None:
             # Only print hints if requested
-            if os.path.exists('/usr/local/bin/brew'):
-                logger.info(textwrap.dedent("""\
+            if os.path.exists("/usr/local/bin/brew"):
+                logger.info(
+                    textwrap.dedent(
+                        """\
                     Maybe try:
 
                         brew install pandoc
-                """))
-            elif os.path.exists('/usr/bin/apt-get'):
-                logger.info(textwrap.dedent("""\
+                """
+                    )
+                )
+            elif os.path.exists("/usr/bin/apt-get"):
+                logger.info(
+                    textwrap.dedent(
+                        """\
                     Maybe try:
 
                         sudo apt-get install pandoc
-                """))
-            elif os.path.exists('/usr/bin/yum'):
-                logger.info(textwrap.dedent("""\
+                """
+                    )
+                )
+            elif os.path.exists("/usr/bin/yum"):
+                logger.info(
+                    textwrap.dedent(
+                        """\
                     Maybe try:
 
                     sudo yum install pandoc
-                """))
-            logger.info(textwrap.dedent("""\
+                """
+                    )
+                )
+            logger.info(
+                textwrap.dedent(
+                    """\
                 See http://johnmacfarlane.net/pandoc/installing.html
                 for installation options
-            """))
-            logger.info(textwrap.dedent("""\
+            """
+                )
+            )
+            logger.info(
+                textwrap.dedent(
+                    """\
                 ---------------------------------------------------------------
 
-            """))
-            raise OSError("No pandoc was found: either install pandoc and add it\n"
-                          "to your PATH or or call pypandoc.download_pandoc(...) or\n"
-                          "install pypandoc wheels with included pandoc.")
+            """
+                )
+            )
+            raise OSError(
+                "No pandoc was found: either install pandoc and add it\n"
+                "to your PATH or or call pypandoc.download_pandoc(...) or\n"
+                "install pypandoc wheels with included pandoc."
+            )
 
 
-def ensure_pandoc_installed(url:Union[str, None]=None,
-                            targetfolder:Union[str, None]=None,
-                            version:str="latest",
-                            delete_installer:bool=False) -> None:
+def ensure_pandoc_installed(
+    url: Union[str, None] = None,
+    targetfolder: Union[str, None] = None,
+    version: str = "latest",
+    delete_installer: bool = False,
+) -> None:
     """Try to install pandoc if it isn't installed.
 
     Parameters are passed to download_pandoc()
@@ -797,16 +924,22 @@ def ensure_pandoc_installed(url:Union[str, None]=None,
 
     # Append targetfolder to the PATH environment variable so it is found by subprocesses
     if targetfolder is not None:
-        os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + os.path.abspath(os.path.expanduser(targetfolder))
+        os.environ["PATH"] = (
+            os.environ.get("PATH", "")
+            + os.pathsep
+            + os.path.abspath(os.path.expanduser(targetfolder))
+        )
 
     try:
         _ensure_pandoc_path()
 
     except OSError:
-        download_pandoc(url=url,
-                        targetfolder=targetfolder,
-                        version=version,
-                        delete_installer=delete_installer)
+        download_pandoc(
+            url=url,
+            targetfolder=targetfolder,
+            version=version,
+            delete_installer=delete_installer,
+        )
 
         # Show errors in case of secondary failure
         _ensure_pandoc_path()

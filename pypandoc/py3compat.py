@@ -43,7 +43,7 @@ from urllib.request import pathname2url, url2pathname
 
 
 def path2url(path):  # noqa: E303
-    return urljoin('file:', pathname2url(path))
+    return urljoin("file:", pathname2url(path))
 
 
 def url2path(url):  # noqa: E303
