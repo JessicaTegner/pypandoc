@@ -7,16 +7,15 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from typing import Union
-
 import urllib
+from typing import Union
 
 try:
     from urllib.request import urlopen
 except ImportError:
     from urllib import urlopen
 
-from .handler import logger, _check_log_handler
+from .handler import _check_log_handler, logger
 
 DEFAULT_TARGET_FOLDER = {
     "win32": "~\\AppData\\Local\\Pandoc",

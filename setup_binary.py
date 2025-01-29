@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-import pypandoc
-from setuptools import setup, Command
-
-import sys
+import io
 import os
 import os.path
-import io
+import sys
+
+from setuptools import Command, setup
+
+import pypandoc
 
 try:
     from urllib.request import urlopen
@@ -61,8 +62,9 @@ if is_build_wheel:
         # we also need to make sure that this version of bdist_wheel supports
         # the --plat-name argument
         try:
-            import wheel
             from distutils.version import StrictVersion
+
+            import wheel
 
             if not StrictVersion(wheel.__version__) >= StrictVersion("0.27"):
                 msg = "Including pandoc in wheel needs wheel >=0.27 but found %s.\nPlease update wheel!"

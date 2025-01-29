@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-import pypandoc
 import io
+
 from setuptools import setup
+
+import pypandoc
 
 with open("README.md", encoding="utf-8") as f:
     long_description = f.read()

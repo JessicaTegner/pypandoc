@@ -1,17 +1,14 @@
-from typing import Iterable
-from typing import Iterator
-from typing import Union
-
+import glob
 import os
 import re
 import subprocess
 import sys
 import tempfile
 import textwrap
-import glob
 from pathlib import Path
+from typing import Iterable, Iterator, Union
 
-from .handler import logger, _check_log_handler
+from .handler import _check_log_handler, logger
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 from .py3compat import cast_bytes, cast_unicode, url2path, urlparse
 
