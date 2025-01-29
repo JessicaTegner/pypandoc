@@ -12,7 +12,7 @@ RUN apt update && apt upgrade -y && apt install pandoc -y
 # Update pip
 RUN pip install --upgrade pip
 
-# Copy the files to container   
+# Copy the files to container
 COPY . pypandoc
 WORKDIR pypandoc
 
