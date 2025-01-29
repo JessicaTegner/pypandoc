@@ -1,4 +1,3 @@
-import logging
 import os
 import os.path
 import platform
@@ -37,7 +36,8 @@ def _get_pandoc_urls(version="latest"):
     :return: str pandoc_urls: a dictionary with keys as system platform
         and values as the url pointing to respective binaries
 
-    :return: str version: actual pandoc version. (e.g. "latest" will be resolved to the actual one)
+    :return: str version: actual pandoc version.
+        (e.g. "latest" will be resolved to the actual one)
     """
     # url to pandoc download page
     url = (
@@ -50,7 +50,7 @@ def _get_pandoc_urls(version="latest"):
         response = urlopen(url)
         version_url_frags = response.url.split("/")
         version = version_url_frags[-1]
-    except urllib.error.HTTPError as e:
+    except urllib.error.HTTPError:
         raise RuntimeError(f"Invalid pandoc version {version}.")
     # read the HTML content
     response = urlopen(
@@ -63,7 +63,8 @@ def _get_pandoc_urls(version="latest"):
         "arm" if uname.startswith("arm") or uname.startswith("aarch") else "amd"
     )
     regex = re.compile(
-        rf"/jgm/pandoc/releases/download/.*(?:{processor_architecture}|x86|mac).*\.(?:msi|deb|pkg)"
+        rf"/jgm/pandoc/releases/download/.*"
+        rf"(?:{processor_architecture}|x86|mac).*\.(?:msi|deb|pkg)"
     )
     # a list of urls to the binaries
     pandoc_urls_list = regex.findall(content.decode("utf-8"))
@@ -222,8 +223,9 @@ def download_pandoc(
         location: `~/bin` on Linux, `~/Applications/pandoc` on Mac OS X, and
         `~\\AppData\\Local\\Pandoc` on Windows.
 
-    :param str download_folder: Directory, where the installer should download files before unpacking
-        to the target folder. If no `download_folder` is given, uses the current directory. example: `/tmp/`, `/tmp`
+    :param str download_folder: Directory where the installer should download files
+        before unpacking to the target folder. If no `download_folder` is given,
+        uses the current directory. example: `/tmp/`, `/tmp`
     """
 
     _check_log_handler()
@@ -261,7 +263,7 @@ def download_pandoc(
         logger.info(f"Using already downloaded file {filename}")
     else:
         logger.info(f"Downloading pandoc from {url} ...")
-        # https://stackoverflow.com/questions/30627937/tracebaclk-attributeerroraddinfourl-instance-has-no-attribute-exit
+        # https://stackoverflow.com/questions/30627937/
         response = urlopen(url)
         with open(filename, "wb") as out_file:
             shutil.copyfileobj(response, out_file)

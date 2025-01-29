@@ -1,8 +1,13 @@
 import locale
 import sys
 
-# compat code from IPython py3compat.py and encoding.py, which is licensed under the terms of the
-# Modified BSD License (also known as New or Revised or 3-Clause BSD)
+# from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
+from urllib.parse import urljoin, urlparse
+from urllib.request import pathname2url, url2pathname
+
+# compat code from IPython py3compat.py and encoding.py,
+# which is licensed under the terms of the Modified BSD License
+# (also known as New or Revised or 3-Clause BSD)
 _DEFAULT_ENCODING = None
 try:
     # There are reports of getpreferredencoding raising errors
@@ -37,14 +42,9 @@ def cast_bytes(s, encoding=None):
     return s
 
 
-# from http://stackoverflow.com/questions/11687478/convert-a-filename-to-a-file-url
-from urllib.parse import urljoin, urlparse
-from urllib.request import pathname2url, url2pathname
-
-
-def path2url(path):  # noqa: E303
+def path2url(path):
     return urljoin("file:", pathname2url(path))
 
 
-def url2path(url):  # noqa: E303
+def url2path(url):
     return url2pathname(urlparse(url).path)

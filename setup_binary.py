@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import io
 import os
 import os.path
 import sys
@@ -7,12 +6,6 @@ import sys
 from setuptools import Command, setup
 
 import pypandoc
-
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
-
 
 with open("README.md", encoding="utf-8") as f:
     long_description = f.read()
@@ -67,7 +60,10 @@ if is_build_wheel:
             import wheel
 
             if not StrictVersion(wheel.__version__) >= StrictVersion("0.27"):
-                msg = "Including pandoc in wheel needs wheel >=0.27 but found %s.\nPlease update wheel!"
+                msg = (
+                    "Including pandoc in wheel needs wheel >=0.27 but found %s.\n"
+                    "Please update wheel!"
+                )
                 raise RuntimeError(msg % wheel.__version__)
         except ImportError:
             # the real error will happen further down...

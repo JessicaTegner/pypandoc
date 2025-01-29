@@ -68,36 +68,43 @@ def convert_text(
 
     :param str source: Unicode string or bytes (see encoding)
 
-    :param str to: format into which the input should be converted; can be one of
-            `pypandoc.get_pandoc_formats()[1]`
+    :param str to: format into which the input should be converted;
+        can be one of `pypandoc.get_pandoc_formats()[1]`
 
-    :param str format: the format of the inputs; can be one of `pypandoc.get_pandoc_formats()[1]`
+    :param str format: the format of the inputs;
+        can be one of `pypandoc.get_pandoc_formats()[1]`
 
     :param list extra_args: extra arguments (list of strings) to be passed to pandoc
-            (Default value = ())
+        (Default value = ())
 
     :param str encoding: the encoding of the input bytes (Default value = 'utf-8')
 
-    :param str outputfile: output will be written to outputfile or the converted content
-            returned if None. The output filename can be specified as a string
-            or pathlib.Path object. (Default value = None)
+    :param str outputfile: output will be written to outputfile
+        or the converted content returned if None.
+        The output filename can be specified as a string or pathlib.Path object.
+        (Default value = None)
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
-    :param bool verify_format: Verify from and to format before converting. Should only be set False when confident of the formats and performance is an issue.
-            (Default value = True)
+    :param bool verify_format: Verify from and to format before converting.
+        Should only be set False when confident of the formats
+        and performance is an issue. (Default value = True)
 
-    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
-            (Default value = False)
+    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations
+        in readers and writers to reading the files specified on the command line.
+        Anyone using pandoc on untrusted user input should use this option.
+        Note: This only does something, on pandoc >= 2.15 (Default value = False)
 
     :param str cworkdir: set the current working directory (Default value = None)
 
-    :returns: converted string (unicode) or an empty string if an outputfile was given
-    :rtype: unicode
+    :returns: converted string or an empty string if an outputfile was given
+    :rtype: str
 
-    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
-    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
-            path.
+    :raises RuntimeError:
+        if any of the inputs are not valid of if pandoc fails with an error
+    :raises OSError:
+        if pandoc is not found; make sure it has been installed
+        and is available at path.
     """
     source = _as_unicode(source, encoding)
     return _convert_input(
@@ -129,17 +136,17 @@ def convert_file(
     """Converts given `source` from `format` to `to`.
 
     :param (str, list, pathlib.Path) source_file: If a string, should be either
-            an absolute file path, relative file path, or a file pattern (like dir/*.md).
-            If a list, should be a list of file paths, file patterns, or pathlib.Path
-            objects. In addition, pathlib.Path objects as well as the generators produced by
-            pathlib.Path.glob may be specified.
+        an absolute file path, relative file path, or a file pattern (like dir/*.md).
+        If a list, should be a list of file paths, file patterns, or pathlib.Path
+        objects. In addition, pathlib.Path objects as well as the generators produced by
+        pathlib.Path.glob may be specified.
 
     :param str to: format into which the input should be converted; can be one of
             `pypandoc.get_pandoc_formats()[1]`
 
-    :param str format: the format of the inputs; will be inferred from the source_file with an
-            known filename extension; can be one of `pypandoc.get_pandoc_formats()[1]`
-            (Default value = None)
+    :param str format: the format of the inputs;
+        will be inferred from the source_file with a known filename extension;
+        can be one of `pypandoc.get_pandoc_formats()[1]` (Default value = None)
 
     :param list extra_args: extra arguments (list of strings) to be passed to pandoc
             (Default value = ())
@@ -150,22 +157,28 @@ def convert_file(
 
     :param list filters: pandoc filters e.g. filters=['pandoc-citeproc']
 
-    :param bool verify_format: Verify from and to format before converting. Should only be set False when confident of the formats and performance is an issue.
-            (Default value = True)
+    :param bool verify_format: Verify from and to format before converting.
+        Should only be set False when confident of the formats
+        and performance is an issue. (Default value = True)
 
-    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations in readers and writers to reading the files specified on the command line. Anyone using pandoc on untrusted user input should use this option. Note: This only does something, on pandoc >= 2.15
-            (Default value = False)
+    :param bool sandbox: Run pandoc in pandocs own sandbox mode, limiting IO operations
+        in readers and writers to reading the files specified on the command line.
+        Anyone using pandoc on untrusted user input should use this option.
+        Note: This only does something, on pandoc >= 2.15 (Default value = False)
 
     :param str cworkdir: set the current working directory (Default value = None)
 
-    :param bool sort_files: causes the files to be sorted before being passed to pandoc (Default value = True)
+    :param bool sort_files: causes the files to be sorted before being passed to pandoc
+        (Default value = True)
 
-    :returns: converted string (unicode) or an empty string if an outputfile was given
-    :rtype: unicode
+    :returns: converted string or an empty string if an outputfile was given
+    :rtype: str
 
-    :raises RuntimeError: if any of the inputs are not valid of if pandoc fails with an error
-    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
-            path.
+    :raises RuntimeError:
+        if any of the inputs are not valid of if pandoc fails with an error
+    :raises OSError:
+        if pandoc is not found; make sure it has been installed
+        and is available at path.
     """
     # check if we have a working directory
     # if we don't, we use the current working directory
@@ -195,10 +208,11 @@ def convert_file(
     elif isinstance(source_file, Iterator):
         source_file = [Path(x) for x in source_file]
 
-    # we are basically interested to figure out if its an absolute path or not
-    # if it's not, we want to prefix the working directory
-    # if it's a list, we want to prefix the working directory to each item if it's not an absolute path
-    # if it is, just use the absolute path
+    # we are basically interested to figure out if it's an absolute path or not.
+    # if it's not, we want to prefix the working directory.
+    # if it's a list, we want to prefix the working directory to each item
+    # if it's not an absolute path.
+    # if it is, just use the absolute path.
     if isinstance(source_file, list):
         source_file = [x if x.is_absolute() else Path(cworkdir, x) for x in source_file]
     elif isinstance(source_file, Iterator):
@@ -308,8 +322,8 @@ def _identify_format_from_path(sourcefile: str, format: str) -> str:
 
 def _as_unicode(source: any, encoding: str) -> any:
     if encoding != "utf-8":
-        # if a source and a different encoding is given, try to decode the the source into a
-        # unicode string
+        # if a source and a different encoding is given,
+        # try to decode the source into a string
         try:
             source = cast_unicode(source, encoding=encoding)
         except (UnicodeDecodeError, UnicodeEncodeError):
@@ -438,14 +452,14 @@ def _convert_input(
         args.append("--output=" + str(outputfile))
 
     if sandbox:
-        if ensure_pandoc_minimal_version(
-            2, 15
-        ):  # sandbox was introduced in pandoc 2.15, so only add if we are using 2.15 or above.
+        # sandbox was introduced in pandoc 2.15, so only add if we are using >= 2.15.
+        if ensure_pandoc_minimal_version(2, 15):
             logger.debug("Adding sandbox argument...")
             args.append("--sandbox")
         else:
             logger.warning(
-                "Sandbox argument was used, but pandoc version is too low. Ignoring argument."
+                "Sandbox argument was used, but pandoc version is too low. "
+                "Ignoring argument."
             )
 
     args.extend(extra_args)
@@ -513,13 +527,13 @@ def _convert_input(
         if not (to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"):
             stdout = stdout.decode("utf-8")
     except UnicodeDecodeError:
-        # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
+        # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
         raise RuntimeError("Pandoc output was not utf-8.")
 
     try:
         stderr = stderr.decode("utf-8")
     except UnicodeDecodeError:
-        # this shouldn't happen: pandoc more or less guarantees that the output is utf-8!
+        # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
         raise RuntimeError("Pandoc output was not utf-8.")
 
     # check that pandoc returned successfully
@@ -700,12 +714,13 @@ def _get_pandoc_version(pandoc_path: str) -> str:
 def get_pandoc_version() -> str:
     """Gets the Pandoc version if Pandoc is installed.
 
-    It will probe Pandoc for its version, cache it and return that value. If a cached version is
-    found, it will return the cached version and stop probing Pandoc
-    (unless :func:`clean_version_cache()` is called).
+    It will probe Pandoc for its version, cache it and return that value.
+    If a cached version is found, it will return the cached version
+    and stop probing Pandoc (unless :func:`clean_version_cache()` is called).
 
-    :raises OSError: if pandoc is not found; make sure it has been installed and is available at
-            path.
+    :raises OSError:
+        if pandoc is not found; make sure it has been installed
+        and is available at path.
     """
     global __version
 
@@ -743,7 +758,7 @@ def ensure_pandoc_minimal_version(major: int, minor: int = 0) -> bool:
 
     :param int minor: pandoc minor version, such as 10 or 11.
 
-    :returns: True if the installed pandoc is above the minimal version, False otherwise.
+    :returns: True only if the installed pandoc is above the minimal version.
     :rtype: bool
     """
     version = [int(x) for x in get_pandoc_version().split(".")]
@@ -759,7 +774,7 @@ def ensure_pandoc_maximal_version(major: int, minor: int = 9999) -> bool:
 
     :param int minor: pandoc minor version, such as 10 or 11.
 
-    :returns: True if the installed pandoc is below the maximal version, False otherwise.
+    :returns: True if the installed pandoc is below the maximal version.
     :rtype: bool
     """
     version = [int(x) for x in get_pandoc_version().split(".")]
@@ -919,7 +934,7 @@ def ensure_pandoc_installed(
     :raises OSError: if pandoc cannot be installed
     """
 
-    # Append targetfolder to the PATH environment variable so it is found by subprocesses
+    # Append targetfolder to the PATH so it is found by subprocesses
     if targetfolder is not None:
         os.environ["PATH"] = (
             os.environ.get("PATH", "")

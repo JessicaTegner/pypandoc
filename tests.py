@@ -162,15 +162,15 @@ class TestPypandoc(unittest.TestCase):
 
     def test_ensure_pandoc_minimal_version(self):
         assert "HOME" in os.environ, "No HOME set, this will error..."
-        assert pypandoc.ensure_pandoc_minimal_version(1) == True
-        assert pypandoc.ensure_pandoc_minimal_version(1, 1) == True
-        assert pypandoc.ensure_pandoc_minimal_version(999, 999) == False
+        assert pypandoc.ensure_pandoc_minimal_version(1)
+        assert pypandoc.ensure_pandoc_minimal_version(1, 1)
+        assert not pypandoc.ensure_pandoc_minimal_version(999, 999)
 
     def test_ensure_pandoc_maximal_version(self):
         assert "HOME" in os.environ, "No HOME set, this will error..."
-        assert pypandoc.ensure_pandoc_maximal_version(999) == True
-        assert pypandoc.ensure_pandoc_maximal_version(999, 999) == True
-        assert pypandoc.ensure_pandoc_maximal_version(1, 1) == False
+        assert pypandoc.ensure_pandoc_maximal_version(999)
+        assert pypandoc.ensure_pandoc_maximal_version(999, 999)
+        assert not pypandoc.ensure_pandoc_maximal_version(1, 1)
 
     def test_converts_valid_format(self):
         self.assertEqualExceptForNewlineEnd(
@@ -599,21 +599,6 @@ class TestPypandoc(unittest.TestCase):
         # Only use german umlauts in the next test, as iso-8859-15 covers that
         expected = f"äüäö{os.linesep}"
         bytes = "<p>äüäö</p>".encode("iso-8859-15")
-
-        # Without encoding, this fails as we expect utf-8 per default
-
-        def f():
-            written = pypandoc.convert_text(bytes, "md", format="html")
-
-            assert expected != written
-
-        def f():
-            # we have to use something which interprets '\xa4', so latin and -1 does not work :-/
-            written = pypandoc.convert_text(
-                bytes, "md", format="html", encoding="utf-16"
-            )
-
-            assert expected != written
 
         # with the right encoding it should work...
         written = pypandoc.convert_text(
