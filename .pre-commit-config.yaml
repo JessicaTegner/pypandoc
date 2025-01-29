@@ -21,3 +21,11 @@ repos:
         args:
           - "--fix=lf"
       - id: "trailing-whitespace"
+
+  - repo: "https://github.com/asottile/pyupgrade"
+    rev: "v3.19.1"
+    hooks:
+      - id: "pyupgrade"
+        name: "Enforce Python 3.7+ idioms"
+        args:
+          - "--py37-plus"
