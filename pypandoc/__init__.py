@@ -97,7 +97,7 @@ def convert_text(source:str, to:str, format:str, extra_args:Iterable=(), encodin
 
 
 def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Union[str, None]=None,
-                 extra_args:Iterable=(), encoding:str='utf-8', outputfile:Union[None, str, Path]=None,
+                 extra_args:Iterable=(), outputfile:Union[None, str, Path]=None,
                  filters:Union[Iterable, None]=None, verify_format:bool=True, sandbox:bool=False,
                  cworkdir:Union[str, None]=None, sort_files=True) -> str:
     """Converts given `source` from `format` to `to`.
@@ -117,8 +117,6 @@ def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Un
 
     :param list extra_args: extra arguments (list of strings) to be passed to pandoc
             (Default value = ())
-
-    :param str encoding (deprecated): the encoding of the input bytes (Default value = 'utf-8')
 
     :param str outputfile: output will be written to outputfile or the converted content
             returned if None. The output filename can be specified as a string
@@ -147,10 +145,6 @@ def convert_file(source_file:Union[list, str, Path, Iterator], to:str, format:Un
     # if we don't, we use the current working directory
     if cworkdir is None:
         cworkdir = os.getcwd()
-
-    # TODO: remove 'encoding' parameter and warning
-    if encoding != "utf-8":
-        logger.warning("The 'encoding' parameter will be removed in version 1.13. Just remove the parameter, because currently the method does not use it.")
 
     if _is_network_path(source_file): # if the source_file is an url
         format = _identify_format_from_path(source_file, format)
