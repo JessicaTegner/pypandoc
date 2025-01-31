@@ -19,6 +19,7 @@ setup(
     author = module.__author__.encode('utf8'),
     author_email = pypandoc.__author_email__,
     packages = ['pypandoc'],
+    package_data = {'pypandoc': ['py.typed']},
     python_requires=pypandoc.__python_requires__,
     setup_requires = pypandoc.__setup_requires__,
     classifiers=pypandoc.__classifiers__,
