@@ -10,7 +10,7 @@ defaults:
 concurrency:
   group: ci-tests-${{ github.ref }}-1
   cancel-in-progress: true
-  
+
 jobs:
   test:
     strategy:
@@ -40,7 +40,7 @@ jobs:
         id: cached-poetry-dependencies
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ runner.arch }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - name: Install dependencies
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -95,7 +95,7 @@ jobs:
           # - pandoc does not publish binaries for Linux 32bit
           CIBW_ARCHS_LINUX: "auto64 aarch64"
           CIBW_ARCHS_MACOS: "x86_64 arm64"
-          CIBW_ARCHS_WINDOWS: "AMD64" 
+          CIBW_ARCHS_WINDOWS: "AMD64"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
