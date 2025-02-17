@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-13, windows-2022]
+        os: [ubuntu-22.04, ubuntu-24.04, macos-15, macos-14, windows-2022]
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9", "pypy3.10", ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -51,7 +51,7 @@ jobs:
 
   builder_pypandoc:
     needs: [test]
-    runs-on: ubuntu-20.04  # Any OS is fine as this wheel is not OS dependent
+    runs-on: ubuntu-latest  # Any OS is fine as this wheel is not OS dependent
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
