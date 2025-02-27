@@ -5,12 +5,14 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import typing
+import urllib.parse
+import urllib.request
 from pathlib import Path
 from typing import Iterable, Iterator, Union
 
 from .handler import _check_log_handler, logger
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
-from .py3compat import cast_bytes, cast_unicode, url2path, urlparse
 
 __author__ = "Juho Vepsäläinen"
 __author_email__ = "bebraw@gmail.com"
@@ -53,7 +55,7 @@ __all__ = [
 
 
 def convert_text(
-    source: str,
+    source: typing.Union[str, bytes],
     to: str,
     format: str,
     extra_args: Iterable = (),
@@ -66,7 +68,7 @@ def convert_text(
 ) -> str:
     """Converts given `source` from `format` to `to`.
 
-    :param str source: Unicode string or bytes (see encoding)
+    :param source: Unicode string or bytes (see encoding)
 
     :param str to: format into which the input should be converted;
         can be one of `pypandoc.get_pandoc_formats()[1]`
@@ -106,7 +108,10 @@ def convert_text(
         if pandoc is not found; make sure it has been installed
         and is available at path.
     """
-    source = _as_unicode(source, encoding)
+
+    if isinstance(source, bytes):
+        source = source.decode(encoding, errors="ignore")
+
     return _convert_input(
         source,
         format,
@@ -286,7 +291,7 @@ def _identify_path(source) -> bool:
     if not is_path:
         try:
             # check if it's an URL
-            result = urlparse(source)
+            result = urllib.parse.urlparse(source)
             if result.scheme in ["http", "https"]:
                 is_path = True
             elif result.scheme and result.netloc and result.path:
@@ -303,7 +308,7 @@ def _identify_path(source) -> bool:
 def _is_network_path(source):
     try:
         # check if it's an URL
-        result = urlparse(source)
+        result = urllib.parse.urlparse(source)
         if result.scheme in ["http", "https"]:
             return True
         elif result.scheme and result.netloc and result.path:
@@ -318,17 +323,6 @@ def _is_network_path(source):
 
 def _identify_format_from_path(sourcefile: str, format: str) -> str:
     return format or os.path.splitext(sourcefile)[1].strip(".")
-
-
-def _as_unicode(source: any, encoding: str) -> any:
-    if encoding != "utf-8":
-        # if a source and a different encoding is given,
-        # try to decode the source into a string
-        try:
-            source = cast_unicode(source, encoding=encoding)
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            pass
-    return source
 
 
 def normalize_format(fmt):
@@ -404,7 +398,7 @@ def _validate_formats(format, to, outputfile):
 
 
 def _convert_input(
-    source,
+    source: str,
     format,
     input_type,
     to,
@@ -509,19 +503,9 @@ def _convert_input(
         )
 
     if string_input:
-        try:
-            source = cast_bytes(source, encoding="utf-8")
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            # assume that it is already a utf-8 encoded string
-            pass
-    try:
-        stdout, stderr = p.communicate(source if string_input else None)
-    except OSError:
-        # this is happening only on Py2.6 when pandoc dies before reading all
-        # the input. We treat that the same as when we exit with an error...
-        raise RuntimeError(
-            'Pandoc died with exitcode "%s" during conversion.' % (p.returncode)
-        )
+        if isinstance(source, str):
+            source = source.encode("utf-8")
+    stdout, stderr = p.communicate(source if string_input else None)
 
     try:
         if not (to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"):
@@ -955,6 +939,10 @@ def ensure_pandoc_installed(
 
         # Show errors in case of secondary failure
         _ensure_pandoc_path()
+
+
+def url2path(url):
+    return urllib.request.url2pathname(urllib.parse.urlparse(url).path)
 
 
 # -----------------------------------------------------------------------------

@@ -6,13 +6,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import urllib
+import urllib.error
+import urllib.request
 from typing import Union
-
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib import urlopen
 
 from .handler import _check_log_handler, logger
 
@@ -47,13 +43,13 @@ def _get_pandoc_urls(version="latest"):
     )
     # try to open the url
     try:
-        response = urlopen(url)
+        response = urllib.request.urlopen(url)
         version_url_frags = response.url.split("/")
         version = version_url_frags[-1]
     except urllib.error.HTTPError:
         raise RuntimeError(f"Invalid pandoc version {version}.")
     # read the HTML content
-    response = urlopen(
+    response = urllib.request.urlopen(
         f"https://github.com/jgm/pandoc/releases/expanded_assets/{version}"
     )
     content = response.read()
@@ -264,7 +260,7 @@ def download_pandoc(
     else:
         logger.info(f"Downloading pandoc from {url} ...")
         # https://stackoverflow.com/questions/30627937/
-        response = urlopen(url)
+        response = urllib.request.urlopen(url)
         with open(filename, "wb") as out_file:
             shutil.copyfileobj(response, out_file)
 
