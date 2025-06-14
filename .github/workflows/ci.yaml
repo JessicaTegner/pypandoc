@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-15, macos-14, windows-2022]
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9", "pypy3.10", ]
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-22.04-arm, ubuntu-24.04-arm, macos-15, macos-14, windows-2022, windows-11-arm]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3.9", "pypy3.10", ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
@@ -95,7 +95,7 @@ jobs:
           # - pandoc does not publish binaries for Linux 32bit
           CIBW_ARCHS_LINUX: "auto64 aarch64"
           CIBW_ARCHS_MACOS: "x86_64 arm64"
-          CIBW_ARCHS_WINDOWS: "AMD64"
+          CIBW_ARCHS_WINDOWS: "AMD64 ARM64"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
