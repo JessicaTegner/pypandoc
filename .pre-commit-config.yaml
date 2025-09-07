@@ -23,7 +23,7 @@ repos:
       - id: "trailing-whitespace"
 
   - repo: "https://github.com/asottile/pyupgrade"
-    rev: "v3.19.1"
+    rev: "v3.20.0"
     hooks:
       - id: "pyupgrade"
         name: "Enforce Python 3.7+ idioms"
@@ -36,12 +36,12 @@ repos:
       - id: "black"
 
   - repo: "https://github.com/pycqa/isort"
-    rev: "6.0.0"
+    rev: "6.0.1"
     hooks:
       - id: "isort"
 
   - repo: "https://github.com/pycqa/flake8"
-    rev: "7.1.1"
+    rev: "7.3.0"
     hooks:
       - id: "flake8"
         additional_dependencies:
