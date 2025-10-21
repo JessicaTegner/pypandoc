@@ -1,6 +1,10 @@
 name: Continuous Integration
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 
 defaults:
@@ -8,7 +12,7 @@ defaults:
     shell: bash
 
 concurrency:
-  group: ci-tests-${{ github.ref }}-1
+  group: test-${{ github.ref }}-1
   cancel-in-progress: true
 
 jobs:
@@ -17,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04, macos-15, macos-14, windows-2022]
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9", "pypy3.10", ]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15.0-alpha.1", "pypy3.10", "pypy3.11", ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
