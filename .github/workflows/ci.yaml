@@ -18,9 +18,9 @@ concurrency:
 jobs:
   test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-15, macos-14, windows-2022]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-large, macos-14, macos-14-large, windows-2025, windows-2022]
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15.0-alpha.1", "pypy3.10", "pypy3.11", ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -78,7 +78,7 @@ jobs:
     needs: [test]
     strategy:
       matrix:
-        os: [macos-14, windows-2022, ubuntu-22.04]
+        os: [macos-14, macos-14-large, windows-2022, ubuntu-22.04, ubuntu-22.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
