@@ -2,7 +2,7 @@
 name = "pypandoc"
 version = "1.15"
 description = "Thin wrapper for pandoc"
-authors = ["JessicaTegner <jessica.tegneroutlook.com>"]
+authors = ["JessicaTegner <jessica@jessicategner.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/JessicaTegner/pypandoc"
