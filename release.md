@@ -8,3 +8,4 @@ This is the internal checklist, so that @janschulz doesn't have to do another br
 - tag the version: `git tag -a vx.x.x`, write a nice version message summarizing new features
 - push directly to the repo: `git push; git push --tags`
 - celebrate :-)
+
