@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm, ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-large, macos-14, macos-14-large, windows-2025, windows-2022]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-14, windows-2025, windows-2022]
         python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15.0-alpha.1", "pypy3.10", "pypy3.11", ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -58,6 +58,8 @@ jobs:
   builder_pypandoc:
     needs: [test]
     runs-on: ubuntu-latest  # Any OS is fine as this wheel is not OS dependent
+    # only run on tagged commits and master branch
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -75,13 +77,15 @@ jobs:
         with:
           name: pypandoc-distributions
           path: dist/
+          retention-days: 1
 
   builder_pypandoc_binary:
     needs: [test]
     strategy:
       matrix:
-        os: [macos-14, macos-14-large, windows-2022, ubuntu-22.04, ubuntu-22.04-arm]
+        os: [macos-15, windows-2022, ubuntu-22.04, ubuntu-22.04-arm]
     runs-on: ${{ matrix.os }}
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -107,6 +111,7 @@ jobs:
         with:
           name: pypandoc-binary-${{ matrix.os }}-distributions
           path: wheelhouse/
+          retention-days: 1
 
   publisher_release:
     needs: [builder_pypandoc, builder_pypandoc_binary]
