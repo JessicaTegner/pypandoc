@@ -35,6 +35,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Print Python Information
         run: python -VV
+      - name: Specify tinytex mirror (CTAN_REPO)
+        run: |
+          echo "CTAN_REPO=https://mirrors.dotsrc.org/ctan/" >> $GITHUB_ENV
       - name: install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
       - name: Install and configure Poetry
