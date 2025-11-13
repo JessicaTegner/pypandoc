@@ -35,13 +35,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Print Python Information
         run: python -VV
-      - name: Install TinyTeX
-        run: |
-          pip3 install -U pytinytex
-          python3 -c "import pytinytex; pytinytex.download_tinytex()"
-          echo "Adding TinyTeX to PATH"
-          TINYTEX_PATH=$(python3 -c "import pytinytex; print(pytinytex.get_tinytex_path())")
-          echo "$TINYTEX_PATH" >> $GITHUB_PATH
       - name: Install and configure Poetry
         run: |
           pip3 install -U poetry setuptools
