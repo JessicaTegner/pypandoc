@@ -621,7 +621,9 @@ class TestPypandoc(unittest.TestCase):
             self.assertEqualExceptForNewlineEnd(expected, received)
 
     # skip in ci
-    @unittest.skipIf(os.environ.get("CI") == "true", "Skipping PDF conversion test in CI environment")
+    @unittest.skipIf(
+        os.environ.get("CI") == "true", "Skipping PDF conversion test in CI environment"
+    )
     def test_pdf_conversion(self):
         with closed_tempfile(".pdf") as file_name:
             ret = pypandoc.convert_text(
