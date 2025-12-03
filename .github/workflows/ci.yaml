@@ -1,6 +1,12 @@
 name: Continuous Integration
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
 
 
 defaults:
@@ -8,16 +14,16 @@ defaults:
     shell: bash
 
 concurrency:
-  group: ci-tests-${{ github.ref }}-1
+  group: test-${{ github.ref }}-1
   cancel-in-progress: true
 
 jobs:
   test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-15, macos-14, windows-2022]
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9", "pypy3.10", ]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-14, windows-2025, windows-2022]
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15.0-alpha.1", "pypy3.10", "pypy3.11", ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out repository
@@ -29,8 +35,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Print Python Information
         run: python -VV
-      - name: install TinyTeX
-        uses: r-lib/actions/setup-tinytex@v2
       - name: Install and configure Poetry
         run: |
           pip3 install -U poetry setuptools
@@ -52,6 +56,8 @@ jobs:
   builder_pypandoc:
     needs: [test]
     runs-on: ubuntu-latest  # Any OS is fine as this wheel is not OS dependent
+    # only run on tagged commits and master branch
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -69,13 +75,15 @@ jobs:
         with:
           name: pypandoc-distributions
           path: dist/
+          retention-days: 1
 
   builder_pypandoc_binary:
     needs: [test]
     strategy:
       matrix:
-        os: [macos-14, windows-2022, ubuntu-22.04]
+        os: [macos-15, windows-2022, ubuntu-22.04, ubuntu-22.04-arm]
     runs-on: ${{ matrix.os }}
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -101,6 +109,7 @@ jobs:
         with:
           name: pypandoc-binary-${{ matrix.os }}-distributions
           path: wheelhouse/
+          retention-days: 1
 
   publisher_release:
     needs: [builder_pypandoc, builder_pypandoc_binary]
