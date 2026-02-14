@@ -39,7 +39,7 @@ python = ">=3.7"
 
 [tool.poetry.group.dev.dependencies]
 pandocfilters = "^1.5"
-setuptools = "68"
+setuptools = ">=78.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
