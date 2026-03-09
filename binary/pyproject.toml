@@ -1,8 +1,7 @@
 [project]
-name = "pypandoc"
-dynamic = ["version"]
+name = "pypandoc_binary"
+dynamic = ["version", "readme"]
 description = "Thin wrapper for pandoc."
-readme = "README.md"
 license = "MIT"
 requires-python = ">=3.7"
 authors = [
@@ -41,20 +40,8 @@ Tracker = "https://github.com/JessicaTegner/pypandoc/issues"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.version]
-path = "pypandoc/__init__.py"
+[tool.hatch.metadata.hooks.custom]
+path = "hatch_build.py"
 
-[tool.hatch.build.targets.wheel]
-packages = ["pypandoc"]
-
-[dependency-groups]
-dev = [
-    "pandocfilters>=1.5",
-    "pytest>=7.0",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-
-[tool.isort]
-profile = "black"
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"

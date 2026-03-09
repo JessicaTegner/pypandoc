@@ -253,7 +253,9 @@ class TestPypandoc(unittest.TestCase):
 
     def test_conversion_with_data_files(self):
         # remove our test.docx file from our test_data dir if it already exosts
-        test_data_dir = os.path.join(os.path.dirname(__file__), "test_data")
+        test_data_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "test_data"
+        )
         test_docx_file = os.path.join(test_data_dir, "test.docx")
         if os.path.exists(test_docx_file):
             os.remove(test_docx_file)
