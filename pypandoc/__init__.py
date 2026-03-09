@@ -470,7 +470,7 @@ def _convert_input(
     if not (p.returncode is None):
         raise RuntimeError(
             'Pandoc died with exitcode "{}" before receiving input: {}'.format(
-                p.returncode, p.stderr.read()
+                p.returncode, p.stderr.read().decode("utf-8", errors="replace")
             )
         )
 
@@ -486,11 +486,7 @@ def _convert_input(
         # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
         raise RuntimeError("Pandoc output was not utf-8.")
 
-    try:
-        stderr = stderr.decode("utf-8")
-    except UnicodeDecodeError:
-        # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
-        raise RuntimeError("Pandoc output was not utf-8.")
+    stderr = stderr.decode("utf-8", errors="replace")
 
     # check that pandoc returned successfully
     if p.returncode != 0:
