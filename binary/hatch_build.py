@@ -92,7 +92,13 @@ class CustomMetadataHook(MetadataHookInterface):
 
         # Read shared metadata from root pyproject.toml
         root = _read_root_pyproject()
-        for key in ("description", "license", "requires-python", "authors", "classifiers"):
+        for key in (
+            "description",
+            "license",
+            "requires-python",
+            "authors",
+            "classifiers",
+        ):
             if key in root:
                 metadata[key] = root[key]
         if "urls" in root:
