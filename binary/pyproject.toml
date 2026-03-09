@@ -1,43 +1,9 @@
 [project]
 name = "pypandoc_binary"
-dynamic = ["version", "readme"]
-description = "Thin wrapper for pandoc."
-license = "MIT"
-requires-python = ">=3.7"
-authors = [
-    { name = "Juho Vepsäläinen" },
-    { name = "Jessica Tegner", email = "jessica@jessicategner.com" },
-]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Environment :: Console",
-    "Intended Audience :: Developers",
-    "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: POSIX",
-    "Programming Language :: Python",
-    "Topic :: Text Processing",
-    "Topic :: Text Processing :: Filters",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
-]
-
-[project.urls]
-Source = "https://github.com/JessicaTegner/pypandoc"
-Tracker = "https://github.com/JessicaTegner/pypandoc/issues"
+dynamic = ["version", "readme", "description", "license", "requires-python", "authors", "classifiers", "urls"]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "tomli; python_version < '3.11'"]
 build-backend = "hatchling.build"
 
 [tool.hatch.metadata.hooks.custom]
