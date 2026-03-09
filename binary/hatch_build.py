@@ -1,18 +1,19 @@
 """Custom hatch hooks for pypandoc_binary.
 
-Metadata hook: reads version and readme from the pypandoc package.
+Metadata hook: reads version, readme, and shared project metadata from the root package.
 Build hook: downloads pandoc if needed, includes pypandoc source via
 force_include, and ensures the wheel is tagged as platform-specific.
 
 File layout support:
   - Local dev: binary/ is a subdir of the repo root, pypandoc/ is at ../pypandoc/
-  - CI / build isolation: pypandoc/ and README.md are pre-copied into binary/
-    via CIBW_BEFORE_BUILD, so they exist at ./pypandoc/ and ./README.md
+  - CI / build isolation: pypandoc/, README.md, and root_pyproject.toml are
+    pre-copied into binary/ via CIBW_BEFORE_BUILD
 """
 
 import os
 import re
 import sys
+import sysconfig
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from hatchling.metadata.plugin.interface import MetadataHookInterface
@@ -46,6 +47,28 @@ def _find_readme():
     raise FileNotFoundError("Could not find README.md")
 
 
+def _read_root_pyproject():
+    """Parse the root pyproject.toml and return the [project] table.
+
+    In local dev the root pyproject.toml lives one directory up (_PARENT).
+    In CI / build isolation it is pre-copied as root_pyproject.toml into _HERE
+    (to avoid overwriting the binary package's own pyproject.toml).
+    """
+    try:
+        import tomllib
+    except ModuleNotFoundError:
+        import tomli as tomllib
+    candidates = [
+        os.path.join(_PARENT, "pyproject.toml"),
+        os.path.join(_HERE, "root_pyproject.toml"),
+    ]
+    for path in candidates:
+        if os.path.isfile(path):
+            with open(path, "rb") as f:
+                return tomllib.load(f)["project"]
+    raise FileNotFoundError("Could not find root pyproject.toml")
+
+
 class CustomMetadataHook(MetadataHookInterface):
     def update(self, metadata):
         pypandoc_dir = _find_pypandoc_dir()
@@ -66,6 +89,20 @@ class CustomMetadataHook(MetadataHookInterface):
                 "content-type": "text/markdown",
                 "text": f.read(),
             }
+
+        # Read shared metadata from root pyproject.toml
+        root = _read_root_pyproject()
+        for key in (
+            "description",
+            "license",
+            "requires-python",
+            "authors",
+            "classifiers",
+        ):
+            if key in root:
+                metadata[key] = root[key]
+        if "urls" in root:
+            metadata["urls"] = root["urls"]
 
 
 class CustomBuildHook(BuildHookInterface):
@@ -90,6 +127,8 @@ class CustomBuildHook(BuildHookInterface):
         # Include the pypandoc package in the wheel
         build_data["force_include"][pypandoc_dir] = "pypandoc"
 
-        # Force the wheel to be platform-specific
-        build_data["pure_python"] = False
-        build_data["infer_tag"] = True
+        # Tag as py3-none-<platform> — no compiled extensions, just a
+        # bundled pandoc binary.  cibuildwheel's auditwheel/delocate will
+        # repair the platform tag to manylinux/musllinux as needed.
+        plat = sysconfig.get_platform().replace("-", "_").replace(".", "_")
+        build_data["tag"] = f"py3-none-{plat}"

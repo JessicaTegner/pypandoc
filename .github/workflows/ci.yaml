@@ -88,7 +88,8 @@ jobs:
             python3 -c "import sys,os; sys.path.insert(0,'.'); from pypandoc.pandoc_download import download_pandoc; download_pandoc(targetfolder=os.path.join(os.getcwd(),'pypandoc','files'))"
           CIBW_BEFORE_BUILD: >
             cp -r pypandoc {package}/pypandoc &&
-            cp README.md {package}/README.md
+            cp README.md {package}/README.md &&
+            cp pyproject.toml {package}/root_pyproject.toml
           CIBW_BUILD: cp39-*
           CIBW_ARCHS_LINUX: "auto64 aarch64"
           CIBW_ARCHS_MACOS: "x86_64 arm64"
