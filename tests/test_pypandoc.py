@@ -622,6 +622,20 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert_file(file_name, to="rst")
             self.assertEqualExceptForNewlineEnd(expected, received)
 
+    def test_convert_text_with_binary_docx_bytes(self):
+        # Regression test for issue #416: convert_text with binary bytes input
+        # (e.g. docx) should not corrupt the data by decoding/re-encoding.
+        with closed_tempfile(".docx") as file_name:
+            # Create a docx file from markdown
+            pypandoc.convert_text(
+                "# some title\n", to="docx", format="md", outputfile=file_name
+            )
+            # Read the docx as raw bytes and convert via convert_text
+            with open(file_name, "rb") as f:
+                docx_bytes = f.read()
+            received = pypandoc.convert_text(docx_bytes, "html", format="docx")
+            self.assertIn("some title", received)
+
     # skip in ci
     @unittest.skipIf(
         os.environ.get("CI") == "true", "Skipping PDF conversion test in CI environment"
