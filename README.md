@@ -43,8 +43,8 @@ pip install pypandoc_binary
 Prebuilt [wheels for Windows and Mac OS X](https://pypi.python.org/pypi/pypandoc_binary/)
 
 If you use Linux and have [your own wheelhouse](https://wheel.readthedocs.org/en/latest/#usage),
-you can build a wheel which include pandoc with
-`python setup_binary.py download_pandoc; python setup.py bdist_wheel`. Be aware that this works only
+you can build a wheel which includes pandoc with
+`uv build --wheel binary/`. Be aware that this works only
 on 64bit intel systems, as we only download it from the
 [official releases](https://github.com/jgm/pandoc/releases).
 
@@ -274,7 +274,7 @@ Contributions are welcome. When opening a PR, please keep the following guidelin
 
 1. Before implementing, please open an issue for discussion.
 2. Make sure you have tests for the new logic.
-3. Make sure your code passes `flake8 pypandoc/*.py tests.py`
+3. Make sure your code passes `flake8 pypandoc/*.py tests/`
 4. Add yourself to contributors at `README.md` unless you are already there. In that case tweak your contributions.
 
 Note that for citeproc tests to pass you'll need to have [pandoc-citeproc](https://github.com/jgm/pandoc-citeproc) installed. If you installed a prebuilt wheel or conda package, it is already included.

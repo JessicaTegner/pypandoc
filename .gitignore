@@ -19,3 +19,7 @@ pandoc-*.pkg
 # The downloaded files end up here
 pypandoc/files/
 build/
+
+# CI copies into binary/ for build isolation
+binary/pypandoc/
+binary/README.md
