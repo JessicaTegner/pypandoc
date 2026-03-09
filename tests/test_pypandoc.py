@@ -792,11 +792,14 @@ class TestCli(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Ensure pandoc is available in pypandoc/files/ for CLI tests."""
-        cls.files_dir = os.path.join(os.path.dirname(os.path.realpath(pypandoc.__file__)), "files")
+        cls.files_dir = os.path.join(
+            os.path.dirname(os.path.realpath(pypandoc.__file__)), "files"
+        )
         pandoc_name = "pandoc.exe" if sys.platform == "win32" else "pandoc"
         cls.pandoc_path = os.path.join(cls.files_dir, pandoc_name)
         if not os.path.isfile(cls.pandoc_path):
             pypandoc.download_pandoc(targetfolder=cls.files_dir)
+
     def test_version(self):
         """pandoc --version should succeed and print version info."""
         result = subprocess.run(
