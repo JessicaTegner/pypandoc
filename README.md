@@ -267,10 +267,6 @@ When converting to PDF or LaTeX, pypandoc will automatically:
 
 This means you can start with a minimal TinyTeX installation and let pypandoc install only the LaTeX packages your documents actually need, on the fly.
 
-### Without pytinytex
-
-If pytinytex is not installed, pypandoc behaves exactly as before -- no extra dependencies are pulled in. When a PDF conversion fails due to a missing LaTeX engine, the error message will now include a hint suggesting `pip install pypandoc[tinytex]`.
-
 ## Logging Messages
 
 Pypandoc logs messages using the [Python logging library](https://docs.python.org/3/library/logging.html).
