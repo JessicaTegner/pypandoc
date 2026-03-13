@@ -481,10 +481,10 @@ def _convert_input(
         ]
         args.extend(f)
 
-    # If converting to PDF, try to set up TinyTeX on PATH so pandoc finds
-    # LaTeX engines automatically.
-    is_pdf = _get_base_format(to) == "pdf"
-    if is_pdf:
+    # If converting to PDF or LaTeX, try to set up TinyTeX on PATH
+    # so pandoc finds LaTeX engines automatically.
+    needs_latex = _get_base_format(to) in ("pdf", "latex")
+    if needs_latex:
         _try_setup_tinytex()
 
     # To get access to pandoc-citeproc when we use a included copy of pandoc,
@@ -498,7 +498,7 @@ def _convert_input(
 
     # When converting to PDF with pytinytex available, retry on missing
     # LaTeX packages (auto-install via tlmgr and re-run pandoc).
-    if is_pdf and _is_tinytex_available():
+    if needs_latex and _is_tinytex_available():
         max_attempts = _MAX_TINYTEX_INSTALL_ATTEMPTS
     else:
         max_attempts = 1
@@ -567,7 +567,7 @@ def _convert_input(
     # check that pandoc returned successfully
     if p.returncode != 0:
         hint = ""
-        if is_pdf:
+        if needs_latex:
             try:
                 import pytinytex  # noqa: F401
 
