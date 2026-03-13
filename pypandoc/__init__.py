@@ -15,7 +15,7 @@ from .handler import _check_log_handler, logger
 from .pandoc_download import DEFAULT_TARGET_FOLDER, download_pandoc
 
 __author__ = "Juho Vepsäläinen; Maintained by Jessica Tegner"
-__version__ = "1.16.2"
+__version__ = "1.17"
 __all__ = [
     "convert_file",
     "convert_text",
