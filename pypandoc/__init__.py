@@ -84,7 +84,7 @@ def convert_text(
     # Binary container formats must not be decoded — they are ZIP archives
     # where a decode/encode round-trip silently corrupts data.
     _binary_input_formats = {"docx", "odt", "epub", "epub3", "pdf", "pptx"}
-    base_format = format.split("+")[0].split("-")[0] if format else ""
+    base_format = _get_base_format(format) if format else ""
     if isinstance(source, bytes) and base_format not in _binary_input_formats:
         source = source.decode(encoding, errors="replace")
 
