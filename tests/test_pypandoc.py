@@ -19,6 +19,17 @@ from urllib.request import pathname2url
 import pypandoc
 
 
+def _has_tinytex():
+    """Check if pytinytex is installed and TinyTeX is available."""
+    try:
+        import pytinytex
+
+        pytinytex.ensure_tinytex_installed()
+        return True
+    except (ImportError, RuntimeError):
+        return False
+
+
 @contextlib.contextmanager
 def capture(command, *args, **kwargs):
     err, sys.stderr = sys.stderr, io.StringIO()
@@ -622,9 +633,8 @@ class TestPypandoc(unittest.TestCase):
             received = pypandoc.convert_file(file_name, to="rst")
             self.assertEqualExceptForNewlineEnd(expected, received)
 
-    # skip in ci
-    @unittest.skipIf(
-        os.environ.get("CI") == "true", "Skipping PDF conversion test in CI environment"
+    @unittest.skipUnless(
+        _has_tinytex(), "pytinytex is not installed or TinyTeX is not available"
     )
     def test_pdf_conversion(self):
         with closed_tempfile(".pdf") as file_name:
@@ -635,7 +645,6 @@ class TestPypandoc(unittest.TestCase):
             with open(file_name, mode="rb") as f:
                 written = f.read()
             assert written[:4] == b"%PDF"
-            # TODO: find a test for the content?
 
         def f():
             # needs an outputfile
