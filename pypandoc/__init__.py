@@ -498,9 +498,10 @@ def _convert_input(
 
     # When converting to PDF with pytinytex available, retry on missing
     # LaTeX packages (auto-install via tlmgr and re-run pandoc).
-    max_attempts = (
-        _MAX_TINYTEX_INSTALL_ATTEMPTS if (is_pdf and _is_tinytex_available()) else 1
-    )
+    if is_pdf and _is_tinytex_available():
+        max_attempts = _MAX_TINYTEX_INSTALL_ATTEMPTS
+    else:
+        max_attempts = 1
 
     for attempt in range(max_attempts):
         old_wd = os.getcwd()
@@ -539,13 +540,13 @@ def _convert_input(
             ):
                 stdout = stdout.decode("utf-8")
         except UnicodeDecodeError:
-            # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
+            # pandoc guarantees utf-8 output, this shouldn't happen
             raise RuntimeError("Pandoc output was not utf-8.")
 
         try:
             stderr = stderr.decode("utf-8")
         except UnicodeDecodeError:
-            # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
+            # pandoc guarantees utf-8 output, this shouldn't happen
             raise RuntimeError("Pandoc output was not utf-8.")
 
         # If pandoc failed and we have retries left, try auto-installing
@@ -581,7 +582,9 @@ def _convert_input(
                     "LaTeX package management: pip install pypandoc[tinytex]"
                 )
         raise RuntimeError(
-            f'Pandoc died with exitcode "{p.returncode}" during conversion: {stderr}{hint}'
+            "Pandoc died with exitcode "
+            f'"{p.returncode}" during conversion: '
+            f"{stderr}{hint}"
         )
 
     # if there is output on stderr, process it and send to logger
