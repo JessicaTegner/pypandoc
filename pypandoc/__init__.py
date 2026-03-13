@@ -525,7 +525,8 @@ def _convert_input(
         if not (p.returncode is None):
             raise RuntimeError(
                 'Pandoc died with exitcode "{}" before receiving input: {}'.format(
-                    p.returncode, p.stderr.read()
+                    p.returncode,
+                    p.stderr.read().decode("utf-8", errors="replace"),
                 )
             )
 
@@ -534,20 +535,13 @@ def _convert_input(
                 source = source.encode("utf-8")
         stdout, stderr = p.communicate(source if string_input else None)
 
-        try:
-            if not (
-                to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"
-            ):
-                stdout = stdout.decode("utf-8")
-        except UnicodeDecodeError:
-            # pandoc guarantees utf-8 output, this shouldn't happen
-            raise RuntimeError("Pandoc output was not utf-8.")
+        if not (
+            to in ["odt", "docx", "epub", "epub3", "pdf"]
+            and outputfile == "-"
+        ):
+            stdout = stdout.decode("utf-8", errors="replace")
 
-        try:
-            stderr = stderr.decode("utf-8")
-        except UnicodeDecodeError:
-            # pandoc guarantees utf-8 output, this shouldn't happen
-            raise RuntimeError("Pandoc output was not utf-8.")
+        stderr = stderr.decode("utf-8", errors="replace")
 
         # If pandoc failed and we have retries left, try auto-installing
         # missing LaTeX packages.
