@@ -33,6 +33,9 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
+[project.optional-dependencies]
+tinytex = ["pytinytex"]
+
 [project.urls]
 Source = "https://github.com/JessicaTegner/pypandoc"
 Tracker = "https://github.com/JessicaTegner/pypandoc/issues"

@@ -234,6 +234,39 @@ output = pypandoc.convert_file('demo.md', 'pdf', outputfile='demo.pdf',
 it won't work. This gotcha has to do with the way
 [`subprocess.Popen`](https://docs.python.org/2/library/subprocess.html#subprocess.Popen) works.
 
+## PDF and LaTeX Support with TinyTeX
+
+Converting to PDF requires a LaTeX engine (like `pdflatex`, `xelatex`, or `lualatex`) to be installed on your system. pypandoc integrates with [pytinytex](https://github.com/JessicaTegner/PyTinyTeX) to make this seamless -- no manual LaTeX setup required.
+
+### Quick Start
+
+```
+pip install pypandoc[tinytex]
+```
+
+Then download TinyTeX (a lightweight LaTeX distribution) once:
+
+```
+pytinytex download
+```
+
+That's it. PDF conversion just works:
+
+```python
+import pypandoc
+
+pypandoc.convert_file('document.md', 'pdf', outputfile='document.pdf')
+```
+
+### Automatic Package Installation
+
+When converting to PDF or LaTeX, pypandoc will automatically:
+
+1. Add TinyTeX to the system PATH so pandoc can find the LaTeX engines
+2. If compilation fails due to a missing LaTeX package (e.g. `booktabs.sty`), install it via `tlmgr` and retry the conversion -- up to 3 attempts
+
+This means you can start with a minimal TinyTeX installation and let pypandoc install only the LaTeX packages your documents actually need, on the fly.
+
 ## Logging Messages
 
 Pypandoc logs messages using the [Python logging library](https://docs.python.org/3/library/logging.html).
