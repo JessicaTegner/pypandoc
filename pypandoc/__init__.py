@@ -498,7 +498,9 @@ def _convert_input(
 
     # When converting to PDF with pytinytex available, retry on missing
     # LaTeX packages (auto-install via tlmgr and re-run pandoc).
-    max_attempts = _MAX_TINYTEX_INSTALL_ATTEMPTS if (is_pdf and _is_tinytex_available()) else 1
+    max_attempts = (
+        _MAX_TINYTEX_INSTALL_ATTEMPTS if (is_pdf and _is_tinytex_available()) else 1
+    )
 
     for attempt in range(max_attempts):
         old_wd = os.getcwd()
@@ -532,7 +534,9 @@ def _convert_input(
         stdout, stderr = p.communicate(source if string_input else None)
 
         try:
-            if not (to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"):
+            if not (
+                to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"
+            ):
                 stdout = stdout.decode("utf-8")
         except UnicodeDecodeError:
             # this shouldn't happen: pandoc basically guarantees that the output is utf-8!
