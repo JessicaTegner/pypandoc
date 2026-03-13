@@ -535,10 +535,7 @@ def _convert_input(
                 source = source.encode("utf-8")
         stdout, stderr = p.communicate(source if string_input else None)
 
-        if not (
-            to in ["odt", "docx", "epub", "epub3", "pdf"]
-            and outputfile == "-"
-        ):
+        if not (to in ["odt", "docx", "epub", "epub3", "pdf"] and outputfile == "-"):
             stdout = stdout.decode("utf-8", errors="replace")
 
         stderr = stderr.decode("utf-8", errors="replace")
