@@ -40,6 +40,9 @@ tinytex = ["pytinytex"]
 Source = "https://github.com/JessicaTegner/pypandoc"
 Tracker = "https://github.com/JessicaTegner/pypandoc/issues"
 
+[project.scripts]
+pypandoc = "pypandoc.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

@@ -11,3 +11,6 @@ path = "hatch_build.py"
 
 [tool.hatch.build.hooks.custom]
 path = "hatch_build.py"
+
+[project.scripts]
+pypandoc = "pypandoc.cli:main"

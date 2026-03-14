@@ -811,6 +811,111 @@ class TestPypandoc(unittest.TestCase):
         self.assertEqual(expected.rstrip("\n"), received.rstrip("\n"))
 
 
+class TestCli(unittest.TestCase):
+    def test_help(self):
+        """No subcommand should print help and return non-zero."""
+        result = subprocess.run(
+            [sys.executable, "-m", "pypandoc"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("pypandoc", result.stdout)
+        self.assertIn("version", result.stdout)
+        self.assertIn("pandoc", result.stdout)
+        self.assertIn("download", result.stdout)
+
+    def test_version(self):
+        """version subcommand should show pypandoc and pandoc versions."""
+        result = subprocess.run(
+            [sys.executable, "-m", "pypandoc", "version"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("pypandoc", result.stdout)
+
+    def test_pandoc_passthrough_version(self):
+        """pandoc --version should pass through to the pandoc binary."""
+        result = subprocess.run(
+            [sys.executable, "-m", "pypandoc", "pandoc", "--version"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("pandoc", result.stdout.lower())
+
+    def test_pandoc_passthrough_help(self):
+        """pandoc --help should pass through to the pandoc binary."""
+        result = subprocess.run(
+            [sys.executable, "-m", "pypandoc", "pandoc", "--help"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("pandoc", result.stdout.lower())
+
+    def test_pandoc_passthrough_list_formats(self):
+        """pandoc --list-output-formats should pass through."""
+        result = subprocess.run(
+            [sys.executable, "-m", "pypandoc", "pandoc", "--list-output-formats"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("html", result.stdout)
+        self.assertIn("latex", result.stdout)
+
+    def test_pandoc_passthrough_convert(self):
+        """pandoc passthrough should convert markdown to HTML via stdin."""
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pypandoc",
+                "pandoc",
+                "-f",
+                "markdown",
+                "-t",
+                "html",
+            ],
+            input="# Hello\n",
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("<h1", result.stdout)
+        self.assertIn("Hello", result.stdout)
+
+    def test_pandoc_passthrough_convert_file(self):
+        """pandoc passthrough should convert a file."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+            f.write("**bold text**\n")
+            f.flush()
+            tmp_path = f.name
+        try:
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pypandoc",
+                    "pandoc",
+                    "-f",
+                    "markdown",
+                    "-t",
+                    "html",
+                    tmp_path,
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("<strong>", result.stdout)
+            self.assertIn("bold text", result.stdout)
+        finally:
+            os.unlink(tmp_path)
+
+
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestPypandoc)
     ret = unittest.TextTestRunner(verbosity=2).run(suite)

@@ -80,6 +80,17 @@ don't need to add it to the `PATH`.
 
 By default, the latest pandoc version is installed. If you want to specify your own version, say 1.19.1, use `download_pandoc(version='1.19.1')` instead.
 
+You can also use pypandocs build in cli to download pandoc
+
+```
+# install latest pandoc to default path
+pypandoc download
+
+# Download a specific version
+pypandoc download --version 3.6
+```
+
+
 #### Installing pandoc manually
 
 Installing manually via the system mechanism is also possible. Such installation mechanism
@@ -291,6 +302,23 @@ utility functions. Example:
 print(pypandoc.get_pandoc_version())
 print(pypandoc.get_pandoc_path())
 print(pypandoc.get_pandoc_formats())
+```
+
+## Command-Line Usage
+
+Pypandoc includes a CLI that can be invoked via `python -m pypandoc` or, if installed with pip, the `pypandoc` command.
+
+```
+# Show pypandoc, pandoc and (if installed) pytinytex versions
+pypandoc version
+
+# Pass arguments through to the pandoc binary
+pypandoc pandoc input.md -o output.html
+
+# Download pandoc
+pypandoc download
+pypandoc download --version 3.6
+pypandoc download --target /usr/local/bin
 ```
 
 ## Related
