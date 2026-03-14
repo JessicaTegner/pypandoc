@@ -13,4 +13,4 @@ path = "hatch_build.py"
 path = "hatch_build.py"
 
 [project.scripts]
-pandoc = "pypandoc._cli:main"
+pypandoc = "pypandoc.cli:main"
