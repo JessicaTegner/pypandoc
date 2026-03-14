@@ -31,14 +31,14 @@ def main(argv=None):
 
     # download
     p_download = sub.add_parser("download", help="Download pandoc")
-    p_download.add_argument(
-        "--url", default=None, help="URL to download pandoc from"
-    )
+    p_download.add_argument("--url", default=None, help="URL to download pandoc from")
     p_download.add_argument(
         "--target", default=None, help="Target folder for the pandoc installation"
     )
     p_download.add_argument(
-        "--version", default="latest", help="Pandoc version to download (default: latest)"
+        "--version",
+        default="latest",
+        help="Pandoc version to download (default: latest)",
     )
     p_download.add_argument(
         "--delete-installer",
@@ -72,6 +72,7 @@ def main(argv=None):
                 print("pandoc info:")
                 pandoc_path = pypandoc.get_pandoc_path()
                 import subprocess
+
                 subprocess.call([pandoc_path, "--version"])
             except OSError:
                 print("pandoc not found")
@@ -95,9 +96,7 @@ def main(argv=None):
                     file=sys.stderr,
                 )
                 return 1
-            sys.exit(
-                subprocess.call([pandoc_path] + args.pandoc_args)
-            )
+            sys.exit(subprocess.call([pandoc_path] + args.pandoc_args))
 
         elif args.command == "download":
             pypandoc.download_pandoc(
