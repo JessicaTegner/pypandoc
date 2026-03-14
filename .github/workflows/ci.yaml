@@ -62,7 +62,7 @@ jobs:
       - name: Build package
         run: uv build
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pypandoc-distributions
           path: dist/
@@ -102,7 +102,7 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
           CIBW_ARCHS_WINDOWS: "AMD64"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pypandoc-binary-${{ matrix.os }}-distributions
           path: wheelhouse/
