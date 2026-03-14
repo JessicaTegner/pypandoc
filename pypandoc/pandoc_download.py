@@ -56,7 +56,8 @@ def _urlopen_with_retry(url, max_retries=5, backoff_factor=1.0, max_backoff=60.0
         req = url
 
     # Add auth header for github.com requests when token is available
-    is_github = "github.com" in (urllib.parse.urlparse(req.full_url).hostname or "")
+    hostname = urllib.parse.urlparse(req.full_url).hostname or ""
+    is_github = hostname in {"github.com", "api.github.com"}
     if github_token and is_github:
         req.add_header("Authorization", f"token {github_token}")
 
