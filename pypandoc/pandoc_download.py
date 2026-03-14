@@ -1,12 +1,16 @@
+import json
 import os
 import os.path
 import platform
+import random
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Union
 
@@ -19,8 +23,76 @@ DEFAULT_TARGET_FOLDER = {
 }
 
 
+class _NoAuthRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Strips Authorization header on cross-domain redirects.
+
+    GitHub redirects release asset downloads to S3/Azure presigned URLs.
+    If the Authorization header is forwarded, the storage backend rejects
+    the request (403) due to conflicting auth mechanisms.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        new_req = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if new_req is not None:
+            original_host = urllib.parse.urlparse(req.full_url).hostname
+            redirect_host = urllib.parse.urlparse(newurl).hostname
+            if original_host != redirect_host:
+                new_req.remove_header("Authorization")
+        return new_req
+
+
+def _urlopen_with_retry(url, max_retries=5, backoff_factor=1.0, max_backoff=60.0):
+    """Open a URL with exponential backoff retry on 429 and 5xx errors.
+
+    If a GITHUB_TOKEN environment variable is set, it will be used to
+    authenticate requests to github.com, raising the rate limit from
+    60 req/hr (shared by IP) to 1,000 req/hr (per-repo).
+    """
+    github_token = os.environ.get("GITHUB_TOKEN", "")
+
+    if isinstance(url, str):
+        req = urllib.request.Request(url)
+    else:
+        req = url
+
+    # Add auth header for github.com requests when token is available
+    is_github = "github.com" in (urllib.parse.urlparse(req.full_url).hostname or "")
+    if github_token and is_github:
+        req.add_header("Authorization", f"token {github_token}")
+
+    # Use custom opener that strips auth on cross-domain redirects
+    opener = urllib.request.build_opener(_NoAuthRedirectHandler)
+
+    for attempt in range(max_retries + 1):
+        try:
+            return opener.open(req)
+        except urllib.error.HTTPError as e:
+            if e.code == 429 or (500 <= e.code < 600):
+                if attempt == max_retries:
+                    raise
+                # Respect Retry-After header if present
+                retry_after = e.headers.get("Retry-After")
+                if retry_after is not None:
+                    try:
+                        wait = int(retry_after)
+                    except ValueError:
+                        wait = backoff_factor * (2 ** attempt)
+                else:
+                    wait = backoff_factor * (2 ** attempt)
+                wait = min(wait, max_backoff)
+                wait += random.uniform(0, 1)  # jitter to avoid thundering herd
+                logger.info(
+                    f"HTTP {e.code} for {req.full_url}, "
+                    f"retrying in {wait:.1f}s (attempt {attempt + 1}/{max_retries})..."
+                )
+                time.sleep(wait)
+            else:
+                raise
+
+
 def _get_pandoc_urls(version="latest"):
     """Get the urls of pandoc's binaries
+    Uses the GitHub API to fetch release assets instead of scraping HTML.
     Uses sys.platform keys, but removes the 2 from linux2
     Adding a new platform means implementing unpacking in "DownloadPandocCommand"
     and adding the URL here
@@ -35,24 +107,19 @@ def _get_pandoc_urls(version="latest"):
     :return: str version: actual pandoc version.
         (e.g. "latest" will be resolved to the actual one)
     """
-    # url to pandoc download page
+    # Use GitHub API instead of scraping HTML release pages
     url = (
-        "https://github.com/jgm/pandoc/releases/"
-        + ("tag/" if version != "latest" else "")
+        "https://api.github.com/repos/jgm/pandoc/releases/"
+        + ("tags/" if version != "latest" else "")
         + version
     )
     # try to open the url
     try:
-        response = urllib.request.urlopen(url)
-        version_url_frags = response.url.split("/")
-        version = version_url_frags[-1]
+        response = _urlopen_with_retry(url)
     except urllib.error.HTTPError:
         raise RuntimeError(f"Invalid pandoc version {version}.")
-    # read the HTML content
-    response = urllib.request.urlopen(
-        f"https://github.com/jgm/pandoc/releases/expanded_assets/{version}"
-    )
-    content = response.read()
+    # read json response
+    data = json.loads(response.read())
     # regex for the binaries
     uname = platform.uname()[4]
     processor_architecture = (
@@ -62,17 +129,18 @@ def _get_pandoc_urls(version="latest"):
         rf"/jgm/pandoc/releases/download/.*"
         rf"(?:{processor_architecture}|x86|mac).*\.(?:msi|deb|pkg)"
     )
-    # a list of urls to the binaries
-    pandoc_urls_list = regex.findall(content.decode("utf-8"))
     # actual pandoc version
-    version = pandoc_urls_list[0].split("/")[5]
+    version = data["tag_name"]
     # dict that lookup the platform from binary extension
     ext2platform = {"msi": "win32", "deb": "linux", "pkg": "darwin"}
-    # parse pandoc_urls from list to dict
-    pandoc_urls = {
-        ext2platform[url_frag[-3:]]: f"https://github.com{url_frag}"
-        for url_frag in pandoc_urls_list
-    }
+    # collect pandoc urls from json content
+    pandoc_urls = {}
+    for asset in data["assets"]:
+        download_url = asset["browser_download_url"]
+        if regex.match(urllib.parse.urlparse(download_url).path):
+            ext = asset["name"][-3:]
+            if ext in ext2platform:
+                pandoc_urls[ext2platform[ext]] = download_url
     return pandoc_urls, version
 
 
@@ -260,7 +328,7 @@ def download_pandoc(
     else:
         logger.info(f"Downloading pandoc from {url} ...")
         # https://stackoverflow.com/questions/30627937/
-        response = urllib.request.urlopen(url)
+        response = _urlopen_with_retry(url)
         with open(filename, "wb") as out_file:
             shutil.copyfileobj(response, out_file)
 

@@ -41,6 +41,8 @@ jobs:
         run: uv sync --extra tinytex
       - name: Download pandoc
         run: uv run python -c "from pypandoc.pandoc_download import download_pandoc; download_pandoc()"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download TinyTeX
         run: uv run pytinytex download
       - name: Run tests
@@ -85,6 +87,8 @@ jobs:
         with:
           package-dir: binary/
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_TOKEN
           CIBW_BEFORE_ALL: >
             pip install hatchling &&
             python3 -c "import sys,os; sys.path.insert(0,'.'); from pypandoc.pandoc_download import download_pandoc; download_pandoc(targetfolder=os.path.join(os.getcwd(),'pypandoc','files'))"
