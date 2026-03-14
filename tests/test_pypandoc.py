@@ -846,7 +846,16 @@ class TestCli(unittest.TestCase):
     def test_pandoc_passthrough_convert(self):
         """pandoc passthrough should convert markdown to HTML via stdin."""
         result = subprocess.run(
-            [sys.executable, "-m", "pypandoc", "pandoc", "-f", "markdown", "-t", "html"],
+            [
+                sys.executable,
+                "-m",
+                "pypandoc",
+                "pandoc",
+                "-f",
+                "markdown",
+                "-t",
+                "html",
+            ],
             input="# Hello\n",
             capture_output=True,
             text=True,
@@ -863,7 +872,17 @@ class TestCli(unittest.TestCase):
             tmp_path = f.name
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "pypandoc", "pandoc", "-f", "markdown", "-t", "html", tmp_path],
+                [
+                    sys.executable,
+                    "-m",
+                    "pypandoc",
+                    "pandoc",
+                    "-f",
+                    "markdown",
+                    "-t",
+                    "html",
+                    tmp_path,
+                ],
                 capture_output=True,
                 text=True,
             )
