@@ -76,9 +76,9 @@ def _urlopen_with_retry(url, max_retries=5, backoff_factor=1.0, max_backoff=60.0
                     try:
                         wait = int(retry_after)
                     except ValueError:
-                        wait = backoff_factor * (2 ** attempt)
+                        wait = backoff_factor * (2**attempt)
                 else:
-                    wait = backoff_factor * (2 ** attempt)
+                    wait = backoff_factor * (2**attempt)
                 wait = min(wait, max_backoff)
                 wait += random.uniform(0, 1)  # jitter to avoid thundering herd
                 logger.info(

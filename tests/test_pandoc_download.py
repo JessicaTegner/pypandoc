@@ -1,7 +1,7 @@
 import unittest
-from unittest.mock import patch, MagicMock
 import urllib.error
 import urllib.request
+from unittest.mock import MagicMock, patch
 
 
 class TestUrlopenWithRetry(unittest.TestCase):
@@ -9,6 +9,7 @@ class TestUrlopenWithRetry(unittest.TestCase):
 
     def _get_func(self):
         from pypandoc.pandoc_download import _urlopen_with_retry
+
         return _urlopen_with_retry
 
     @patch("pypandoc.pandoc_download.time.sleep")
@@ -130,7 +131,7 @@ class TestUrlopenWithRetry(unittest.TestCase):
         # Check backoff values: 2^0+jitter, 2^1+jitter, 2^2+jitter
         for i, call in enumerate(mock_sleep.call_args_list):
             sleep_val = call[0][0]
-            expected_base = 1.0 * (2 ** i)
+            expected_base = 1.0 * (2**i)
             self.assertGreaterEqual(sleep_val, expected_base)
             self.assertLess(sleep_val, expected_base + 1.0)
 
@@ -143,10 +144,18 @@ class TestUrlopenWithRetry(unittest.TestCase):
         )
         mock_opener = MagicMock()
         # Force enough retries to exceed max_backoff
-        mock_opener.open.side_effect = [error_429, error_429, error_429, error_429, mock_response]
+        mock_opener.open.side_effect = [
+            error_429,
+            error_429,
+            error_429,
+            error_429,
+            mock_response,
+        ]
         mock_build_opener.return_value = mock_opener
 
-        self._get_func()("https://example.com/file", backoff_factor=10.0, max_backoff=15.0)
+        self._get_func()(
+            "https://example.com/file", backoff_factor=10.0, max_backoff=15.0
+        )
 
         for call in mock_sleep.call_args_list:
             sleep_val = call[0][0]
@@ -187,6 +196,7 @@ class TestUrlopenWithRetry(unittest.TestCase):
     def test_no_auth_header_without_token(self, mock_build_opener, mock_sleep):
         # Remove GITHUB_TOKEN if present
         import os
+
         os.environ.pop("GITHUB_TOKEN", None)
 
         mock_response = MagicMock()
@@ -205,6 +215,7 @@ class TestNoAuthRedirectHandler(unittest.TestCase):
 
     def _get_handler_class(self):
         from pypandoc.pandoc_download import _NoAuthRedirectHandler
+
         return _NoAuthRedirectHandler
 
     def test_strips_auth_on_cross_domain_redirect(self):
@@ -215,7 +226,11 @@ class TestNoAuthRedirectHandler(unittest.TestCase):
         )
         # Simulate a 302 redirect to S3
         new_req = handler.redirect_request(
-            req, None, 302, "Found", {},
+            req,
+            None,
+            302,
+            "Found",
+            {},
             "https://objects.githubusercontent.com/some-presigned-url",
         )
         self.assertIsNotNone(new_req)
@@ -228,7 +243,11 @@ class TestNoAuthRedirectHandler(unittest.TestCase):
             headers={"Authorization": "token ghp_test123"},
         )
         new_req = handler.redirect_request(
-            req, None, 302, "Found", {},
+            req,
+            None,
+            302,
+            "Found",
+            {},
             "https://github.com/jgm/pandoc/releases/tag/3.1",
         )
         self.assertIsNotNone(new_req)
