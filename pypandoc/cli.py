@@ -19,7 +19,7 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command")
 
     # version
-    p_version = sub.add_parser("version", help="Show pypandoc and pandoc versions")
+    sub.add_parser("version", help="Show pypandoc and pandoc versions")
 
     # pandoc
     p_pandoc = sub.add_parser(
@@ -84,7 +84,6 @@ def main(argv=None):
                 print("pytinytex not installed")
 
         elif args.command == "pandoc":
-            import os
             import subprocess
 
             try:
