@@ -17,6 +17,9 @@ concurrency:
   group: test-${{ github.ref }}-1
   cancel-in-progress: true
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   test:
     strategy:
@@ -85,6 +88,7 @@ jobs:
         with:
           package-dir: binary/
         env:
+          CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_TOKEN
           CIBW_BEFORE_ALL: >
             pip install hatchling &&
             python3 -c "import sys,os; sys.path.insert(0,'.'); from pypandoc.pandoc_download import download_pandoc; download_pandoc(targetfolder=os.path.join(os.getcwd(),'pypandoc','files'))"
