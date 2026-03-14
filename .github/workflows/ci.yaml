@@ -17,6 +17,9 @@ concurrency:
   group: test-${{ github.ref }}-1
   cancel-in-progress: true
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   test:
     strategy:
@@ -41,8 +44,6 @@ jobs:
         run: uv sync --extra tinytex
       - name: Download pandoc
         run: uv run python -c "from pypandoc.pandoc_download import download_pandoc; download_pandoc()"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download TinyTeX
         run: uv run pytinytex download
       - name: Run tests
@@ -87,7 +88,6 @@ jobs:
         with:
           package-dir: binary/
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_TOKEN
           CIBW_BEFORE_ALL: >
             pip install hatchling &&
