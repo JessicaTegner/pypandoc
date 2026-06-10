@@ -84,7 +84,7 @@ jobs:
         with:
           platforms: all
       - name: Build binary wheels
-        uses: pypa/cibuildwheel@v3.4.0
+        uses: pypa/cibuildwheel@v4.0.0
         with:
           package-dir: binary/
         env:
