@@ -928,51 +928,31 @@ def _ensure_pandoc_path() -> None:
         if __pandoc_path is None:
             # Only print hints if requested
             if os.path.exists("/usr/local/bin/brew"):
-                logger.info(
-                    textwrap.dedent(
-                        """\
+                logger.info(textwrap.dedent("""\
                     Maybe try:
 
                         brew install pandoc
-                """
-                    )
-                )
+                """))
             elif os.path.exists("/usr/bin/apt-get"):
-                logger.info(
-                    textwrap.dedent(
-                        """\
+                logger.info(textwrap.dedent("""\
                     Maybe try:
 
                         sudo apt-get install pandoc
-                """
-                    )
-                )
+                """))
             elif os.path.exists("/usr/bin/yum"):
-                logger.info(
-                    textwrap.dedent(
-                        """\
+                logger.info(textwrap.dedent("""\
                     Maybe try:
 
                     sudo yum install pandoc
-                """
-                    )
-                )
-            logger.info(
-                textwrap.dedent(
-                    """\
+                """))
+            logger.info(textwrap.dedent("""\
                 See http://johnmacfarlane.net/pandoc/installing.html
                 for installation options
-            """
-                )
-            )
-            logger.info(
-                textwrap.dedent(
-                    """\
+            """))
+            logger.info(textwrap.dedent("""\
                 ---------------------------------------------------------------
 
-            """
-                )
-            )
+            """))
             raise OSError(
                 "No pandoc was found: either install pandoc and add it\n"
                 "to your PATH or or call pypandoc.download_pandoc(...) or\n"
