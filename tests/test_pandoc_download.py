@@ -256,3 +256,55 @@ class TestNoAuthRedirectHandler(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestArchitectureSelection(unittest.TestCase):
+    """The chosen download URL must match the architecture we are running on."""
+
+    ASSETS = [
+        "pandoc-3.7.0.2-1-amd64.deb",
+        "pandoc-3.7.0.2-1-arm64.deb",
+        "pandoc-3.7.0.2-arm64-macOS.pkg",
+        "pandoc-3.7.0.2-x86_64-macOS.pkg",
+        "pandoc-3.7.0.2-windows-x86_64.msi",
+    ]
+
+    def _urls_for(self, machine):
+        import json
+
+        from pypandoc.pandoc_download import _get_pandoc_urls
+
+        release = {
+            "tag_name": "3.7.0.2",
+            "assets": [
+                {
+                    "name": name,
+                    "browser_download_url": (
+                        "https://github.com/jgm/pandoc/releases/download/3.7.0.2/"
+                        + name
+                    ),
+                }
+                for name in self.ASSETS
+            ],
+        }
+        response = MagicMock()
+        response.read.return_value = json.dumps(release).encode()
+        uname = ("", "", "", "", machine, "")
+        with patch("pypandoc.pandoc_download.platform.uname", return_value=uname):
+            with patch(
+                "pypandoc.pandoc_download._urlopen_with_retry", return_value=response
+            ):
+                urls, _ = _get_pandoc_urls()
+        return urls
+
+    def test_arm_mac_gets_the_arm_build(self):
+        for machine in ("arm64", "aarch64"):
+            with self.subTest(machine=machine):
+                self.assertIn("arm64-macOS", self._urls_for(machine)["darwin"])
+
+    def test_intel_mac_gets_the_intel_build(self):
+        self.assertIn("x86_64-macOS", self._urls_for("x86_64")["darwin"])
+
+    def test_linux_matches_the_running_architecture(self):
+        self.assertIn("arm64", self._urls_for("aarch64")["linux"])
+        self.assertIn("amd64", self._urls_for("x86_64")["linux"])
