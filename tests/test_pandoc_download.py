@@ -280,7 +280,8 @@ class TestArchitectureSelection(unittest.TestCase):
                 {
                     "name": name,
                     "browser_download_url": (
-                        "https://github.com/jgm/pandoc/releases/download/3.7.0.2/" + name
+                        "https://github.com/jgm/pandoc/releases/download/3.7.0.2/"
+                        + name
                     ),
                 }
                 for name in self.ASSETS
