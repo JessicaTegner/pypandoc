@@ -323,8 +323,6 @@ pypandoc download --target /usr/local/bin
 
 ## Related
 
-* [pydocverter](https://github.com/msabramo/pydocverter) is a client for a service called
-[Docverter](https://www.docverter.com), which offers pandoc as a service (plus some extra goodies).
 * See [pyandoc](https://pypi.python.org/pypi/pyandoc/) for an alternative implementation of a pandoc
 wrapper from Kenneth Reitz. This one hasn't been active in a while though.
 * See [panflute](https://github.com/sergiocorreia/panflute) which provides `convert_text` similar to pypandoc's. Its focus is on writing and running pandoc filters though.
