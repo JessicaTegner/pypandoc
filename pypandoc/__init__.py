@@ -317,7 +317,9 @@ def _is_network_path(source):
 
 
 def _identify_format_from_path(sourcefile: str, format: str) -> str:
-    return format or os.path.splitext(sourcefile)[1].strip(".")
+    # Pandoc format names are lowercase, so normalize the detected
+    # extension: "README.MD" must resolve to "markdown", not "MD".
+    return format or os.path.splitext(sourcefile)[1].strip(".").lower()
 
 
 def normalize_format(fmt):
