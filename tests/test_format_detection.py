@@ -14,9 +14,7 @@ class TestIdentifyFormatFromPath(unittest.TestCase):
         self.assertEqual(pypandoc.normalize_format(detected), "markdown")
 
     def test_lowercase_extension_unchanged(self):
-        self.assertEqual(
-            pypandoc._identify_format_from_path("doc.md", None), "md"
-        )
+        self.assertEqual(pypandoc._identify_format_from_path("doc.md", None), "md")
 
     def test_explicit_format_takes_precedence(self):
         self.assertEqual(
